@@ -7,57 +7,54 @@ from annif_client import AnnifClient
 import os.path
 
 
-DIR = os.path.realpath(__file__)
+DIR = os.path.dirname(__file__)
 
 
 class _Utility:
     """ A collection of utility functions. """
 
     @classmethod
-    def load_json(cls, folder: str, filename: str) -> list:
+    def load_json(cls, file_path: str) -> list:
         """ Load a JSON object from file.
 
-        :param folder: the path to the folder
-        :param filename: the name of the file
+        :param file_path: complete path to file including filename and extension
         """
 
-        filename = folder + f"{filename}.json"
-
-        with open(filename, encoding="utf-8") as file:
+        with open(file_path, encoding="utf-8") as file:
             loaded = load(file)
 
             return loaded
 
     @classmethod
-    def save_json(cls, data: List[Dict], folder: str = None, filename: str = None) -> None:
+    def save_json(cls, data: List[Dict], file_path: str) -> None:
         """ Save data as JSON file.
 
         :param data: the data to be saved
-        :param folder: complete folder path, defaults to None
-        :param filename: the name of the file, defaults to None
+        :param file_path: complete path to file including filename and extension
         """
 
-        if filename is None:
-            filename = str(datetime.now()).split(".")[0].replace(":", "-")
-
-        if folder is None:
-            full_filename = f"{filename}.json"
-        else:
-            full_filename = folder + f"{filename}.json"
-
-        with open(full_filename, "w") as file:
+        with open(file_path, "w") as file:
             dump(data, file)
 
     @classmethod
-    def split_json(cls, folder: str, filename: str) -> None:
-        """ Split a JSON file into pieces not larger than 100MB.
+    def split_json(cls, file_path: str, save_path: str) -> None:
+        """ Split a JSON file into files not larger than 100MB.
 
-        :param folder: the path to the folder
-        :param filename: the name of the file
+        :param file_path: complete path to file including filename and extension
+        save_path: complete path to save folder including filename without extension
         """
 
-        pass
+        size = int(os.path.getsize(file_path)/(1024*1024))
+        print(f"{file_path} is {size} MB")
 
+        if size > 99:
+            data = cls.load_json(file_path)
+            maximum = len(data)
+            position = 0
+            while position < maximum:
+                json_slice = data[position:position + 5000]
+                cls.save_json(json_slice, DIR + f"{save_path}_{position}-{position + 5000}.json")
+                position = position + 5000
 
 
 class _Data:
@@ -103,23 +100,23 @@ class _Data:
         print(f"Items in data: {len(data)}")
 
 
-def select(filename: str, *fields: str) -> None:
-    """ Select items with fields from (raw) edoc file.
+def select(file_path: str, *fields: str) -> None:
+    """ Select items from file according to fields.
 
-    :param filename: the name of the raw edoc file
+    :param file_path: complete path to file including filename and extension
     :param fields: the required fields for an item to be selected
     """
 
-    data = _Utility.load_json("raw/", filename)
-    print(f"{filename} loaded")
+    data = _Utility.load_json(file_path)
+    print(f"{file_path} loaded")
     selected = _Data.select_items(data, *fields)
     print(f"Items selected")
-    folder = DIR + "/selected"
-    _Utility.save_json(selected, folder)
+    save_file_path = DIR + "/selected/" + str(datetime.now()).split(".")[0].replace(":", "-").replace(" ", "-")
+    _Utility.save_json(selected, save_file_path)
 
-
-# select("1900-2020", "title", "abstract", "keywords", "id_number")
-
+print(DIR)
+select(DIR + "/raw/2019.json", "title", "abstract", "keywords", "id_number")
+exit()
 
 def index(filename: str):
     data = _Utility.load_json("selected/", filename)
