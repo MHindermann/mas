@@ -4,6 +4,11 @@ from json import load, dump
 from datetime import datetime
 from annif_client import AnnifClient
 
+import os.path
+
+
+DIR = os.path.realpath(__file__)
+
 
 class _Utility:
     """ A collection of utility functions. """
@@ -42,6 +47,17 @@ class _Utility:
 
         with open(full_filename, "w") as file:
             dump(data, file)
+
+    @classmethod
+    def split_json(cls, folder: str, filename: str) -> None:
+        """ Split a JSON file into pieces not larger than 100MB.
+
+        :param folder: the path to the folder
+        :param filename: the name of the file
+        """
+
+        pass
+
 
 
 class _Data:
@@ -94,18 +110,19 @@ def select(filename: str, *fields: str) -> None:
     :param fields: the required fields for an item to be selected
     """
 
-    data = _Utility.load_json("edoc/raw/", filename)
+    data = _Utility.load_json("raw/", filename)
     print(f"{filename} loaded")
     selected = _Data.select_items(data, *fields)
     print(f"Items selected")
-    _Utility.save_json(selected)  # TODO: correct output path
+    folder = DIR + "/selected"
+    _Utility.save_json(selected, folder)
 
 
 # select("1900-2020", "title", "abstract", "keywords", "id_number")
 
 
 def index(filename: str):
-    data = _Utility.load_json("edoc/selected/", filename)
+    data = _Utility.load_json("selected/", filename)
 
     client = AnnifClient()
     for item in data:
