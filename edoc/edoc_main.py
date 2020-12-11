@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import List, Optional, Dict, Union, Tuple
 from json import load, dump
 from datetime import datetime
+from time import sleep
 from annif_client import AnnifClient
 
 import os.path
@@ -41,7 +42,7 @@ class _Utility:
         """ Split a JSON file into files not larger than 100MB.
 
         :param file_path: complete path to file including filename and extension
-        save_path: complete path to save folder including filename without extension
+        :param save_path: complete path to save folder including filename without extension
         """
 
         size = int(os.path.getsize(file_path)/(1024*1024))
@@ -103,6 +104,8 @@ class _Data:
 def select(file_path: str, *fields: str) -> None:
     """ Select items from file according to fields.
 
+    For example: select(DIR + "/raw/2019.json", "title", "abstract", "keywords", "id_number")
+
     :param file_path: complete path to file including filename and extension
     :param fields: the required fields for an item to be selected
     """
@@ -114,16 +117,68 @@ def select(file_path: str, *fields: str) -> None:
     save_file_path = DIR + "/selected/" + str(datetime.now()).split(".")[0].replace(":", "-").replace(" ", "-")
     _Utility.save_json(selected, save_file_path)
 
-print(DIR)
-select(DIR + "/raw/2019.json", "title", "abstract", "keywords", "id_number")
-exit()
 
-def index(filename: str):
-    data = _Utility.load_json("selected/", filename)
+def index(file_path: str,
+          save_path: str,
+          project_id: str,
+          abstract: bool = False,
+          fulltext: bool = False,
+          limit: int = None,
+          threshold: int = None) -> None:
+    """ Index items of file with Annif-client.
 
+    Project IDs are yso-en, yso-maui-en, yso-bonsai-en, yso-fasttext-en, tfidf, wikidata-en, fasttext.
+
+    :param file_path: complete path to file including filename and extension
+    :param save_path: complete path to save folder including filename without extension
+    :param project_id: Annif-client project ID
+    :param abstract: use abstract for indexing, defaults to False
+    :param fulltext: use fulltext for indexing, defaults to False
+    :param limit: Annif-client limit, defaults to None
+    :param threshold: Annif-client threshold, defaults to None
+    """
+
+    data = _Utility.load_json(file_path)
     client = AnnifClient()
-    for item in data:
-        print(client.suggest(project_id="yso-en", text=item.get("title")))
-        break
+    modified_data = []
 
-#index("selected_master")
+    for item in data:
+
+        # make deep copy of item:
+        modified_item = dict(item)
+
+        # make text to be indexed:
+        text = modified_item.get("title")
+        if abstract is True:
+            text = text + " " + modified_item.get("abstract")
+        if fulltext is True:
+            pass
+            # TODO: add fulltext support
+
+        # make name for indexing:
+        name = f"{project_id}-{str(abstract)}-{str(fulltext)}-{str(threshold)}-{str(limit)}"
+
+        # check if item has annif-component:
+        if "annif" in modified_item:
+            if name in modified_item.get("annif"):
+                print(f"WARNING: {name} is already available and is currently being overridden!")
+        else:
+            modified_item["annif"] = dict()
+
+        # indexing:
+        results = client.suggest(project_id=project_id, text=text, threshold=threshold, limit=limit)
+
+        # add results to item:
+        modified_item["annif"][name] = results
+
+        # add item to output:
+        modified_data.append(modified_item)
+
+    _Utility.save_json(modified_data, save_path)
+
+
+index(file_path=DIR+"/selected/selected_master.json",
+      save_path=f"{DIR}/indexed/indexed_working_{str(datetime.now()).split('.')[0].replace(':', '-').replace(' ', '-')}.json",
+      project_id="yso-maui-en",
+      abstract=True)
+
