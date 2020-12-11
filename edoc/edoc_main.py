@@ -120,7 +120,7 @@ def select(file_path: str, *fields: str) -> None:
 
 def index(file_path: str,
           save_path: str,
-          project_id: str,
+          project_ids: List[str],
           abstract: bool = False,
           fulltext: bool = False,
           limit: int = None,
@@ -131,7 +131,7 @@ def index(file_path: str,
 
     :param file_path: complete path to file including filename and extension
     :param save_path: complete path to save folder including filename without extension
-    :param project_id: Annif-client project ID
+    :param project_ids: Annif-client project IDs to be used
     :param abstract: use abstract for indexing, defaults to False
     :param fulltext: use fulltext for indexing, defaults to False
     :param limit: Annif-client limit, defaults to None
@@ -155,21 +155,23 @@ def index(file_path: str,
             pass
             # TODO: add fulltext support
 
-        # make name for indexing:
-        name = f"{project_id}-{str(abstract)}-{str(fulltext)}-{str(threshold)}-{str(limit)}"
+        for project_id in project_ids:
 
-        # check if item has annif-component:
-        if "annif" in modified_item:
-            if name in modified_item.get("annif"):
-                print(f"WARNING: {name} is already available and is currently being overridden!")
-        else:
-            modified_item["annif"] = dict()
+            # make name for indexing:
+            name = f"{project_id}-{str(abstract)}-{str(fulltext)}-{str(threshold)}-{str(limit)}"
 
-        # indexing:
-        results = client.suggest(project_id=project_id, text=text, threshold=threshold, limit=limit)
+            # check if item has annif-component:
+            if "annif" in modified_item:
+                if name in modified_item.get("annif"):
+                    print(f"WARNING: {name} is already available and is currently being overridden!")
+            else:
+                modified_item["annif"] = dict()
 
-        # add results to item:
-        modified_item["annif"][name] = results
+            # indexing:
+            results = client.suggest(project_id=project_id, text=text, threshold=threshold, limit=limit)
+
+            # add results to item:
+            modified_item["annif"][name] = results
 
         # add item to output:
         modified_data.append(modified_item)
@@ -179,6 +181,6 @@ def index(file_path: str,
 
 index(file_path=DIR+"/selected/selected_master.json",
       save_path=f"{DIR}/indexed/indexed_working_{str(datetime.now()).split('.')[0].replace(':', '-').replace(' ', '-')}.json",
-      project_id="yso-maui-en",
+      project_ids=["yso-en", "yso-maui-en", "yso-bonsai-en", "yso-fasttext-en", "wikidata-en"],
       abstract=True)
 
