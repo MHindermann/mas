@@ -62,8 +62,8 @@ class _Data:
     """ A collection of data functions. """
 
     @classmethod
-    def select_items(cls, data: List[Dict], *fields: str) -> List[Dict]:
-        """ Select items based on fields from (raw) edoc data.
+    def select_from_data(cls, data: List[Dict], *fields: str) -> List[Dict]:
+        """ Select items from data based on fields.
 
         :param data: the input data from edoc
         :param fields: the required fields for an item to be selected
@@ -80,6 +80,23 @@ class _Data:
                 selected.append(item)
 
         return selected
+
+    @classmethod
+    def select_from_file(cls, file_path: str, *fields: str) -> None:
+        """ Select items from file according to fields.
+
+        For example: select(DIR + "/raw/2019.json", "title", "abstract", "keywords", "id_number")
+
+        :param file_path: complete path to file including filename and extension
+        :param fields: the required fields for an item to be selected
+        """
+
+        data = _Utility.load_json(file_path)
+        print(f"{file_path} loaded")
+        selected = _Data.select_from_data(data, *fields)
+        print(f"Items selected")
+        save_file_path = DIR + "/selected/" + str(datetime.now()).split(".")[0].replace(":", "-").replace(" ", "-")
+        _Utility.save_json(selected, save_file_path)
 
     @classmethod
     def inspect(cls, data: List[Dict], *fields: str) -> None:
@@ -100,87 +117,83 @@ class _Data:
 
         print(f"Items in data: {len(data)}")
 
+    @classmethod
+    def do_indexing(cls, file_path: str,
+                    save_path: str,
+                    project_ids: List[str],
+                    abstract: bool = False,
+                    fulltext: bool = False,
+                    limit: int = None,
+                    threshold: int = None) -> None:
+        """ Index items of file with Annif-client.
 
-def select(file_path: str, *fields: str) -> None:
-    """ Select items from file according to fields.
+        Available Annif-client project IDs are yso-en, yso-maui-en, yso-bonsai-en, yso-fasttext-en, wikidata-en.
 
-    For example: select(DIR + "/raw/2019.json", "title", "abstract", "keywords", "id_number")
+        :param file_path: complete path to file including filename and extension
+        :param save_path: complete path to save folder including filename without extension
+        :param project_ids: Annif-client project IDs to be used
+        :param abstract: toggle use abstract for indexing, defaults to False
+        :param fulltext: toggle use fulltext for indexing, defaults to False
+        :param limit: Annif-client limit, defaults to None
+        :param threshold: Annif-client threshold, defaults to None
+        """
 
-    :param file_path: complete path to file including filename and extension
-    :param fields: the required fields for an item to be selected
-    """
+        data = _Utility.load_json(file_path)
+        client = AnnifClient()
+        modified_data = []
 
-    data = _Utility.load_json(file_path)
-    print(f"{file_path} loaded")
-    selected = _Data.select_items(data, *fields)
-    print(f"Items selected")
-    save_file_path = DIR + "/selected/" + str(datetime.now()).split(".")[0].replace(":", "-").replace(" ", "-")
-    _Utility.save_json(selected, save_file_path)
+        for item in data:
 
+            # make deep copy of item:
+            modified_item = dict(item)
 
-def index(file_path: str,
-          save_path: str,
-          project_ids: List[str],
-          abstract: bool = False,
-          fulltext: bool = False,
-          limit: int = None,
-          threshold: int = None) -> None:
-    """ Index items of file with Annif-client.
+            # make text to be indexed:
+            text = modified_item.get("title")
+            if abstract is True:
+                text = text + " " + modified_item.get("abstract")
+            if fulltext is True:
+                pass
+                # TODO: add fulltext support
 
-    Project IDs are yso-en, yso-maui-en, yso-bonsai-en, yso-fasttext-en, tfidf, wikidata-en, fasttext.
+            for project_id in project_ids:
 
-    :param file_path: complete path to file including filename and extension
-    :param save_path: complete path to save folder including filename without extension
-    :param project_ids: Annif-client project IDs to be used
-    :param abstract: use abstract for indexing, defaults to False
-    :param fulltext: use fulltext for indexing, defaults to False
-    :param limit: Annif-client limit, defaults to None
-    :param threshold: Annif-client threshold, defaults to None
-    """
+                # make name for indexing:
+                name = f"{project_id}-{str(abstract)}-{str(fulltext)}-{str(threshold)}-{str(limit)}"
 
-    data = _Utility.load_json(file_path)
-    client = AnnifClient()
-    modified_data = []
+                # check if item has annif-component:
+                if "annif" in modified_item:
+                    if name in modified_item.get("annif"):
+                        print(f"WARNING: {name} is already available and is currently being overridden!")
+                else:
+                    modified_item["annif"] = dict()
 
-    for item in data:
+                # actual indexing via Annif-client:
+                results = client.suggest(project_id=project_id, text=text, threshold=threshold, limit=limit)
 
-        # make deep copy of item:
-        modified_item = dict(item)
+                # add results to item:
+                modified_item["annif"][name] = results
 
-        # make text to be indexed:
-        text = modified_item.get("title")
-        if abstract is True:
-            text = text + " " + modified_item.get("abstract")
-        if fulltext is True:
-            pass
-            # TODO: add fulltext support
+            # add item to output:
+            modified_data.append(modified_item)
 
-        for project_id in project_ids:
-
-            # make name for indexing:
-            name = f"{project_id}-{str(abstract)}-{str(fulltext)}-{str(threshold)}-{str(limit)}"
-
-            # check if item has annif-component:
-            if "annif" in modified_item:
-                if name in modified_item.get("annif"):
-                    print(f"WARNING: {name} is already available and is currently being overridden!")
-            else:
-                modified_item["annif"] = dict()
-
-            # indexing:
-            results = client.suggest(project_id=project_id, text=text, threshold=threshold, limit=limit)
-
-            # add results to item:
-            modified_item["annif"][name] = results
-
-        # add item to output:
-        modified_data.append(modified_item)
-
-    _Utility.save_json(modified_data, save_path)
+        _Utility.save_json(modified_data, save_path)
 
 
-index(file_path=DIR+"/selected/selected_master.json",
-      save_path=f"{DIR}/indexed/indexed_working_{str(datetime.now()).split('.')[0].replace(':', '-').replace(' ', '-')}.json",
-      project_ids=["yso-en", "yso-maui-en", "yso-bonsai-en", "yso-fasttext-en", "wikidata-en"],
-      abstract=True)
+class App:
+    """ Public functions. """
 
+    @classmethod
+    def do_super_indexing(cls, abstract: bool) -> None:
+        """ Index items of file with all Annif-client projects.
+
+        :param abstract: toggle use abstract for indexing
+        """
+
+        file_path = DIR + "/selected/selected_master.json"
+        save_path = f"{DIR}/indexed/indexed_working_{str(datetime.now()).split('.')[0].replace(':', '-').replace(' ', '-')}.json"
+        project_ids = ["yso-en", "yso-maui-en", "yso-bonsai-en", "yso-fasttext-en", "wikidata-en"]
+
+        _Data.do_indexing(file_path=file_path, save_path=save_path, project_ids=project_ids, abstract=abstract)
+
+
+App.do_super_indexing(abstract=False)
