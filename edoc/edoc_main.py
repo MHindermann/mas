@@ -181,6 +181,40 @@ class _Data:
         _Utility.save_json(modified_data, save_path)
 
 
+    @classmethod
+    def extract_keywords(cls, file_path) -> List[str]:
+        """ Extract keywords from file.
+
+        :param file_path: complete path to file including filename and extension
+        """
+        data = _Utility.load_json(file_path)
+        keywords = []
+        for item in data:
+            keywords.append(item.get("keywords"))
+
+        return keywords
+
+    @classmethod
+    def clean_keywords(cls, keywords: List[str]) -> List[str]:
+        """ Blah.
+
+        :param keywords: blah
+        """
+
+        clean = []
+        for item in keywords:
+            try:
+                if ";" in item:
+                    temp = item.split(";")
+                else:
+                    temp = item.split(",")
+                for keyword in temp:
+                    clean.append(keyword.strip())
+            except TypeError:
+                pass
+        return clean
+
+
 class App:
     """ Public functions. """
 
@@ -198,4 +232,7 @@ class App:
         _Data.do_indexing(file_path=file_path, save_path=save_path, project_ids=project_ids, abstract=abstract)
 
 
-App.do_super_indexing(abstract=False)
+file_path = DIR + "/indexed/indexed_master.json"
+keywords = _Data.extract_keywords(file_path)
+clean = _Data.clean_keywords(keywords)
+print(clean)
