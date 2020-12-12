@@ -2,7 +2,6 @@ from __future__ import annotations
 from typing import List, Optional, Dict, Union, Tuple
 from json import load, dump
 from datetime import datetime
-from time import sleep
 from annif_client import AnnifClient
 
 import os.path
@@ -144,6 +143,9 @@ class _Data:
 
         for item in data:
 
+            # sanity check:
+            print(item.get("title"))
+
             # make deep copy of item:
             modified_item = dict(item)
 
@@ -189,7 +191,7 @@ class App:
         :param abstract: toggle use abstract for indexing
         """
 
-        file_path = DIR + "/selected/selected_master.json"
+        file_path = DIR + "/indexed/indexed_master.json"
         save_path = f"{DIR}/indexed/indexed_working_{str(datetime.now()).split('.')[0].replace(':', '-').replace(' ', '-')}.json"
         project_ids = ["yso-en", "yso-maui-en", "yso-bonsai-en", "yso-fasttext-en", "wikidata-en"]
 
