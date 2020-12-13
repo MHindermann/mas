@@ -214,6 +214,14 @@ class _Data:
                 pass
         return clean
 
+        # TODO:
+        # 1. Cases like Breast Neoplasms/*diagnosis/genetics/*pathology
+        # 2. Cases like Biodiversity – Carbon – Carbon sequestration – Climate change mitigation – Ecosystem services – Habitat conservation
+        # 3. Make output lowercase
+        # 4. Make histogram
+        # 5. Make version w/out duplicates
+        # 6. Cases like CA1 Region, Hippocampal/metabolism (after first pass, so basically nested comma)
+
 
 class App:
     """ Public functions. """
@@ -235,4 +243,4 @@ class App:
 file_path = DIR + "/indexed/indexed_master.json"
 keywords = _Data.extract_keywords(file_path)
 clean = _Data.clean_keywords(keywords)
-print(clean)
+_Utility.save_json(clean, DIR + "/keywords.json")
