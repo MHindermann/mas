@@ -26,7 +26,7 @@ class _Utility:
             return loaded
 
     @classmethod
-    def save_json(cls, data: List[Dict], file_path: str) -> None:
+    def save_json(cls, data: Union[List, Dict], file_path: str) -> None:
         """ Save data as JSON file.
 
         :param data: the data to be saved
@@ -180,7 +180,6 @@ class _Data:
 
         _Utility.save_json(modified_data, save_path)
 
-
     @classmethod
     def extract_keywords(cls, file_path) -> List[str]:
         """ Extract keywords from file.
@@ -195,32 +194,88 @@ class _Data:
         return keywords
 
     @classmethod
-    def clean_keywords(cls, keywords: List[str]) -> List[str]:
-        """ Blah.
+    def clean_keywords(cls, keywords_per_article: List[str]) -> List[str]:
+        """ Turn a list of edoc keywords per article into a clean list of keywords.
 
-        :param keywords: blah
+        Note that the keywords per article come as string!
+
+        :param keywords_per_article: the edoc keywords
         """
 
         clean = []
-        for item in keywords:
+        for keywords in keywords_per_article:
             try:
-                if ";" in item:
-                    temp = item.split(";")
+                # generate distinct keywords from string:
+                if ";" in keywords:
+                    keywords = keywords.split(";")
+                elif "–" in keywords:
+                    keywords = keywords.split("-")
                 else:
-                    temp = item.split(",")
-                for keyword in temp:
-                    clean.append(keyword.strip())
+                    keywords = keywords.split(",")
+                # clean keywords:
+                for keyword in keywords:
+                    clean = clean + cls.clean_keyword(keyword)
             except TypeError:
-                pass
+                print(f"TypeError with {keywords}")
         return clean
 
-        # TODO:
-        # 1. Cases like Breast Neoplasms/*diagnosis/genetics/*pathology
-        # 2. Cases like Biodiversity – Carbon – Carbon sequestration – Climate change mitigation – Ecosystem services – Habitat conservation
-        # 3. Make output lowercase
-        # 4. Make histogram
-        # 5. Make version w/out duplicates
-        # 6. Cases like CA1 Region, Hippocampal/metabolism (after first pass, so basically nested comma)
+    @classmethod
+    def clean_keyword(cls, keyword: str) -> List[str]:
+        """ Clean an edoc keyword.
+
+        :param keyword: the edoc keyword
+        """
+
+        clean = []
+        # make lower case:
+        keyword = keyword.lower()
+        # remove *:
+        keyword = keyword.replace("*", "")
+        # remove whitespace:
+        keyword = keyword.strip()
+
+        new_keywords = []
+        if "," in keyword:
+            new_keywords = keyword.split(",")
+        elif "/" in keyword:
+            new_keywords = keyword.split("/")
+        elif ":" in keyword:
+            new_keywords = keyword.split(":")
+
+        if len(new_keywords) > 0:
+            for new_keyword in new_keywords:
+                clean = clean + cls.clean_keyword(new_keyword)
+            return clean
+        else:
+            clean.append(keyword)
+            return clean
+
+    @classmethod
+    def make_histogram(cls, keywords: List[str]) -> List[Dict]:
+        """ Make a histogram for keywords.
+
+        :param keywords: the keywords
+        """
+        histogram = dict()
+        for keyword in keywords:
+            if keyword in histogram:
+                histogram[keyword] = histogram[keyword] + 1
+            else:
+                histogram[keyword] = 1
+
+        openrefine_histogram = []
+        for entry in histogram:
+            openrefine_histogram.append({"keyword": entry, "occurences": histogram.get(entry)})
+
+        return openrefine_histogram
+
+
+file_path = DIR + "/keywords/keywords_raw.json"
+keywords = _Utility.load_json(file_path)
+histogram = _Data.make_histogram(keywords)
+file_path = DIR + "/keywords/keywords_raw_histogram.json"
+_Utility.save_json(histogram, file_path)
+exit()
 
 
 class App:
