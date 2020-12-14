@@ -265,7 +265,7 @@ class _Data:
 
         openrefine_histogram = []
         for entry in histogram:
-            openrefine_histogram.append({"keyword": entry, "occurences": histogram.get(entry)})
+            openrefine_histogram.append({"keyword": entry, "occurrences": histogram.get(entry)})
 
         return openrefine_histogram
 
