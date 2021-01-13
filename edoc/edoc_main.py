@@ -241,6 +241,9 @@ class _Data:
             new_keywords = keyword.split("/")
         elif ":" in keyword:
             new_keywords = keyword.split(":")
+        # untested but required
+        elif "&" in keyword:
+            new_keywords = keyword.split("&")
 
         if len(new_keywords) > 0:
             for new_keyword in new_keywords:
