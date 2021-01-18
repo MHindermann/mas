@@ -3,8 +3,9 @@ from typing import List, Optional, Dict, Union, Tuple
 from json import load, dump
 from datetime import datetime
 from annif_client import AnnifClient
-
 import os.path
+import urllib3
+import xmltodict
 
 
 DIR = os.path.dirname(__file__)
@@ -118,6 +119,7 @@ class _Data:
 
         print(f"Items in data: {len(data)}")
 
+    # TODO: perhaps put keyword functions into own class
     @classmethod
     def extract_keywords(cls, file_path) -> List[str]:
         """ Extract keywords per item from file.
@@ -208,14 +210,58 @@ class _Data:
 
         return openrefine_histogram
 
+
+class _Keywords:
+    """ A collection of functions for manipulating edoc keywords. """
+
     @classmethod
-    def fetch_mesh(cls):
-        pass
+    def enrich_with_mesh(cls, file_path: str):
+        """ Text.
 
-        # open the json file
-        # iterate through articles; check if article has the value "pmid" in the "_ - id_number - _ - type"-field
-        # if yes, take the value from "_ - id_number - _ - id"-field to construct efetch-query
+        :param file_path: complete path to file including filename and extension
+        """
 
+        data = _Utility.load_json(file_path)
+        print(f"{file_path} loaded")
+
+        counter = 0
+
+        for item in data:
+            identifiers = item.get("id_number") # identifiers is list of dict
+            for identifier in identifiers:
+                if identifier.get("type") == "pmid":
+                    pmid_id = identifier.get("id")
+                    print(pmid_id)
+                    break
+            if counter > 20:
+                break
+            counter = counter + 1
+
+    @classmethod
+    def fetch_mesh(cls, pubmed_id: str) -> Dict:
+        """ Fetch MeSH keywords for article based on PubMed ID.
+
+        :param pubmed_id: article PubMed ID
+        """
+
+        mesh = dict()
+
+        http = urllib3.PoolManager()
+        url = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id={pubmed_id}&retmode=xml"
+        response = http.request('GET', url)
+        article = xmltodict.parse(response.data)
+        try:
+            for item in article["PubmedArticleSet"]["PubmedArticle"]["MedlineCitation"]["MeshHeadingList"]["MeshHeading"]:
+                mesh[item["DescriptorName"]["@UI"]] = item["DescriptorName"]["#text"]
+        except TypeError:
+            pass
+
+        return mesh
+
+print(_Keywords.fetch_mesh("3030142"))
+
+exit()
+_Keywords.enrich_with_mesh(DIR + "/indexed/indexed_testfile.json")
 
 class _Annif:
 
