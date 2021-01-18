@@ -215,36 +215,52 @@ class _Keywords:
     """ A collection of functions for manipulating edoc keywords. """
 
     @classmethod
-    def enrich_with_mesh(cls, file_path: str):
-        """ Text.
+    def enrich_with_mesh(cls,
+                         file_path: str,
+                         save_path: str):
+        """ Enrich edoc data per item with MeSH keywords from PubMed if available.
 
         :param file_path: complete path to file including filename and extension
+        :param save_path: complete path to save folder including filename without extension
         """
 
         data = _Utility.load_json(file_path)
-        print(f"{file_path} loaded")
-
+        modified_data = []
         counter = 0
 
         for item in data:
-            identifiers = item.get("id_number") # identifiers is list of dict
+
+            # sanity check:
+            print(item.get("title"))
+
+            # make deep copy of item:
+            modified_item = dict(item)
+
+            # find PubMed ID if available
+            identifiers = modified_item.get("id_number") # identifiers is list of dict
             for identifier in identifiers:
+                if counter > 100:
+                    break
                 if identifier.get("type") == "pmid":
                     pmid_id = identifier.get("id")
-                    print(pmid_id)
-                    break
-            if counter > 20:
-                break
-            counter = counter + 1
+
+                    # add MeSH based on PubMed ID:
+                    mesh = cls.fetch_mesh(pmid_id)
+                    modified_item["mesh"] = mesh
+                counter = counter + 1
+            # add modified item to output:
+            modified_data.append(modified_item)
+
+        _Utility.save_json(modified_data, save_path + ".json")
 
     @classmethod
-    def fetch_mesh(cls, pubmed_id: str) -> Dict:
+    def fetch_mesh(cls, pubmed_id: str) -> List[Dict]:
         """ Fetch MeSH keywords for article based on PubMed ID.
 
         :param pubmed_id: article PubMed ID
         """
 
-        mesh = dict()
+        mesh = []
 
         http = urllib3.PoolManager()
         url = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id={pubmed_id}&retmode=xml"
@@ -252,12 +268,16 @@ class _Keywords:
         article = xmltodict.parse(response.data)
         try:
             for item in article["PubmedArticleSet"]["PubmedArticle"]["MedlineCitation"]["MeshHeadingList"]["MeshHeading"]:
-                mesh[item["DescriptorName"]["@UI"]] = item["DescriptorName"]["#text"]
-        except TypeError:
+                mesh.append({"MeSH descriptor ID": item["DescriptorName"]["@UI"], "MeSH label": item["DescriptorName"]["#text"]})
+        except (TypeError, KeyError):
             pass
 
         return mesh
 
+
+_Keywords.enrich_with_mesh(DIR + "/indexed/indexed_testfile.json", DIR + "/indexed/indexed_testfile_mesh")
+
+exit()
 print(_Keywords.fetch_mesh("3030142"))
 
 exit()
@@ -326,7 +346,7 @@ class _Annif:
                 # add results to item:
                 modified_item["annif"][name] = results
 
-            # add item to output:
+            # add modified item to output:
             modified_data.append(modified_item)
 
         _Utility.save_json(modified_data, save_path)
