@@ -400,7 +400,8 @@ elsewhere).
 resulting file is indexed_master.json saved in edoc/index. 
 
 9. We enrich the selected items with MeSH keywords from PubMed if available (item needs a PubMed ID and items needs to
-be indexed with MeSH on PubMed, 1653 items match this requirement); the resulting file is indexed_master_mesh.json. Like so: 
+be indexed with MeSH on PubMed, 1653 items match this requirement); the resulting file is indexed_master_mesh.json. Like 
+so: 
 _Keywords.enrich_with_mesh(DIR + "/indexed/indexed_master.json", DIR + "/indexed/indexed_master_mesh")
 """
 
