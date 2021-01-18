@@ -274,11 +274,6 @@ class _Keywords:
 
 _Keywords.enrich_with_mesh(DIR + "/indexed/indexed_testfile.json", DIR + "/indexed/indexed_testfile_mesh")
 
-exit()
-print(_Keywords.fetch_mesh("3030142"))
-
-exit()
-_Keywords.enrich_with_mesh(DIR + "/indexed/indexed_testfile.json")
 
 class _Annif:
 
@@ -403,11 +398,15 @@ elsewhere).
 
 8. We index the selected items with _Annif.super_make_index. How this works exactly is explained elsewhere. The 
 resulting file is indexed_master.json saved in edoc/index. 
+
+9. We enrich the selected items with MeSH keywords from PubMed if available (item needs a PubMed ID and items needs to
+be indexed with MeSH on PubMed, 1653 items match this requirement); the resulting file is indexed_master_mesh.json. Like so: 
+_Keywords.enrich_with_mesh(DIR + "/indexed/indexed_master.json", DIR + "/indexed/indexed_master_mesh")
 """
 
 #TODO:
 """
-9. For each set of keywords and article in selected_master.json, map each keyword to its corresponding keyword in 
+A. For each set of keywords and article in selected_master.json, map each keyword to its corresponding keyword in 
 keywords_clean_histogram.json. This is required so that we can compute precision and recall. To dos so, we require both 
 the concept and its URI.
 
