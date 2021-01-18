@@ -58,13 +58,15 @@ class _Utility:
 
 
 class _Data:
-    """ A collection of data functions. """
+    """ A collection of edoc data functions. """
 
     @classmethod
     def select_from_data(cls, data: List[Dict], *fields: str) -> List[Dict]:
         """ Select items from data based on fields.
 
-        :param data: the input data from edoc
+        Only items with all required fields are selected.
+
+        :param data: the input data
         :param fields: the required fields for an item to be selected
         """
 
@@ -118,7 +120,7 @@ class _Data:
 
     @classmethod
     def extract_keywords(cls, file_path) -> List[str]:
-        """ Extract keywords per article from file.
+        """ Extract keywords per item from file.
 
         :param file_path: complete path to file including filename and extension
         """
@@ -130,16 +132,14 @@ class _Data:
         return keywords
 
     @classmethod
-    def clean_keywords(cls, keywords_per_article: List[str]) -> List[str]:
-        """ Turn a list of edoc keywords per article into a clean list of keywords.
+    def clean_keywords(cls, keywords_per_item: str) -> List[str]:
+        """ Turn a list of keywords per item into a clean list of keywords.
 
-        Note that the keywords per article come as string!
-
-        :param keywords_per_article: the edoc keywords
+        :param keywords_per_item: the keywords
         """
 
         clean = []
-        for keywords in keywords_per_article:
+        for keywords in keywords_per_item:
             try:
                 # generate distinct keywords from string:
                 if ";" in keywords:
@@ -157,9 +157,9 @@ class _Data:
 
     @classmethod
     def clean_keyword(cls, keyword: str) -> List[str]:
-        """ Clean an edoc keyword.
+        """ Clean a keyword.
 
-        :param keyword: the edoc keyword
+        :param keyword: the keyword
         """
 
         clean = []
@@ -207,6 +207,14 @@ class _Data:
             openrefine_histogram.append({"keyword": entry, "occurrences": histogram.get(entry)})
 
         return openrefine_histogram
+
+    @classmethod
+    def fetch_mesh(cls):
+        pass
+
+        # open the json file
+        # iterate through articles; check if article has the value "pmid" in the "_ - id_number - _ - type"-field
+        # if yes, take the value from "_ - id_number - _ - id"-field to construct efetch-query
 
 
 class _Annif:
@@ -332,6 +340,12 @@ elsewhere).
 
 8. We index the selected items with _Annif.super_make_index. How this works exactly is explained elsewhere. The 
 resulting file is indexed_master.json saved in edoc/index. 
+"""
 
-9. 
+#TODO:
+"""
+9. For each set of keywords and article in selected_master.json, map each keyword to its corresponding keyword in 
+keywords_clean_histogram.json. This is required so that we can compute precision and recall. To dos so, we require both 
+the concept and its URI.
+
 """
