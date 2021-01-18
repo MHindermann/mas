@@ -226,7 +226,6 @@ class _Keywords:
 
         data = _Utility.load_json(file_path)
         modified_data = []
-        counter = 0
 
         for item in data:
 
@@ -239,15 +238,13 @@ class _Keywords:
             # find PubMed ID if available
             identifiers = modified_item.get("id_number") # identifiers is list of dict
             for identifier in identifiers:
-                if counter > 100:
-                    break
                 if identifier.get("type") == "pmid":
                     pmid_id = identifier.get("id")
 
                     # add MeSH based on PubMed ID:
                     mesh = cls.fetch_mesh(pmid_id)
                     modified_item["mesh"] = mesh
-                counter = counter + 1
+
             # add modified item to output:
             modified_data.append(modified_item)
 
