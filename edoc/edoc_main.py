@@ -63,9 +63,9 @@ class _Data:
 
     @classmethod
     def select_from_data(cls, data: List[Dict], *fields: str) -> List[Dict]:
-        """ Select items from data based on fields.
+        """ Select items from data based on non-empty fields.
 
-        Only items with all required fields are selected.
+        Only items where all required fields are non-empty are selected.
 
         :param data: the input data
         :param fields: the required fields for an item to be selected
@@ -119,11 +119,83 @@ class _Data:
 
         print(f"Items in data: {len(data)}")
 
+    @classmethod
+    def clean_author_keywords(cls,
+                         file_path: str,
+                         save_path: str) -> None:
+        """ Clean and enrich author keywords.
+
+        For each edoc item: the string of author keywords is cut into single keywords and each keyword is cleaned. Each
+        keyword is then enriched with Qid, MeSh and YSO ID if available.
+
+        :param file_path: complete path to file including filename and extension
+        :param save_path: complete path to save folder including filename without extension
+        """
+
+        data = _Utility.load_json(file_path)
+
+
+    @classmethod
+    def enrich_with_mesh(cls,
+                         file_path: str,
+                         save_path: str):
+        """ Enrich edoc data per item with MeSH keywords from PubMed if available.
+
+        :param file_path: complete path to file including filename and extension
+        :param save_path: complete path to save folder including filename without extension
+        """
+
+        data = _Utility.load_json(file_path)
+        modified_data = []
+
+        for item in data:
+
+            # sanity check:
+            print(item.get("title"))
+
+            # make deep copy of item:
+            modified_item = dict(item)
+
+            # find PubMed ID if available
+            identifiers = modified_item.get("id_number") # identifiers is list of dict
+            for identifier in identifiers:
+                if identifier.get("type") == "pmid":
+                    pmid_id = identifier.get("id")
+
+                    # add MeSH based on PubMed ID:
+                    mesh = cls.fetch_mesh(pmid_id)
+                    modified_item["mesh"] = mesh
+
+            # add modified item to output:
+            modified_data.append(modified_item)
+
+        _Utility.save_json(modified_data, save_path + ".json")
+
+    @classmethod
+    def fetch_mesh(cls, pubmed_id: str) -> List[Dict]:
+        """ Fetch MeSH keywords for article based on PubMed ID.
+
+        :param pubmed_id: article PubMed ID
+        """
+
+        mesh = []
+
+        http = urllib3.PoolManager()
+        url = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id={pubmed_id}&retmode=xml"
+        response = http.request('GET', url)
+        article = xmltodict.parse(response.data)
+        try:
+            for item in article["PubmedArticleSet"]["PubmedArticle"]["MedlineCitation"]["MeshHeadingList"]["MeshHeading"]:
+                mesh.append({"MeSH descriptor ID": item["DescriptorName"]["@UI"], "MeSH label": item["DescriptorName"]["#text"]})
+        except (TypeError, KeyError):
+            pass
+
+        return mesh
+
 
 class _Keywords:
-    """ A collection of functions for manipulating edoc keywords. """
+    """ A collection of functions for manipulating edoc author keywords. """
 
-    # TODO: perhaps put keyword functions into own class
     @classmethod
     def extract_keywords(cls, file_path) -> List[str]:
         """ Extract keywords per item from file.
@@ -139,7 +211,7 @@ class _Keywords:
 
     @classmethod
     def clean_keywords(cls, keywords_per_item: str) -> List[str]:
-        """ Turn a list of keywords per item into a clean list of keywords.
+        """ Turn a string of keywords per item into a list of cleaned (=normalized) keywords.
 
         :param keywords_per_item: the keywords
         """
@@ -214,70 +286,13 @@ class _Keywords:
 
         return openrefine_histogram
 
-    @classmethod
-    def enrich_with_mesh(cls,
-                         file_path: str,
-                         save_path: str):
-        """ Enrich edoc data per item with MeSH keywords from PubMed if available.
 
-        :param file_path: complete path to file including filename and extension
-        :param save_path: complete path to save folder including filename without extension
-        """
-
-        data = _Utility.load_json(file_path)
-        modified_data = []
-
-        for item in data:
-
-            # sanity check:
-            print(item.get("title"))
-
-            # make deep copy of item:
-            modified_item = dict(item)
-
-            # find PubMed ID if available
-            identifiers = modified_item.get("id_number") # identifiers is list of dict
-            for identifier in identifiers:
-                if identifier.get("type") == "pmid":
-                    pmid_id = identifier.get("id")
-
-                    # add MeSH based on PubMed ID:
-                    mesh = cls.fetch_mesh(pmid_id)
-                    modified_item["mesh"] = mesh
-
-            # add modified item to output:
-            modified_data.append(modified_item)
-
-        _Utility.save_json(modified_data, save_path + ".json")
-
-    @classmethod
-    def fetch_mesh(cls, pubmed_id: str) -> List[Dict]:
-        """ Fetch MeSH keywords for article based on PubMed ID.
-
-        :param pubmed_id: article PubMed ID
-        """
-
-        mesh = []
-
-        http = urllib3.PoolManager()
-        url = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id={pubmed_id}&retmode=xml"
-        response = http.request('GET', url)
-        article = xmltodict.parse(response.data)
-        try:
-            for item in article["PubmedArticleSet"]["PubmedArticle"]["MedlineCitation"]["MeshHeadingList"]["MeshHeading"]:
-                mesh.append({"MeSH descriptor ID": item["DescriptorName"]["@UI"], "MeSH label": item["DescriptorName"]["#text"]})
-        except (TypeError, KeyError):
-            pass
-
-        return mesh
-
-
-_Keywords.enrich_with_mesh(DIR + "/indexed/indexed_testfile.json", DIR + "/indexed/indexed_testfile_mesh")
+#_Data.enrich_with_mesh(DIR + "/indexed/indexed_testfile.json", DIR + "/indexed/indexed_testfile_mesh")
 
 
 class _Annif:
 
-    """ A collection of Annif indexing function. """
+    """ A collection of Annif indexing functions. """
 
     @classmethod
     def make_index(cls, file_path: str,
@@ -378,12 +393,12 @@ edoc/selected.
 4. We extract the keywords (per entry) from the selected entries with _Keywords.extract_keywords like so:
 keywords = _Keywords.extract_keywords(DIR + "/selected/selected_master.json")
 We the save the resulting list under edoc/keywords as keywords_raw.json like so:
-_Utility.save_json(keywords, DIR + "keywords/keywords_raw.json")
+_Utility.save_json(keywords, DIR + "/keywords/keywords_extracted.json")
 
-5. We clean the extracted keywords with _Keywords.clean_keywords. How and why this is done is explained elsewhere. This is
-done as follows:
-keywords_raw = _Utility.load_json(DIR + "/keywords/keywords_raw.json")
-keywords_clean = _Keywords.clean_keywords(keywords_raw)
+5. We clean the extracted keywords with _Keywords.clean_keywords. How and why this is done is explained elsewhere. This 
+is done as follows:
+keywords_extracted = _Utility.load_json(DIR + "/keywords/keywords_extracted.json")
+keywords_clean = _Keywords.clean_keywords(keywords_extracted)
 We the save the resulting list under edoc/keywords as keywords_clean.json like so:
 _Utility.save_json(clean, DIR + "keywords/keywords_clean.json")
 
@@ -402,7 +417,7 @@ resulting file is indexed_master.json saved in edoc/index.
 9. We enrich the selected items with MeSH keywords from PubMed if available (item needs a PubMed ID and items needs to
 be indexed with MeSH on PubMed, 1653 items match this requirement); the resulting file is indexed_master_mesh.json. Like 
 so: 
-_Keywords.enrich_with_mesh(DIR + "/indexed/indexed_master.json", DIR + "/indexed/indexed_master_mesh")
+_Data.enrich_with_mesh(DIR + "/indexed/indexed_master.json", DIR + "/indexed/indexed_master_mesh")
 """
 
 #TODO:
