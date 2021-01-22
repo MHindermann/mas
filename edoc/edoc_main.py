@@ -232,6 +232,83 @@ class _Data:
 
         return mesh
 
+    @classmethod
+    def enrich_with_annif(cls, file_path: str,
+                   save_path: str,
+                   project_ids: List[str],
+                   abstract: bool = False,
+                   fulltext: bool = False,
+                   limit: int = None,
+                   threshold: int = None) -> None:
+        """ Enrich items from file with automatic keywords using Annif-client.
+
+        Available Annif-client project IDs are yso-en, yso-maui-en, yso-bonsai-en, yso-fasttext-en, wikidata-en.
+
+        :param file_path: complete path to file including filename and extension
+        :param save_path: complete path to save folder including filename without extension
+        :param project_ids: Annif-client project IDs to be used
+        :param abstract: toggle use abstract for indexing, defaults to False
+        :param fulltext: toggle use fulltext for indexing, defaults to False
+        :param limit: Annif-client limit, defaults to None
+        :param threshold: Annif-client threshold, defaults to None
+        """
+
+        data = _Utility.load_json(file_path)
+        client = AnnifClient()
+        modified_data = []
+
+        for item in data:
+
+            # sanity check:
+            print(item.get("title"))
+
+            # make deep copy of item:
+            modified_item = dict(item)
+
+            # make text to be indexed:
+            text = modified_item.get("title")
+            if abstract is True:
+                text = text + " " + modified_item.get("abstract")
+            if fulltext is True:
+                pass
+                # TODO: add fulltext support
+
+            for project_id in project_ids:
+
+                # make name for indexing:
+                name = f"{project_id}-{str(abstract)}-{str(fulltext)}-{str(threshold)}-{str(limit)}"
+
+                # check if item has annif-component:
+                if "annif" in modified_item:
+                    if name in modified_item.get("annif"):
+                        print(f"WARNING: {name} is already available and is currently being overridden!")
+                else:
+                    modified_item["annif"] = dict()
+
+                # actual indexing via Annif-client:
+                results = client.suggest(project_id=project_id, text=text, threshold=threshold, limit=limit)
+
+                # add results to item:
+                modified_item["annif"][name] = results
+
+            # add modified item to output:
+            modified_data.append(modified_item)
+
+        _Utility.save_json(modified_data, save_path)
+
+    @classmethod
+    def super_enrich_with_annif(cls, abstract: bool) -> None:
+        """ Enrich items with automatic keywords using all Annif-client projects.
+
+        :param abstract: toggle use abstract for indexing
+        """
+
+        file_path = DIR + "/indexed/indexed_master.json"
+        save_path = f"{DIR}/indexed/indexed_working_{str(datetime.now()).split('.')[0].replace(':', '-').replace(' ', '-')}.json"
+        project_ids = ["yso-en", "yso-maui-en", "yso-bonsai-en", "yso-fasttext-en", "wikidata-en"]
+
+        _Data.enrich_with_annif(file_path=file_path, save_path=save_path, project_ids=project_ids, abstract=abstract)
+
 
 class _Keywords:
     """ A collection of functions for manipulating edoc author keywords. """
@@ -328,88 +405,6 @@ class _Keywords:
 
         return openrefine_histogram
 
-# TODO: move annif into _Data class
-class _Annif:
-
-    """ A collection of Annif indexing functions. """
-
-    @classmethod
-    def make_index(cls, file_path: str,
-                   save_path: str,
-                   project_ids: List[str],
-                   abstract: bool = False,
-                   fulltext: bool = False,
-                   limit: int = None,
-                   threshold: int = None) -> None:
-        """ Index items of file with Annif-client.
-
-        Available Annif-client project IDs are yso-en, yso-maui-en, yso-bonsai-en, yso-fasttext-en, wikidata-en.
-
-        :param file_path: complete path to file including filename and extension
-        :param save_path: complete path to save folder including filename without extension
-        :param project_ids: Annif-client project IDs to be used
-        :param abstract: toggle use abstract for indexing, defaults to False
-        :param fulltext: toggle use fulltext for indexing, defaults to False
-        :param limit: Annif-client limit, defaults to None
-        :param threshold: Annif-client threshold, defaults to None
-        """
-
-        data = _Utility.load_json(file_path)
-        client = AnnifClient()
-        modified_data = []
-
-        for item in data:
-
-            # sanity check:
-            print(item.get("title"))
-
-            # make deep copy of item:
-            modified_item = dict(item)
-
-            # make text to be indexed:
-            text = modified_item.get("title")
-            if abstract is True:
-                text = text + " " + modified_item.get("abstract")
-            if fulltext is True:
-                pass
-                # TODO: add fulltext support
-
-            for project_id in project_ids:
-
-                # make name for indexing:
-                name = f"{project_id}-{str(abstract)}-{str(fulltext)}-{str(threshold)}-{str(limit)}"
-
-                # check if item has annif-component:
-                if "annif" in modified_item:
-                    if name in modified_item.get("annif"):
-                        print(f"WARNING: {name} is already available and is currently being overridden!")
-                else:
-                    modified_item["annif"] = dict()
-
-                # actual indexing via Annif-client:
-                results = client.suggest(project_id=project_id, text=text, threshold=threshold, limit=limit)
-
-                # add results to item:
-                modified_item["annif"][name] = results
-
-            # add modified item to output:
-            modified_data.append(modified_item)
-
-        _Utility.save_json(modified_data, save_path)
-
-    @classmethod
-    def super_make_index(cls, abstract: bool) -> None:
-        """ Index items of file with all Annif-client projects.
-
-        :param abstract: toggle use abstract for indexing
-        """
-
-        file_path = DIR + "/indexed/indexed_master.json"
-        save_path = f"{DIR}/indexed/indexed_working_{str(datetime.now()).split('.')[0].replace(':', '-').replace(' ', '-')}.json"
-        project_ids = ["yso-en", "yso-maui-en", "yso-bonsai-en", "yso-fasttext-en", "wikidata-en"]
-
-        _Annif.make_index(file_path=file_path, save_path=save_path, project_ids=project_ids, abstract=abstract)
-
 
 _Data.enrich_author_keywords(DIR + "/indexed/indexed_master.json", DIR + "/indexed/dummyenrichment")
 
@@ -454,7 +449,7 @@ keywords_clean_histogram.json to Wikidata and other ontologies. This is explaine
 methods up to 20210121. The resulting file is exported as keywords_clean_histogram_enriched.csv and then transformed to 
 keywords_reference.json).
 
-8. We index the selected items with _Annif.super_make_index. How this works exactly is explained elsewhere. The 
+8. We index the selected items with _Data.super_enrich_with_annif. How this works exactly is explained elsewhere. The 
 resulting file is indexed_master.json saved in edoc/index. 
 
 9. We enrich the selected items with MeSH keywords from PubMed if available (item needs a PubMed ID and items needs to
