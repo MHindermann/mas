@@ -15,7 +15,8 @@ class _Utility:
     """ A collection of utility functions. """
 
     @classmethod
-    def load_json(cls, file_path: str) -> list:
+    def load_json(cls,
+                  file_path: str) -> list:
         """ Load a JSON object from file.
 
         :param file_path: complete path to file including filename and extension
@@ -27,7 +28,9 @@ class _Utility:
             return loaded
 
     @classmethod
-    def save_json(cls, data: Union[List, Dict], file_path: str) -> None:
+    def save_json(cls,
+                  data: Union[List, Dict],
+                  file_path: str) -> None:
         """ Save data as JSON file.
 
         :param data: the data to be saved
@@ -38,7 +41,9 @@ class _Utility:
             dump(data, file)
 
     @classmethod
-    def split_json(cls, file_path: str, save_path: str) -> None:
+    def split_json(cls,
+                   file_path: str,
+                   save_path: str) -> None:
         """ Split a JSON file into files not larger than 100MB.
 
         :param file_path: complete path to file including filename and extension
@@ -62,7 +67,9 @@ class _Data:
     """ A collection of edoc data functions. """
 
     @classmethod
-    def select_from_data(cls, data: List[Dict], *fields: str) -> List[Dict]:
+    def select_from_data(cls,
+                         data: List[Dict],
+                         *fields: str) -> List[Dict]:
         """ Select items from data based on non-empty fields.
 
         Only items where all required fields are non-empty are selected.
@@ -84,7 +91,9 @@ class _Data:
         return selected
 
     @classmethod
-    def select_from_file(cls, file_path: str, *fields: str) -> None:
+    def select_from_file(cls,
+                         file_path: str,
+                         *fields: str) -> None:
         """ Select items from file according to fields.
 
         For example: select_from_file(DIR + "/raw/2019.json", "title", "abstract", "keywords", "id_number")
@@ -101,7 +110,9 @@ class _Data:
         _Utility.save_json(selected, save_file_path)
 
     @classmethod
-    def inspect(cls, data: List[Dict], *fields: str) -> None:
+    def inspect(cls,
+                data: List[Dict],
+                *fields: str) -> None:
         """ Print fields of items in data.
 
         :param data: data to be inspected
@@ -157,7 +168,8 @@ class _Data:
         _Utility.save_json(modified_data, save_path + ".json")
 
     @classmethod
-    def map2reference(cls, keyword: str) -> Dict:
+    def map2reference(cls,
+                      keyword: str) -> Dict:
         """ Map a keyword to its reference keyword.
 
         Keyword must first be cleaned by corresponding _Keyword method.
@@ -212,7 +224,8 @@ class _Data:
         _Utility.save_json(modified_data, save_path + ".json")
 
     @classmethod
-    def fetch_mesh(cls, pubmed_id: str) -> List[Dict]:
+    def fetch_mesh(cls,
+                   pubmed_id: str) -> List[Dict]:
         """ Fetch MeSH keywords for article based on PubMed ID.
 
         :param pubmed_id: article PubMed ID
@@ -233,13 +246,14 @@ class _Data:
         return mesh
 
     @classmethod
-    def enrich_with_annif(cls, file_path: str,
-                   save_path: str,
-                   project_ids: List[str],
-                   abstract: bool = False,
-                   fulltext: bool = False,
-                   limit: int = None,
-                   threshold: int = None) -> None:
+    def enrich_with_annif(cls,
+                          file_path: str,
+                          save_path: str,
+                          project_ids: List[str],
+                          abstract: bool = False,
+                          fulltext: bool = False,
+                          limit: int = None,
+                          threshold: int = None) -> None:
         """ Enrich items from file with automatic keywords using Annif-client.
 
         Available Annif-client project IDs are yso-en, yso-maui-en, yso-bonsai-en, yso-fasttext-en, wikidata-en.
@@ -297,7 +311,8 @@ class _Data:
         _Utility.save_json(modified_data, save_path)
 
     @classmethod
-    def super_enrich_with_annif(cls, abstract: bool) -> None:
+    def super_enrich_with_annif(cls,
+                                abstract: bool) -> None:
         """ Enrich items with automatic keywords using all Annif-client projects.
 
         :param abstract: toggle use abstract for indexing
@@ -314,7 +329,8 @@ class _Keywords:
     """ A collection of functions for manipulating edoc author keywords. """
 
     @classmethod
-    def extract_keywords(cls, file_path) -> List[str]:
+    def extract_keywords(cls,
+                         file_path) -> List[str]:
         """ Extract keywords per item from file.
 
         :param file_path: complete path to file including filename and extension
@@ -327,7 +343,8 @@ class _Keywords:
         return keywords
 
     @classmethod
-    def clean_keywords(cls, keywords_per_item: List[str]) -> List[str]:
+    def clean_keywords(cls,
+                       keywords_per_item: List[str]) -> List[str]:
         """ Turn a string of keywords per item into a list of cleaned (=normalized) keywords.
 
         :param keywords_per_item: the keywords
@@ -353,7 +370,8 @@ class _Keywords:
         return clean
 
     @classmethod
-    def clean_keyword(cls, keyword: str) -> List[str]:
+    def clean_keyword(cls,
+                      keyword: str) -> List[str]:
         """ Clean a keyword.
 
         :param keyword: the keyword
@@ -387,7 +405,8 @@ class _Keywords:
             return clean
 
     @classmethod
-    def make_histogram(cls, keywords: List[str]) -> List[Dict]:
+    def make_histogram(cls,
+                       keywords: List[str]) -> List[Dict]:
         """ Make a histogram for keywords.
 
         :param keywords: the keywords
