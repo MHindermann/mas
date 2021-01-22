@@ -119,6 +119,10 @@ class _Data:
 
         print(f"Items in data: {len(data)}")
 
+
+class _Keywords:
+    """ A collection of functions for manipulating edoc keywords. """
+
     # TODO: perhaps put keyword functions into own class
     @classmethod
     def extract_keywords(cls, file_path) -> List[str]:
@@ -209,10 +213,6 @@ class _Data:
             openrefine_histogram.append({"keyword": entry, "occurrences": histogram.get(entry)})
 
         return openrefine_histogram
-
-
-class _Keywords:
-    """ A collection of functions for manipulating edoc keywords. """
 
     @classmethod
     def enrich_with_mesh(cls,
@@ -375,21 +375,21 @@ eodc/raw
 items from which to construct a gold standard). The resulting 4111 items are saved as selected_master.json in 
 edoc/selected.
 
-4. We extract the keywords (per entry) from the selected entries with _Data.extract_keywords like so:
-keywords = _Data.extract_keywords(DIR + "/selected/selected_master.json")
+4. We extract the keywords (per entry) from the selected entries with _Keywords.extract_keywords like so:
+keywords = _Keywords.extract_keywords(DIR + "/selected/selected_master.json")
 We the save the resulting list under edoc/keywords as keywords_raw.json like so:
 _Utility.save_json(keywords, DIR + "keywords/keywords_raw.json")
 
-5. We clean the extracted keywords with _Data.clean_keywords. How and why this is done is explained elsewhere. This is
+5. We clean the extracted keywords with _Keywords.clean_keywords. How and why this is done is explained elsewhere. This is
 done as follows:
 keywords_raw = _Utility.load_json(DIR + "/keywords/keywords_raw.json")
-keywords_clean = _Data.clean_keywords(keywords_raw)
+keywords_clean = _Keywords.clean_keywords(keywords_raw)
 We the save the resulting list under edoc/keywords as keywords_clean.json like so:
 _Utility.save_json(clean, DIR + "keywords/keywords_clean.json")
 
-6. We build a histogram of the cleaned keywords used in the selected data with _Data.make_histogram:
+6. We build a histogram of the cleaned keywords used in the selected data with _Keyword.make_histogram:
 keywords_clean = _Utility.load_json(DIR + "/keywords/keywords_clean.json")
-histogram = _Data.make_histogram(keywords)
+histogram = _Keyword.make_histogram(keywords)
 We the save the resulting histogram under edoc/keywords as keywords_clean_histogram.json like so:
 _Utility.save_json(histogram, "/keywords/keywords_clean_histogram.json")
 
