@@ -120,20 +120,60 @@ class _Data:
         print(f"Items in data: {len(data)}")
 
     @classmethod
-    def clean_author_keywords(cls,
-                         file_path: str,
-                         save_path: str) -> None:
-        """ Clean and enrich author keywords.
+    def enrich_author_keywords(cls,
+                               file_path: str,
+                               save_path: str) -> None:
+        """ Enrich author keywords.
 
         For each edoc item: the string of author keywords is cut into single keywords and each keyword is cleaned. Each
-        keyword is then enriched with Qid, MeSh and YSO ID if available.
+        keyword is then enriched with Qid, MeSH and YSO ID if available.
 
         :param file_path: complete path to file including filename and extension
         :param save_path: complete path to save folder including filename without extension
         """
 
         data = _Utility.load_json(file_path)
+        modified_data = []
 
+        for item in data:
+
+            # make deep copy of item:
+            modified_item = dict(item)
+
+            # clean keywords
+            keywords = modified_item.get("keywords")
+            keywords_clean = _Keywords.clean_keywords([keywords])
+
+            # enrich keywords
+            enriched_keywords = []
+            for keyword in keywords_clean:
+                enriched_keywords.append(cls.map2reference(keyword))
+
+            modified_item["keywords enriched"] = enriched_keywords
+
+            # add modified item to output:
+            modified_data.append(modified_item)
+
+        _Utility.save_json(modified_data, save_path + ".json")
+
+    @classmethod
+    def map2reference(cls, keyword: str) -> Dict:
+        """ Map a keyword to its reference keyword.
+
+        Keyword must first be cleaned by corresponding _Keyword method.
+
+        :param keyword: the keyword
+        """
+
+        # load reference keywords (for now keywords_clean_histogram_enriched.csv):
+        keywords_reference = _Utility.load_json(DIR + "/keywords/keywords_reference.json")
+
+        # enrich keywords
+        for entry in keywords_reference:
+            if entry["keyword clean"] == keyword:
+                return entry
+
+        raise LookupError("No reference keyword found! Clean keyword before calling _Data.map2reference!")
 
     @classmethod
     def enrich_with_mesh(cls,
@@ -210,11 +250,13 @@ class _Keywords:
         return keywords
 
     @classmethod
-    def clean_keywords(cls, keywords_per_item: str) -> List[str]:
+    def clean_keywords(cls, keywords_per_item: List[str]) -> List[str]:
         """ Turn a string of keywords per item into a list of cleaned (=normalized) keywords.
 
         :param keywords_per_item: the keywords
         """
+
+        assert(isinstance(keywords_per_item, list))
 
         clean = []
         for keywords in keywords_per_item:
@@ -286,10 +328,7 @@ class _Keywords:
 
         return openrefine_histogram
 
-
-#_Data.enrich_with_mesh(DIR + "/indexed/indexed_testfile.json", DIR + "/indexed/indexed_testfile_mesh")
-
-
+# TODO: move annif into _Data class
 class _Annif:
 
     """ A collection of Annif indexing functions. """
@@ -372,6 +411,8 @@ class _Annif:
         _Annif.make_index(file_path=file_path, save_path=save_path, project_ids=project_ids, abstract=abstract)
 
 
+_Data.enrich_author_keywords(DIR + "/indexed/indexed_master.json", DIR + "/dummy")
+
 """
 Here I describe _Utility and _Data in relation to the files in the edoc folder. 
 
@@ -408,8 +449,9 @@ histogram = _Keyword.make_histogram(keywords)
 We the save the resulting histogram under edoc/keywords as keywords_clean_histogram.json like so:
 _Utility.save_json(histogram, "/keywords/keywords_clean_histogram.json")
 
-(7. We use OpenRefine to match keywords from the cleaned histogram to Wikidata and other ontologies. This is explained
-elsewhere).
+(7. We use OpenRefine to match keywords from keywords_clean_histogram.json to Wikidata and other ontologies. This is 
+explained elsewhere: draft-document OpenRefine methods up to 20210121. The resulting file is exported as
+keywords_clean_histogram_enriched.csv).
 
 8. We index the selected items with _Annif.super_make_index. How this works exactly is explained elsewhere. The 
 resulting file is indexed_master.json saved in edoc/index. 
