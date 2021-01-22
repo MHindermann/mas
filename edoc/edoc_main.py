@@ -330,7 +330,7 @@ class _Keywords:
 
     @classmethod
     def extract_keywords(cls,
-                         file_path) -> List[str]:
+                         file_path: str) -> List[str]:
         """ Extract keywords per item from file.
 
         :param file_path: complete path to file including filename and extension
@@ -423,6 +423,32 @@ class _Keywords:
             openrefine_histogram.append({"keyword": entry, "occurrences": histogram.get(entry)})
 
         return openrefine_histogram
+
+    @classmethod
+    def enrich_with_yso(cls,
+                        file_path: str,
+                        save_path: str):
+        """ Blah.
+
+        :param file_path: complete path to file including filename and extension
+        :param save_path: complete path to save folder including filename without extension
+        """
+
+        data = _Utility.load_json(file_path)
+        modified_data = []
+
+        for item in data:
+            # make deep copy of item:
+            modified_item = dict(item)
+
+            if modified_item.get("yso id") == "":
+                # fetch yso
+                yso = None
+                modified_item["yso id"] = yso
+
+            modified_data.append(modified_item)
+
+        _Utility.save_json(modified_data, save_path)
 
 
 _Data.enrich_author_keywords(DIR + "/indexed/indexed_master.json", DIR + "/indexed/dummyenrichment")
