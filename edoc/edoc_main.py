@@ -173,12 +173,12 @@ class _Data:
             if entry["keyword clean"] == keyword:
                 return entry
 
-        raise LookupError("No reference keyword found! Clean keyword before calling _Data.map2reference!")
+        print(f"No reference found for {keyword}!")
 
     @classmethod
     def enrich_with_mesh(cls,
                          file_path: str,
-                         save_path: str):
+                         save_path: str) -> None:
         """ Enrich edoc data per item with MeSH keywords from PubMed if available.
 
         :param file_path: complete path to file including filename and extension
@@ -411,7 +411,7 @@ class _Annif:
         _Annif.make_index(file_path=file_path, save_path=save_path, project_ids=project_ids, abstract=abstract)
 
 
-_Data.enrich_author_keywords(DIR + "/indexed/indexed_master.json", DIR + "/dummy")
+_Data.enrich_author_keywords(DIR + "/indexed/indexed_master.json", DIR + "/indexed/dummyenrichment")
 
 """
 Here I describe _Utility and _Data in relation to the files in the edoc folder. 
@@ -449,9 +449,10 @@ histogram = _Keyword.make_histogram(keywords)
 We the save the resulting histogram under edoc/keywords as keywords_clean_histogram.json like so:
 _Utility.save_json(histogram, "/keywords/keywords_clean_histogram.json")
 
-(7. We use OpenRefine to match keywords from keywords_clean_histogram.json to Wikidata and other ontologies. This is 
-explained elsewhere: draft-document OpenRefine methods up to 20210121. The resulting file is exported as
-keywords_clean_histogram_enriched.csv).
+(7. We create a list of reference keywords from the author keywords. To do this we use OpenRefine to match keywords from 
+keywords_clean_histogram.json to Wikidata and other ontologies. This is explained elsewhere: draft-document OpenRefine 
+methods up to 20210121. The resulting file is exported as keywords_clean_histogram_enriched.csv and then transformed to 
+keywords_reference.json).
 
 8. We index the selected items with _Annif.super_make_index. How this works exactly is explained elsewhere. The 
 resulting file is indexed_master.json saved in edoc/index. 
@@ -460,6 +461,10 @@ resulting file is indexed_master.json saved in edoc/index.
 be indexed with MeSH on PubMed, 1653 items match this requirement); the resulting file is indexed_master_mesh.json. Like 
 so: 
 _Data.enrich_with_mesh(DIR + "/indexed/indexed_master.json", DIR + "/indexed/indexed_master_mesh")
+
+10. We enrich the selected items with cleaned author keywords (including, if available, Qid, MeSH ID, YSO ID) based on 
+the reference keywords; the resulting file is indexed_master_mesh_enriched.json. To do so:
+_Data.enrich_with_mesh(DIR + "/indexed/indexed_master_mesh.json", DIR + "/indexed/indexed_master_mesh_enriched")
 """
 
 #TODO:
