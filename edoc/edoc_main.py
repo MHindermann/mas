@@ -6,6 +6,7 @@ from annif_client import AnnifClient
 import os.path
 import urllib3
 import xmltodict
+import ast
 
 
 DIR = os.path.dirname(__file__)
@@ -441,17 +442,49 @@ class _Keywords:
             # make deep copy of item:
             modified_item = dict(item)
 
+            # if YSO ID is missing, fetch it if available; but discard entries without clean keywords:
             if modified_item.get("yso id") == "":
-                # fetch yso
-                yso = None
-                modified_item["yso id"] = yso
+                if modified_item.get("keyword clean") == "":
+                    continue
+                else:
+                    yso = cls.fetch_yso(modified_item.get("keyword clean"))
+                    modified_item["yso id"] = yso
+                    print(yso)
 
             modified_data.append(modified_item)
 
         _Utility.save_json(modified_data, save_path)
 
+    @classmethod
+    def fetch_yso(cls,
+                  keyword: str) -> Union[str, None]:
+        """ Fetch the YSO ID for a keyword if any.
 
-_Data.enrich_author_keywords(DIR + "/indexed/indexed_master.json", DIR + "/indexed/dummyenrichment")
+        :param keyword: the keyword
+        """
+
+        http = urllib3.PoolManager()
+        url = f"https://api.finto.fi/rest/v1/yso/search?query={keyword}&lang=en"
+        response = http.request('GET', url)
+
+        try:
+            results = ast.literal_eval(response.data.decode("UTF-8")).get("results")
+            return results[0].get("localname")[1:]
+        except (IndexError, SyntaxError):
+            return None
+
+
+class _Analysis:
+    """ A of data analysis functions. """
+
+
+_Keywords.enrich_with_yso(DIR + "/keywords/keywords_reference.json", DIR + "/keywords/keywords_reference_test.json")
+
+#print(_Keywords.fetch_yso("drug"))
+
+
+# call this after completing the construction of the reference keywords:
+# _Data.enrich_author_keywords(DIR + "/indexed/indexed_master_mesh.json", DIR + "/indexed/indexed_master_mesh_enriched")
 
 """
 Here I describe _Utility and _Data in relation to the files in the edoc folder. 
@@ -489,10 +522,13 @@ histogram = _Keyword.make_histogram(keywords)
 We the save the resulting histogram under edoc/keywords as keywords_clean_histogram.json like so:
 _Utility.save_json(histogram, "/keywords/keywords_clean_histogram.json")
 
-(7. We create a list of reference keywords from the author keywords. To do this we use OpenRefine to match keywords from 
+7a. We create a list of reference keywords from the author keywords. To do this we use OpenRefine to match keywords from 
 keywords_clean_histogram.json to Wikidata and other ontologies. This is explained elsewhere: draft-document OpenRefine 
 methods up to 20210121. The resulting file is exported as keywords_clean_histogram_enriched.csv and then transformed to 
-keywords_reference.json).
+keywords_reference.json. Problem with exports here: multiple IDs are lost  (e.g., keyword clean ethnology has two mesh 
+ids Q000208 and D005007 but the second is on different line and exported as standing alone...). 
+
+7b. We try to enrich the reference keywords with YSO ids wherever they are missing.
 
 8. We index the selected items with _Data.super_enrich_with_annif. How this works exactly is explained elsewhere. The 
 resulting file is indexed_master.json saved in edoc/index. 
@@ -504,7 +540,8 @@ _Data.enrich_with_mesh(DIR + "/indexed/indexed_master.json", DIR + "/indexed/ind
 
 10. We enrich the selected items with cleaned author keywords (including, if available, Qid, MeSH ID, YSO ID) based on 
 the reference keywords; the resulting file is indexed_master_mesh_enriched.json. To do so:
-_Data.enrich_with_mesh(DIR + "/indexed/indexed_master_mesh.json", DIR + "/indexed/indexed_master_mesh_enriched")
+_Data.enrich_author_keywords(DIR + "/indexed/indexed_master_mesh.json", DIR + "/indexed/indexed_master_mesh_enriched")
+NOTE: rerun this whenever we amend the reference keywords!
 """
 
 #TODO:
