@@ -528,7 +528,9 @@ methods up to 20210121. The resulting file is exported as keywords_clean_histogr
 keywords_reference.json. Problem with exports here: multiple IDs are lost  (e.g., keyword clean ethnology has two mesh 
 ids Q000208 and D005007 but the second is on different line and exported as standing alone...). 
 
-7b. We try to enrich the reference keywords with YSO ids wherever they are missing.
+7b. We try to enrich the reference keywords with YSO ids wherever they are missing. Increases YSO coverage from 1759 to
+3185. To do this:
+_Keywords.enrich_with_yso(DIR + "/keywords/keywords_reference.json", DIR + "/keywords/keywords_reference-test.json")
 
 8. We index the selected items with _Data.super_enrich_with_annif. How this works exactly is explained elsewhere. The 
 resulting file is indexed_master.json saved in edoc/index. 
