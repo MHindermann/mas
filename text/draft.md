@@ -168,6 +168,7 @@ available.
 ## Assessment
 
 ### Precision, recall, F1-score
+!! Discussion of metrics
 
 ### Annif versus gold standard
 
