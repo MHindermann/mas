@@ -75,7 +75,11 @@ specifiying a subset of the Edoc data and by "construction" I mean the task of i
 
 ### Selection
 
-There are a number of constraints for selecting the sample data set. The first constraint stems from Annif, the 
+There are a number of constraints for selecting the sample data set pertaining to an items's text, evaluability and 
+the data set's
+scope.
+
+The first constraint stems from Annif, the 
 machine 
 indexing framework that will be used. Put simply, machine indexing assigns index terms to a text based on training 
 data. The training data consists of a set of texts, a vocabulary, and function from vocabulary to texts. In this 
@@ -84,20 +88,15 @@ consists of pairs of text and subject terms that meet some standard. The trainin
 already supplied by Annif, we only need to provide a text for each item that we want to be assigned index terms. 
 Therefore, we only select items with text. 
 
-The second constraint is due to our need for evaluating the generated output. 
-
-that items in the sample data set must 
-have keywords. 
-
+The second constraint is that we must be able to evaluate the quality of the index terms assigned by Annif to any 
+item in the 
+sample data set. 
 
 The third and final constraint takes into account 
 the possibility of having to extend the prototype to the complete Edoc data. On the one hand, the sample data set 
 should be small enough to allow for easy handling and rapid iteration. On the other hand, the sample data set should 
 not be trivial but reflect the quirks and inadequacies of the complete dataset. In other words, 
 we are looking for an abstraction rather than an idealization in the sense of  [@Stokhof.2011]. 
-
-
-
 
 ### Construction
 
@@ -114,22 +113,39 @@ when
 disambiguating homonymous or polysemous words. For example, consider item `https://edoc.unibas.ch/id/eprint/76510` 
 which is titled "Blacking Out". Without further context, this title could refer (amongst others) to a physiological 
 phenomenon, a 
-sudden loss of electricity, or a measure taken in wartime. However, knowing that the item was published by a 
+sudden loss of electricity, or a measure taken in wartime. Knowing that the item was published by a 
 researcher employed by the 
 Faculty of Business and Economics (and not, say, by the Faculty of Medicine) gives us reason to exclude the first 
 meaning. However, this idea cannot be implemented with the out 
-of the box instance of Annif employed in this chapter (see [subsection on machine indexing](#machine)). 
+of the box instance of Annif employed in this chapter (see [subsection "Machine indexing"](#machine-indexing)). 
 
+The second constraint is that the index terms assigned to each item in the sample data set must be assessable. How 
+the assessment is conducted in detail is discussed in [section "Assessment"](#assessment). For now, it is 
+sufficient 
+to say that we require a standard against which we can evaluate the assigned index terms. By "standard" I mean that 
+given 
+a vocabulary of index terms and our sample data set, for every item in the sample data set, there is an approved 
+subset of the 
+vocabulary. The production of a standard from scratch is of course is very costly since a person, usually highly 
+skilled in a certain academic domain, must assign and/or approve each item's index terms (!!source). For this reason 
+we try to avoid having to produce a standard. One way of doing so is by requiring items in the sample data set to 
+have non-empty `keywords` data field. The caveats of this approach are discussed in [section "Assessment"](#assessment).
 
+Taking into account the third constraint simply means that we do not employ any further restrictions. We can hence 
+construct the sample data set by choosing exactly those the items from `/edoc/raw` which have non-empty data fields 
+`title`, `abstract`, `id_number`, and `keywords`. We do so by calling `_Data.select_from_file` iteratively for all 
+files in `/edoc/raw`. The resulting file is saved as `/edoc/selected` as `selected_master.json`. 
 
+### Analysis
 
-
+!! Mayhaps give a description of `selected_master.json`, namely 4111 items. Also, perhaps also say how many items in 
+`/raw` per data field 
+are 
+available. 
 
 ## Indexing
 
-### Machine indexing {#machine}
-
-
+### Machine indexing
 
 
 ### Annif
