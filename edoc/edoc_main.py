@@ -489,11 +489,11 @@ _Keywords.enrich_with_yso(DIR + "/keywords/keywords_reference.json", DIR + "/key
 """
 Here I describe _Utility and _Data in relation to the files in the edoc folder. 
 
-1. We start by extracting all data from edoc. We do this by conducting an advanced search with the date-field set to
+OK 1. We start by extracting all data from edoc. We do this by conducting an advanced search with the date-field set to
 1900-2020. On the results page, we export the results as JSON. We use the data extracted pm 20201210 We have 68345 
 entries and the file has a size of about 326 MB (which is why it won't fit on GitHub). We call this file 1900-2020.json.
 
-2. We split 1900-2020.json into smaller files that are easier handled and can be uploaded to GitHub. For this we use 
+OK 2. We split 1900-2020.json into smaller files that are easier handled and can be uploaded to GitHub. For this we use 
 _Utility.split_json and we end up with files of size 20 MB or less containing 5000 or less entries each. These files are
 called raw_master_x-y.json where x and y indicate the entries as given by 1900-2020.json. These files are saved under
 eodc/raw
