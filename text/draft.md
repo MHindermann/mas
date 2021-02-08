@@ -29,8 +29,9 @@ subset as output. In order to fulfill this aim we can distinguish a number of st
 
 1. Understand the Edoc data.  
 2. Select and construct a sample data set.
-3. Index the items in the sample data set.
-4. Assess the quality of the output.
+3. Use Annif to index the items in the sample data set.
+4. Construct a gold standard from the keywords.
+5. Assess the quality of the output based on the gold standard.
 
 In the sections below, these steps will be discussed in detail.
 
@@ -143,18 +144,45 @@ files in `/edoc/raw`. The resulting file is saved as `/edoc/selected` as `select
 are 
 available. 
 
-## Indexing
+## Machine indexing
 
-### Machine indexing
-
+### General overview
+!! Give an overview over machine indexing.
 
 ### Annif
+!! Given an intro to Annif.
+
+### Implementation
+!! Explain how to implementation works.
+
+## Gold standard
+
+### Extract keywords
+
+### Clean keywords
+
+### Frequency analysis
+
+### Mapping to controlled vocabularies
 
 ## Assessment
+
+### Precision, recall, F1-score
+
+### Annif versus gold standard
+
+#### YSO
+
+#### Wikidata
+
+### Annif versus MeSH
+
+
 
 ### Digression: truth-conditions for indexing
 (Correspondence theory of indexing: subject term T fits text X iff text X is about T)
 ### Targets
+!! Find out what I meant here.
 
 ### Analysis
 
