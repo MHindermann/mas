@@ -2,7 +2,8 @@
 Markdown Syntax: https://www.markdownguide.org/basic-syntax/
 PyCharm and Markdown: https://www.jetbrains.com/help/pycharm/markdown.html 
 Convert Markdown to LaTeX or PDF: https://pandoc.org/getting-started.html (PS C:\Users\Max\PycharmProjects\mas\text> 
-pandoc .\draft.md -s -o draft.pdf)
+pandoc .\draft.md -s --number-sections --bibliography biblio.bib --citeproc -o test.pdf)
+Write a research paper in Markdown: https://opensource.com/article/18/9/pandoc-research-paper
 -->
 
 Machine indexing of institutional repositories: indexing Edoc with Annif and BARTOC FAST as proof of concept
@@ -83,18 +84,20 @@ consists of pairs of text and subject terms that meet some standard. The trainin
 already supplied by Annif, we only need to provide a text for each item that we want to be assigned index terms. 
 Therefore, we only select items with text. 
 
+The second constraint is due to our need for evaluating the generated output. 
 
-Therefore, only items with texts 
-
-
-
-
+that items in the sample data set must 
+have keywords. 
 
 
-In the case of the Data extracted 
-from Edoc, we have three relevant data fields per item: title, abstract and full text. 
+The third and final constraint takes into account 
+the possibility of having to extend the prototype to the complete Edoc data. On the one hand, the sample data set 
+should be small enough to allow for easy handling and rapid iteration. On the other hand, the sample data set should 
+not be trivial but reflect the quirks and inadequacies of the complete dataset. In other words, 
+we are looking for an abstraction rather than an idealization in the sense of  [@Stokhof.2011]. 
 
-(Correspondence theory of indexing: subject term T fits text X iff text X is about T)
+
+
 
 ### Construction
 
@@ -105,28 +108,36 @@ information (that is, longer texts) usually implies a higher indexing quality in
 assumption needs to be confirmed empirically for the given machine indexing framework and data set. If indeed 
 confirmed, it might be advisable only to index items that have a certain minimal text length. Therefore, in order to 
 construct the sample data set, we require each item to have a non-empty value in the data fields `title`, `abstract`,
-and `id_number` as proxy to retrieve a full text remotely. 
+and `id_number` as proxy to retrieve a full text remotely. Note that even more context could be provided by taking 
+into account other data fields such as `type`, `publication` or `department`. Especially the latter might be valuable 
+when 
+disambiguating homonymous or polysemous words. For example, consider item `https://edoc.unibas.ch/id/eprint/76510` 
+which is titled "Blacking Out". Without further context, this title could refer (amongst others) to a physiological 
+phenomenon, a 
+sudden loss of electricity, or a measure taken in wartime. However, knowing that the item was published by a 
+researcher employed by the 
+Faculty of Business and Economics (and not, say, by the Faculty of Medicine) gives us reason to exclude the first 
+meaning. However, this idea cannot be implemented with the out 
+of the box instance of Annif employed in this chapter (see [subsection on machine indexing](#machine)). 
 
 
 
 
 
-
-
-
-comparing the quality and or quantity of output terms 
-with some standard(s) – but more on this below [see X].For convenience, let us call this subset simply the sample data. The construction of the sample data is important to facilitate development. The sample data need to be small enough to handle yet not be trivial. They hence should contain the quirks of the complete dataset but on a smaller scale. In other words, we are looking for an abstraction rather than an idealization [QUELLE]. 
-
-### Selection criteria
-
-### Construction
 
 ## Indexing
+
+### Machine indexing {#machine}
+
+
+
 
 ### Annif
 
 ## Assessment
 
+### Digression: truth-conditions for indexing
+(Correspondence theory of indexing: subject term T fits text X iff text X is about T)
 ### Targets
 
 ### Analysis
