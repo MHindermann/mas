@@ -478,7 +478,7 @@ class _Analysis:
     """ A of data analysis functions. """
 
 
-_Keywords.enrich_with_yso(DIR + "/keywords/keywords_reference.json", DIR + "/keywords/keywords_reference_test.json")
+#_Keywords.enrich_with_yso(DIR + "/keywords/keywords_reference.json", DIR + "/keywords/keywords_reference_test.json")
 
 #print(_Keywords.fetch_yso("drug"))
 
@@ -553,3 +553,28 @@ keywords_clean_histogram.json. This is required so that we can compute precision
 the concept and its URI.
 
 """
+
+# see https://medium.com/better-programming/how-to-convert-pdfs-into-searchable-key-words-with-python-85aab86c544f for some ideas
+
+from tika import parser
+rawText = parser.from_file(DIR + "/fulltexts/2020_18_Informed by wet feet_How do floods affect property prices.pdf")
+rawList = rawText['content'].splitlines()
+print(" ".join(rawList))
+exit()
+
+#this does not work:
+import PyPDF2
+filename = DIR + "/fulltexts/2020_18_Informed by wet feet_How do floods affect property prices.pdf"
+file = open(filename,'rb')
+pdf_reader = PyPDF2.PdfFileReader(file)
+
+num_pages = pdf_reader.numPages
+count = 0
+text = ""
+while count < num_pages:
+    page = pdf_reader.getPage(count)
+    count +=1
+    text += page.extractText()
+
+print(text)
+

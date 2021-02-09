@@ -155,6 +155,12 @@ available.
 ### Implementation
 !! Explain how to implementation works.
 
+!! Somewhere here we talk about indexing based on title and/or abstract and/or fulltext. Fulltext is not yet
+ implemented. Some observations to do so:
+ - the link to the fulltext is constructed from the data fields `offical url` and `documebts - main`, e.g., `https
+ ://edoc.unibas.ch/79633/` + `1/` + `2020_18_Informed by wet feet_How do floods affect property prices.pdf` to get
+  `https://edoc.unibas.ch/79633/1/2020_18_Informed by wet feet_How do floods affect property prices.pdf`
+
 ## Gold standard
 
 ### Extract keywords
