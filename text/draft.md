@@ -133,11 +133,13 @@ we try to avoid having to produce a standard. One way of doing so is by requirin
 have non-empty `keywords` data field. The caveats of this approach are discussed in [section "Assessment"](#assessment).
 
 Taking into account the third constraint simply means that we do not employ any further restrictions. We can hence 
-construct the sample data set by choosing exactly those the items from `/edoc/raw` which have non-empty data fields 
+construct the sample data set by choosing exactly those items from `/edoc/raw` which have non-empty data fields 
 `title`, `abstract`, `id_number`, and `keywords`. We do so by calling `_Data.select_from_file` iteratively for all 
-files in `/edoc/raw`. The resulting file is saved as `/edoc/selected` as `selected_master.json`. 
+files in `/edoc/raw`. The resulting file is saved in `/edoc/selected` as `selected_master.json`. 
 
 ### Analysis
+
+Of the 68'345 items in `/edoc/raw`, all have a title (non-empty `title` data field), most items have an ID (57'153 items with non-empty `id_number` data field), roughly half of the items have an abstract (37'381 items with non-empty `abstract` data field), an less than 10% of the items have keywords (6'660 items with non-empty `keywords` data field). The 4'111 items 
 
 !! Mayhaps give a description of `selected_master.json`, namely 4111 items. Also, perhaps also say how many items in 
 `/raw` per data field 
