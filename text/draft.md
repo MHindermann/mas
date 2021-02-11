@@ -145,7 +145,9 @@ files in `/edoc/raw`. The resulting file is saved in `/edoc/selected` as `select
 
 ### Analysis
 
-Of the 68'345 items in `/edoc/raw`, all have a title (non-empty `title` data field), most items have an ID (57'153 items with non-empty `id_number` data field), roughly half of the items have an abstract (37'381 items with non-empty `abstract` data field), an less than 10% of the items have keywords (6'660 items with non-empty `keywords` data field). The 4'111 items 
+Of the 68'345 items in `/edoc/raw`, all have a title (non-empty `title` data field), most items have an ID (57'153 items with non-empty `id_number` data field), roughly half of the items have an abstract (37'381 items with non-empty `abstract` data field), an less than 10% of the items have keywords (6'660 items with non-empty `keywords` data field). The sample data set as requires all the above data fields to be non-empty; `/edoc/sample/sample_master.json` has 4'111 items and hence constitutes 6% of the raw data. 
+
+!! Now talk about the distribution of the items 
 
 !! Mayhaps give a description of `selected_master.json`, namely 4111 items. Also, perhaps also say how many items in 
 `/raw` per data field 
