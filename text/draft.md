@@ -20,7 +20,9 @@ Machine indexing of institutional repositories: indexing Edoc with Annif and BAR
 
 ### OpenRefine 
 
-For data refinement I use OpenRefine (https://openrefine.org/). Data manipulation in OpenRefine is tracked: the manipulation history of some data can be exported as JSON file and then reproduced (on the same data on a different machine or on different data) by loading said file. I will supply a corresponding manipulation history whenever appropriate. Note that when using OpenRefine with larger files (and there are many such files in this project), the memory allocation to OpenRefine must be manually increased (see https://docs.openrefine.org/manual/installing/#increasing-memory-allocation for details).
+For data refinement I use OpenRefine version 3.4.1 (https://openrefine.org/). Data manipulation in OpenRefine is 
+tracked: 
+the manipulation history of some data can be exported as JSON file and then reproduced (on the same data on a different machine or on different data) by loading said file. I will supply a corresponding manipulation history whenever appropriate. Note that when using OpenRefine with larger files (and there are many such files in this project), the memory allocation to OpenRefine must be manually increased (see https://docs.openrefine.org/manual/installing/#increasing-memory-allocation for details).
 
 # Prototype
 
@@ -77,8 +79,8 @@ files are called `raw_master_x-y.json` (where x and y indicate the entries as gi
 
 ## Sample data set
 
-In this section, I will explain how the sample data set is selected and constructed. By "selection" I mean the task of 
-specifiying a subset of the Edoc data and by "construction" I mean the task of implementing this selection. 
+In this section, I will explain how the sample data set is selected and constructed. "Selection" means the task of 
+specifying a subset of the Edoc data and "construction" means the task of implementing this selection. 
 
 ### Selection
 
@@ -147,7 +149,8 @@ files in `/edoc/raw`. The resulting file is saved in `/edoc/selected` as `select
 
 Of the 68'345 items in `/edoc/raw`, all have a title (non-empty `title` data field), most items have an ID (57'153 items with non-empty `id_number` data field), roughly half of the items have an abstract (37'381 items with non-empty `abstract` data field), an less than 10% of the items have keywords (6'660 items with non-empty `keywords` data field). The sample data set as requires all the above data fields to be non-empty; `/edoc/sample/sample_master.json` has 4'111 items and hence constitutes 6% of the raw data. 
 
-!! Now talk about the distribution of the items 
+!! Now talk about the distribution of the items . The sample is not representative. Talk about different biases. See 
+`/edoc/analysis` ![qwqwd](raw_sample_analysis.jpg)
 
 !! Mayhaps give a description of `selected_master.json`, namely 4111 items. Also, perhaps also say how many items in 
 `/raw` per data field 
@@ -193,8 +196,6 @@ available.
 #### Wikidata
 
 ### Annif versus MeSH
-
-
 
 ### Digression: truth-conditions for indexing
 (Correspondence theory of indexing: subject term T fits text X iff text X is about T)
