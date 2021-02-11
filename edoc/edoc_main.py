@@ -106,8 +106,8 @@ class _Data:
         data = _Utility.load_json(file_path)
         print(f"{file_path} loaded")
         selected = _Data.select_from_data(data, *fields)
-        print(f"Items selected")
-        save_file_path = DIR + "/selected/" + str(datetime.now()).split(".")[0].replace(":", "-").replace(" ", "-")
+        print(f"Items sample")
+        save_file_path = DIR + "/sample/" + str(datetime.now()).split(".")[0].replace(":", "-").replace(" ", "-")
         _Utility.save_json(selected, save_file_path)
 
     @classmethod
@@ -501,11 +501,11 @@ eodc/raw
 3. We select a subset of the entries downloaded from edoc. We use _Data.select_from_file to do so (for convencience on 
 1900-2020.json, but it could also be iteratively employed on the files in edoc/raw). The fields chosen are "title", 
 "abstract", "keywords" and "id_number". The rationale for choosing these fields is given elsewhere (in short: we need 
-items from which to construct a gold standard). The resulting 4111 items are saved as selected_master.json in 
-edoc/selected.
+items from which to construct a gold standard). The resulting 4111 items are saved as sample_master.json in 
+edoc/sample.
 
-4. We extract the keywords (per entry) from the selected entries with _Keywords.extract_keywords like so:
-keywords = _Keywords.extract_keywords(DIR + "/selected/selected_master.json")
+4. We extract the keywords (per entry) from the sample entries with _Keywords.extract_keywords like so:
+keywords = _Keywords.extract_keywords(DIR + "/sample/sample_master.json")
 We the save the resulting list under edoc/keywords as keywords_raw.json like so:
 _Utility.save_json(keywords, DIR + "/keywords/keywords_extracted.json")
 
@@ -516,7 +516,7 @@ keywords_clean = _Keywords.clean_keywords(keywords_extracted)
 We the save the resulting list under edoc/keywords as keywords_clean.json like so:
 _Utility.save_json(clean, DIR + "keywords/keywords_clean.json")
 
-6. We build a histogram of the cleaned keywords used in the selected data with _Keyword.make_histogram:
+6. We build a histogram of the cleaned keywords used in the sample data with _Keyword.make_histogram:
 keywords_clean = _Utility.load_json(DIR + "/keywords/keywords_clean.json")
 histogram = _Keyword.make_histogram(keywords)
 We the save the resulting histogram under edoc/keywords as keywords_clean_histogram.json like so:
@@ -532,15 +532,15 @@ ids Q000208 and D005007 but the second is on different line and exported as stan
 3185. To do this:
 _Keywords.enrich_with_yso(DIR + "/keywords/keywords_reference.json", DIR + "/keywords/keywords_reference-test.json")
 
-8. We index the selected items with _Data.super_enrich_with_annif. How this works exactly is explained elsewhere. The 
+8. We index the sample items with _Data.super_enrich_with_annif. How this works exactly is explained elsewhere. The 
 resulting file is indexed_master.json saved in edoc/index. 
 
-9. We enrich the selected items with MeSH keywords from PubMed if available (item needs a PubMed ID and items needs to
+9. We enrich the sample items with MeSH keywords from PubMed if available (item needs a PubMed ID and items needs to
 be indexed with MeSH on PubMed, 1653 items match this requirement); the resulting file is indexed_master_mesh.json. Like 
 so: 
 _Data.enrich_with_mesh(DIR + "/indexed/indexed_master.json", DIR + "/indexed/indexed_master_mesh")
 
-10. We enrich the selected items with cleaned author keywords (including, if available, Qid, MeSH ID, YSO ID) based on 
+10. We enrich the sample items with cleaned author keywords (including, if available, Qid, MeSH ID, YSO ID) based on 
 the reference keywords; the resulting file is indexed_master_mesh_enriched.json. To do so:
 _Data.enrich_author_keywords(DIR + "/indexed/indexed_master_mesh.json", DIR + "/indexed/indexed_master_mesh_enriched")
 NOTE: rerun this whenever we amend the reference keywords!
@@ -548,7 +548,7 @@ NOTE: rerun this whenever we amend the reference keywords!
 
 #TODO:
 """
-A. For each set of keywords and article in selected_master.json, map each keyword to its corresponding keyword in 
+A. For each set of keywords and article in sample_master.json, map each keyword to its corresponding keyword in 
 keywords_clean_histogram.json. This is required so that we can compute precision and recall. To dos so, we require both 
 the concept and its URI.
 

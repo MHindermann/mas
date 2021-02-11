@@ -16,6 +16,12 @@ Machine indexing of institutional repositories: indexing Edoc with Annif and BAR
 
 !! Say something to the effect that all data and code are available on GitHub.
 
+## Tools and configuration 
+
+### OpenRefine 
+
+For data refinement I use OpenRefine (https://openrefine.org/). Data manipulation in OpenRefine is tracked: the manipulation history of some data can be exported as JSON file and then reproduced (on the same data on a different machine or on different data) by loading said file. I will supply a corresponding manipulation history whenever appropriate. Note that when using OpenRefine with larger files (and there are many such files in this project), the memory allocation to OpenRefine must be manually increased (see https://docs.openrefine.org/manual/installing/#increasing-memory-allocation for details).
+
 # Prototype
 
 In this chapter, the prototype for a machine indexing of Edoc is presented. The focus is primarily on practical 
@@ -135,16 +141,15 @@ have non-empty `keywords` data field. The caveats of this approach are discussed
 Taking into account the third constraint simply means that we do not employ any further restrictions. We can hence 
 construct the sample data set by choosing exactly those items from `/edoc/raw` which have non-empty data fields 
 `title`, `abstract`, `id_number`, and `keywords`. We do so by calling `_Data.select_from_file` iteratively for all 
-files in `/edoc/raw`. The resulting file is saved in `/edoc/selected` as `selected_master.json`. 
+files in `/edoc/raw`. The resulting file is saved in `/edoc/selected` as `sample_master.json`. 
 
 ### Analysis
 
-Of the 68'345 items in `/edoc/raw`, all have a title (non-empty `title` data field), most items have an ID (57'153 items with non-empty `id_number` data field), roughly half of the items have an abstract (37'381 items with non-empty `abstract` data field), an less than 10% of the items have keywords (6'660 items with non-empty `keywords` data field). The 4'111 items 
+Of the 68'345 items in `/edoc/raw`, all have a title (non-empty `title` data field), most items have an ID (57'153 items with non-empty `id_number` data field), roughly half of the items have an abstract (37'381 items with non-empty `abstract` data field), an less than 10% of the items have keywords (6'660 items with non-empty `keywords` data field). The sample data set as requires all the above data fields to be non-empty; `/edoc/sample/sample_master.json` has 4'111 items and hence constitutes 6% of the raw data. 
 
-!! Mayhaps give a description of `selected_master.json`, namely 4111 items. Also, perhaps also say how many items in 
-`/raw` per data field 
-are 
-available. 
+!! Now talk about the distribution of the items 
+
+!! Mayhaps give a description of `selected_master.json`, namely 4111 items. Also, perhaps also say how many items in `/raw` per data field are available.
 
 ## Machine indexing
 
