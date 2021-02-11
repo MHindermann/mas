@@ -73,10 +73,10 @@ class _Data:
                          *fields: str) -> List[Dict]:
         """ Select items from data based on non-empty fields.
 
-        Only items where all required fields are non-empty are selected.
+        Only items where all required fields are non-empty are sample.
 
         :param data: the input data
-        :param fields: the required fields for an item to be selected
+        :param fields: the required fields for an item to be sample
         """
 
         selected = []
@@ -100,7 +100,7 @@ class _Data:
         For example: select_from_file(DIR + "/raw/2019.json", "title", "abstract", "keywords", "id_number")
 
         :param file_path: complete path to file including filename and extension
-        :param fields: the required fields for an item to be selected
+        :param fields: the required fields for an item to be sample
         """
 
         data = _Utility.load_json(file_path)
@@ -563,18 +563,18 @@ print(" ".join(rawList))
 exit()
 
 #this does not work:
-import PyPDF2
-filename = DIR + "/fulltexts/2020_18_Informed by wet feet_How do floods affect property prices.pdf"
-file = open(filename,'rb')
-pdf_reader = PyPDF2.PdfFileReader(file)
+#import PyPDF2
+#filename = DIR + "/fulltexts/2020_18_Informed by wet feet_How do floods affect property prices.pdf"
+#file = open(filename,'rb')
+#pdf_reader = PyPDF2.PdfFileReader(file)
 
-num_pages = pdf_reader.numPages
-count = 0
-text = ""
-while count < num_pages:
-    page = pdf_reader.getPage(count)
-    count +=1
-    text += page.extractText()
+#num_pages = pdf_reader.numPages
+#count = 0
+#text = ""
+#while count < num_pages:
+#    page = pdf_reader.getPage(count)
+#    count +=1
+#    text += page.extractText()
 
-print(text)
+#print(text)
 
