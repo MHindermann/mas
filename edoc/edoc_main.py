@@ -475,7 +475,7 @@ class _Keywords:
 
 
 class _Analysis:
-    """ A of data analysis functions. """
+    """ A of data images functions. """
 
 
 #_Keywords.enrich_with_yso(DIR + "/keywords/keywords_reference.json", DIR + "/keywords/keywords_reference_test.json")
@@ -553,6 +553,46 @@ keywords_clean_histogram.json. This is required so that we can compute precision
 the concept and its URI.
 
 """
+
+
+import scipy.stats as stats
+
+# variable = number of abstracts in different deparments
+expected = [5737,
+1079,
+1523,
+16679,
+1138,
+5091,
+11470,
+2961,
+19560,
+2867]
+
+observed = [4463,
+658,
+918,
+2708,
+531,
+509,
+9836,
+1807,
+15722,
+531]
+
+print(stats.chisquare(f_obs=observed, f_exp=expected))
+
+# variable = number of items in a specific department
+expected = [5737,
+5737,
+5737,]
+observed = [4463,
+363,
+4947]
+
+print(stats.chisquare(f_obs=observed, f_exp=expected))
+
+exit()
 
 # see https://medium.com/better-programming/how-to-convert-pdfs-into-searchable-key-words-with-python-85aab86c544f for some ideas
 

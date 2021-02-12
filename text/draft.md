@@ -2,7 +2,7 @@
 Markdown Syntax: https://www.markdownguide.org/basic-syntax/
 PyCharm and Markdown: https://www.jetbrains.com/help/pycharm/markdown.html 
 Convert Markdown to LaTeX or PDF: https://pandoc.org/getting-started.html (PS C:\Users\Max\PycharmProjects\mas\text> 
-pandoc .\draft.md -s --number-sections --bibliography biblio.bib --citeproc -o test.pdf)
+pandoc .\draft.md --from markdown+footnotes+implicit_figures --number-sections --bibliography biblio.bib --citeproc -o test.pdf)
 Write a research paper in Markdown: https://opensource.com/article/18/9/pandoc-research-paper
 -->
 
@@ -64,7 +64,7 @@ responsible co-workers. I thus employed a workaround: Edoc has a built-in advanc
 exported. Even though it is not possible to extract all database items by default, only one of the many available search
 fields has to be filled in. The complete database can hence be extracted by only filling in the `Date` field and using a
 sufficiently permissive time period such as 1940 to 2020 since the oldest record in the database was published in 1942.
-On January 21 2021 this query yielded 68'345 results. These results were then exported as a 326 MB JSON file
+On January 21 2021, this query yielded 68'345 results. These results were then exported as a 326 MB JSON file
 called `1942-2020.json`. `1942-2020.json` has two drawbacks. First, the maximum file size on GitHub is 100 MB. And
 second, `1942-2020.json` is too big to be handled by standard editors requiring special editors such as Oxygen. For
 these reasons `1942-2020.json` was split into smaller files that are easier handled and can be uploaded to GitHub. For
@@ -147,15 +147,29 @@ files in `/edoc/raw`. The resulting file is saved in `/edoc/selected` as `select
 
 ### Analysis
 
-Of the 68'345 items in `/edoc/raw`, all have a title (non-empty `title` data field), most items have an ID (57'153 items with non-empty `id_number` data field), roughly half of the items have an abstract (37'381 items with non-empty `abstract` data field), an less than 10% of the items have keywords (6'660 items with non-empty `keywords` data field). The sample data set as requires all the above data fields to be non-empty; `/edoc/sample/sample_master.json` has 4'111 items and hence constitutes 6% of the raw data. 
+Of the 68'345 items in `/edoc/raw`, all have a title (non-empty `title` data field),  a little more than half of the items have an abstract (37'381 items with non-empty `abstract` data field), roughly half of the items have an ID (35'355 items with non-empty `id_number` data field),[^1] and less than 10% of the items have keywords (6'660 items with non-empty `keywords` data field). The sample data set as requires all the above data fields to be non-empty; `/edoc/sample/sample_master.json` has 4'111 items and hence constitutes 6% of the raw data. 
+
+[^1]: Note that when using the facet by blank on `id_number` in OpenRefine, there are 57'153 matches; this is due to the fact that many items with an ID such as DOI have secondary or tertiary IDs such as ISI or PMID. 
+
+ The sample data set is not representative of the raw Edoc data since its construction is strongly biased: it is strongly skewed towards English journal publications in the sciences, medicine and economics from the 21st century as shown in Figure 1. We can also see in Figure 2 that the humanities are clearly underrepresented in Figure. 
+ 
+The reason for this 
 
 !! Now talk about the distribution of the items . The sample is not representative. Talk about different biases. See 
-`/edoc/analysis` ![qwqwd](raw_sample_analysis.jpg)
+`/edoc/analysis` 
+
+![Compared to the raw Edoc data, the sample data is skewed towards English journal publications in the sciences, medicine and economics from the 21st century. This is demonstrated by a Chi-Square goodness of fit test: for each data field, the Chi-Square test statistic is larger than 2000 and the corresponding p-value is 0. The null hypothesis that the sample data set is representative of the raw Edoc data can hence be rejected for each data field. See `blabka` for the data.](images/raw_sample_analysis.pdf)
+
+
+![Compared to the raw Edoc data, the sample data is skewed towards English journal publications in the sciences, medicine and economics from the 21st century. The humanities are thus clearly underrepresented in the sample data set.](images/test.pdf)
 
 !! Mayhaps give a description of `selected_master.json`, namely 4111 items. Also, perhaps also say how many items in 
 `/raw` per data field 
 are 
 available. 
+
+
+
 
 ## Machine indexing
 
@@ -216,3 +230,11 @@ available.
 
 # Appendix
 
+<!-- 
+Codeblocks are done like so:
+~~~~{.Python .numberLines caption="test"}
+def myfunction(var):
+  """ Oh how awesome this is. """
+  pass
+~~~~
+--> 
