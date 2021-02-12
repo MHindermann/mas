@@ -1,12 +1,14 @@
 from __future__ import annotations
 from typing import List, Optional, Dict, Union, Tuple
 from json import load, dump
+import csv
 from datetime import datetime
 from annif_client import AnnifClient
 import os.path
 import urllib3
 import xmltodict
 import ast
+import scipy.stats
 
 
 DIR = os.path.dirname(__file__)
@@ -475,8 +477,42 @@ class _Keywords:
 
 
 class _Analysis:
-    """ A of data images functions. """
+    """ A collection of data analysis functions. """
 
+    @classmethod
+    def chi_square_fit(cls,
+                       file_path: str) -> None:
+
+        """ Print chi square goodness of fit.
+
+        File must be CSV with first line title; three columns with first column categories, second column expected and
+        third column observed values.
+
+        :param file_path: complete path to file including filename and extension
+        """
+
+        with open(file_path, mode='r') as file:
+            reader = csv.reader(file)
+
+            expected = []
+            observed = []
+
+            line_count = 0
+            for line in reader:
+                if line_count == 0:
+                    name = line
+                    line_count = line_count + 1
+                    continue
+                expected.append(int(line[1].split(".")[0]))
+                observed.append(int(line[2].split(".")[0]))
+
+        print(f"Results for {name}")
+        print(scipy.stats.chisquare(f_obs=observed, f_exp=expected))
+
+
+
+
+_Analysis.chi_square_fit(DIR + "/analysis/chi_square_language.csv")
 
 #_Keywords.enrich_with_yso(DIR + "/keywords/keywords_reference.json", DIR + "/keywords/keywords_reference_test.json")
 
@@ -555,42 +591,6 @@ the concept and its URI.
 """
 
 
-import scipy.stats as stats
-
-# variable = number of abstracts in different deparments
-expected = [5737,
-1079,
-1523,
-16679,
-1138,
-5091,
-11470,
-2961,
-19560,
-2867]
-
-observed = [4463,
-658,
-918,
-2708,
-531,
-509,
-9836,
-1807,
-15722,
-531]
-
-print(stats.chisquare(f_obs=observed, f_exp=expected))
-
-# variable = number of items in a specific department
-expected = [5737,
-5737,
-5737,]
-observed = [4463,
-363,
-4947]
-
-print(stats.chisquare(f_obs=observed, f_exp=expected))
 
 exit()
 
