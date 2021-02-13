@@ -2,7 +2,7 @@
 Markdown Syntax: https://www.markdownguide.org/basic-syntax/
 PyCharm and Markdown: https://www.jetbrains.com/help/pycharm/markdown.html 
 Convert Markdown to LaTeX or PDF: https://pandoc.org/getting-started.html (PS C:\Users\Max\PycharmProjects\mas\text> 
-pandoc .\draft.md --from markdown+footnotes+implicit_figures+tex_math_dollars --number-sections --bibliography biblio.bib --citeproc -o test.pdf)
+pandoc .\draft.md --from markdown+footnotes+implicit_figures+tex_math_dollars --number-sections --bibliography biblio.bib --citeproc -o draft.pdf)
 Write a research paper in Markdown: https://opensource.com/article/18/9/pandoc-research-paper
 -->
 
@@ -75,7 +75,7 @@ files are called `raw_master_x-y.json` (where x and y indicate the entries as gi
 
 ### Data description and analysis
 
-!! Text.
+!! Explain the data fields. 
 
 ## Sample data set
 
@@ -105,7 +105,7 @@ The third and final constraint takes into account
 the possibility of having to extend the prototype to the complete Edoc data. On the one hand, the sample data set 
 should be small enough to allow for easy handling and rapid iteration. On the other hand, the sample data set should 
 not be trivial but reflect the quirks and inadequacies of the complete dataset. In other words, 
-we are looking for an abstraction rather than an idealization in the sense of  [@Stokhof.2011]. 
+we are looking for an abstraction rather than an idealization in the sense of  @Stokhof.2011. 
 
 ### Construction
 
@@ -151,21 +151,13 @@ Of the 68'345 items in `/edoc/raw`, all have a title (non-empty `title` data fie
 
 [^1]: Note that when using the facet by blank on `id_number` in OpenRefine, there are 57'153 matches; this is due to the fact that many items with an ID such as DOI have secondary or tertiary IDs such as ISI or PMID. 
 
-In order to determine how well the sample data set represents the raw Edoc data, a one-sample chi-square test was conducted on each selection data field. The results indicate that the sample data proportions of items are significantly different from the raw Edoc data per department (see Figure 1 for more details).
+In order to determine how well the sample data set represents the raw Edoc data, a one-sample chi-square test was conducted on each selection data field [see @Parke.2013, chapter 1]. The results indicate that the sample data proportions of items are significantly different from the raw Edoc data per department (see Figure 1 for more details).
 
-![The sample data set ($N = 4'111$) is not representative of the raw Edoc data ($N = 68'345$) per department. Data field `abstract`: $\chi^2 (df=9)) = 3'160.556$, $p < 0.001$; data field `id_number`: $\chi^2 (df=9)) = 4'209.0285$, $p < 0.001$; data field `keywords`: $\chi^2 (df=9)) = 2'314.533$, $p < 0.001$. The data foundation is available at `/edoc/analysis` and the chi-square can be calculated by calling `_Analysis.chi_square_fit`.](images/chi_square_selection_fields.pdf)
+![The sample data set ($N$ = 4'111) is not representative of the raw Edoc data ($N$ = 68'345) per department. Data field `abstract`: $\chi^2 (df=9) =$ 3'160.556, $p < 0.001$; data field `id_number`: $\chi^2 (df=9) =$ 4'209.0285, $p < 0.001$; data field `keywords`: $\chi^2 (df=9) =$ 2'314.533, $p < 0.001$. The data foundation is available at `/edoc/analysis` and the chi-square statistic can be calculated by calling `_Analysis.chi_square_fit`.](images/chi_square_selection_fields.pdf)
 
- The sample data set is hence not representative of the raw Edoc data. This is not surprising since its construction is strongly biased. This bias has the effect that the sample data set is significantly skewed towards English journal publications in the sciences, medicine and economics from the 21st century (see Figure 2 for more details). The upshot of this analysis is that the humanities are underrepresented in the sample data set. Therefore, any results with respect to the quality of machine indexing discussed below might not be applicable.
+ The sample data set is hence not representative of the raw Edoc data. This is not surprising since its construction is strongly biased. This bias has the effect that the sample data set is significantly skewed towards English journal publications in the sciences, medicine and economics from the 21st century (see Figure 2 for more details). The upshot of this analysis is that the humanities are underrepresented in the sample data set. Therefore, any results with respect to the quality of machine indexing discussed below might not be applicable to the humanities.
 
-![The sample data set ($N = 4'111$) is significantly skewed towards English (data field `language`: $\chi^2 (df=3)) = 1'441.414$, $p < 0.001$) journal publications (data field `type`: $\chi^2 (df=10)) = 52'519.743$, $p < 0.001$) in the sciences, medicine and economics (data field `department`: $\chi^2 (df=9)) = 14'447.276$, $p < 0.001$) from the 21st (data field `date`: $\chi^2 (df=7)) = 35'878.493$, $p < 0.001$) century as compared to the raw Edoc data ($N = 68'345$).](images/raw_sample_analysis.pdf)
-
-!! Mayhaps give a description of `selected_master.json`, namely 4111 items. Also, perhaps also say how many items in 
-`/raw` per data field 
-are 
-available. 
-
-
-
+![The sample data set ($N$ = 4'111) is significantly skewed towards English (data field `language`: $\chi^2 (df=3) =$ 1'441.414, $p < 0.001$) journal publications (data field `type`: $\chi^2 (df=10) =$ 52'519.743, $p < 0.001$) in the sciences, medicine and economics (data field `department`: $\chi^2 (df=9) =$ 14'447.276$, $p < 0.001$) from the 21st (data field `date`: $\chi^2 (df=7)) =$ 35'878.493, $p < 0.001$) century as compared to the raw Edoc data ($N$ = 68'345). The data foundation is available at `/edoc/analysis` and the chi-square statistic can be calculated by calling `_Analysis.chi_square_fit`.](images/raw_sample_analysis.pdf)
 
 ## Machine indexing
 
