@@ -51,7 +51,8 @@ Edoc is the institutional repository of the University of Basel. It was conceive
 electronic dissertations and grew in scope when the University of Basel adapted its first open access policy in 2013.
 As per today Edoc contains roughly 68’000 items. 
 
-Edoc runs on the EPrints 3 document management system [https://github.com/eprints/eprints]. 
+Edoc runs on the EPrints 3 document management system (https://github.com/eprints/eprints).  
+!! Add technical description of Edoc.  
 !! Perhaps add description of how files are added to Edoc, see PDF in `/todo`.
 
 ### Data extraction
@@ -75,7 +76,7 @@ files are called `raw_master_x-y.json` (where x and y indicate the entries as gi
 
 ### Data description and analysis
 
-!! Explain the data fields. 
+!! Explain the Edoc data fields. Say perhaps something about the granularity of the relevant fields. Say something about how the fields are filled in (and by whom).
 
 ## Sample data set
 
@@ -208,9 +209,13 @@ In order to determine how well the sample data set represents the raw Edoc data,
 
 ## Discussion
 
-# Refinement
+# Outlook
 
-# Implementation strategy
+## Refinement
+
+## Implementation strategy
+
+## Other use cases
 
 # Conclusion
 
