@@ -120,7 +120,7 @@ construct the sample data set, we require each item to have a non-empty value in
 and `id_number` as proxy to retrieve a full text remotely. Note that even more context could be provided by taking 
 into account other data fields such as `type`, `publication` or `department`. Especially the latter might be valuable 
 when 
-disambiguating homonymous or polysemous words. For example, consider item `https://edoc.unibas.ch/id/eprint/76510` 
+disambiguating homonymous or polysemous words. For example, consider the item `https://edoc.unibas.ch/id/eprint/76510` 
 which is titled "Blacking Out". Without further context, this title could refer (amongst others) to a physiological 
 phenomenon, a 
 sudden loss of electricity, or a measure taken in wartime. Knowing that the item was published by a 
@@ -235,3 +235,9 @@ def myfunction(var):
   pass
 ~~~~
 --> 
+
+~~~~{.Python .numberLines caption="test"}
+def myfunction(var):
+  """ Oh how awesome this is. """
+  pass
+~~~~
