@@ -534,7 +534,7 @@ _Utility.split_json and we end up with files of size 20 MB or less containing 50
 called raw_master_x-y.json where x and y indicate the entries as given by 1900-2020.json. These files are saved under
 eodc/raw
 
-3. We select a subset of the entries downloaded from edoc. We use _Data.select_from_file to do so (for convencience on 
+OK 3. We select a subset of the entries downloaded from edoc. We use _Data.select_from_file to do so (for convencience on 
 1900-2020.json, but it could also be iteratively employed on the files in edoc/raw). The fields chosen are "title", 
 "abstract", "keywords" and "id_number". The rationale for choosing these fields is given elsewhere (in short: we need 
 items from which to construct a gold standard). The resulting 4111 items are saved as sample_master.json in 

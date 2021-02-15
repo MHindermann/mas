@@ -154,11 +154,11 @@ Of the 68'345 items in `/edoc/raw`, all have a title (non-empty `title` data fie
 
 In order to determine how well the sample data set represents the raw Edoc data, a one-sample chi-square test was conducted on each selection data field [see @Parke.2013, chapter 1]. The results indicate that the sample data proportions of items are significantly different from the raw Edoc data per department (see Figure 1 for more details).
 
-![The sample data set ($N$ = 4'111) is not representative of the raw Edoc data ($N$ = 68'345) per department. Data field `abstract`: $\chi^2 (df=9) =$ 3'160.556, $p < 0.001$; data field `id_number`: $\chi^2 (df=9) =$ 4'209.0285, $p < 0.001$; data field `keywords`: $\chi^2 (df=9) =$ 2'314.533, $p < 0.001$. The data foundation is available at `/edoc/analysis` and the chi-square statistic can be calculated by calling `_Analysis.chi_square_fit`.](images/chi_square_selection_fields.pdf)
+![The sample data set ($n$ = 4'111) is not representative of the raw Edoc data ($n$ = 68'345) per department. Data field `abstract`: $\chi^2 (df=9) =$ 3'160.556, $p < 0.001$; data field `id_number`: $\chi^2 (df=9) =$ 4'209.0285, $p < 0.001$; data field `keywords`: $\chi^2 (df=9) =$ 2'314.533, $p < 0.001$. The data foundation is available at `/edoc/analysis` and the chi-square statistic can be calculated by calling `_Analysis.chi_square_fit`.](images/chi_square_selection_fields.pdf)
 
  The sample data set is hence not representative of the raw Edoc data. This is not surprising since its construction is strongly biased. This bias has the effect that the sample data set is significantly skewed towards English journal publications in the sciences, medicine and economics from the 21st century (see Figure 2 for more details). The upshot of this analysis is that the humanities are underrepresented in the sample data set. Therefore, any results with respect to the quality of machine indexing discussed below might not be applicable to the humanities.
 
-![The sample data set ($N$ = 4'111) is significantly skewed towards English (data field `language`: $\chi^2 (df=3) =$ 1'441.414, $p < 0.001$) journal publications (data field `type`: $\chi^2 (df=10) =$ 52'519.743, $p < 0.001$) in the sciences, medicine and economics (data field `department`: $\chi^2 (df=9) =$ 14'447.276$, $p < 0.001$) from the 21st (data field `date`: $\chi^2 (df=7)) =$ 35'878.493, $p < 0.001$) century as compared to the raw Edoc data ($N$ = 68'345). The data foundation is available at `/edoc/analysis` and the chi-square statistic can be calculated by calling `_Analysis.chi_square_fit`.](images/raw_sample_analysis.pdf)
+![The sample data set ($n$ = 4'111) is significantly skewed towards English (data field `language`: $\chi^2 (df=3) =$ 1'441.414, $p < 0.001$) journal publications (data field `type`: $\chi^2 (df=10) =$ 52'519.743, $p < 0.001$) in the sciences, medicine and economics (data field `department`: $\chi^2 (df=9) =$ 14'447.276$, $p < 0.001$) from the 21st (data field `date`: $\chi^2 (df=7) =$ 35'878.493, $p < 0.001$) century as compared to the raw Edoc data ($n$ = 68'345). The data foundation is available at `/edoc/analysis` and the chi-square statistic can be calculated by calling `_Analysis.chi_square_fit`.](images/raw_sample_analysis.pdf)
 
 ## Machine indexing
 
@@ -166,10 +166,15 @@ In order to determine how well the sample data set represents the raw Edoc data,
 !! Give an overview over machine indexing.
 
 ### Annif
-!! Given an intro to Annif.
+!! Given an intro to Annif. Explain that we are using the out of the box version
 
 ### Implementation
+
+As explained above, for the prototype we will use the out
+
 !! Explain how to implementation works.
+
+In addition to the already used algorithms we should also try https://ai.finto.fi/?locale=en
 
 !! Somewhere here we talk about indexing based on title and/or abstract and/or fulltext. Fulltext is not yet
  implemented. Some observations to do so:
@@ -177,17 +182,27 @@ In order to determine how well the sample data set represents the raw Edoc data,
  ://edoc.unibas.ch/79633/` + `1/` + `2020_18_Informed by wet feet_How do floods affect property prices.pdf` to get
   `https://edoc.unibas.ch/79633/1/2020_18_Informed by wet feet_How do floods affect property prices.pdf`
 
-## Gold standard
-
-### Extract keywords
-
-### Clean keywords
-
-### Frequency analysis
-
-### Mapping to controlled vocabularies
-
 ## Assessment
+
+In this chapter I will construct three distinct gold standards in order to assess the quality of machine indexing the sample data set with Annif.  
+!! Say something about assessments of Annif that have already been carried out.
+
+### Gold standard
+
+The most common approach for assessing the output of machine indexing is by systematically comparing it with a gold standard (sometimes also referred to as model or reference). @Golub.2016 [p. 10]  define a gold standard as "a collection in which each document is assigned a set of subjects that is assumed to be complete and correct" where "_complete_ means that all subjects that should be assigned to a document are in fact assigned, and _correct_ means
+that there are no subjects assigned that are irrelevant to the content". Put inversely, if an item in the gold standard lacks subject terms describing its content, the assignment is not complete; and if an item in the gold standard has been assigned subject terms that are not relevant to its content, the assignment is not correct. 
+
+A gold standard is usually the product of manual indexing by "information experts, subject experts, or potential or real end users" [@Golub.2016, p. 10]. This entails its own host of epistemic problems relating to objectivity and consistency of the assigned subject terms. Most importantly, however, the construction of a gold standard from scratch is very expensive. It is therefore not an option for the project at hand. Rather, I will construct what could be called derivative gold standards by reusing indexing data that is already available. Here we can distinguish two distinct kinds of derivative gold standards: first, I will construct a derivative gold standard based on the author keywords available in the sample data set; call this the "native" gold standard. Second, I will construct a derivative gold standard based on indexing metadata available in repositories distinct from Edoc; call this the "foreign" gold standard. 
+
+There are other methods for assessing machine indexing quality besides comparison with a gold standard that are worth mentioning. These include an evaluation in the context of indexing workflows [@Golub.2016, p. 13ff.], the assessment of retrieval performance [@Golub.2016, p. 15-23.], and so-called model free assessments [@Louis.2013]. 
+
+#### Extract keywords
+
+#### Clean keywords
+
+#### Frequency analysis
+
+#### Mapping to controlled vocabularies
 
 ### Precision, recall, F1-score
 !! Discussion of metrics
@@ -224,6 +239,11 @@ In order to determine how well the sample data set represents the raw Edoc data,
 # Appendix
 
 <!-- 
+How to cite:
+https://pandoc.org/demo/CITATIONS
+
+Annfi@DNB:
+https://wiki.dnb.de/display/FNMVE/Erfahrungen+und+Perspektiven+mit+dem+Toolkit+Annif
 
 Chi-Square Test: 
 https://www.statology.org/chi-square-goodness-of-fit-test-python/
