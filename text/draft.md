@@ -2,7 +2,7 @@
 Markdown Syntax: https://www.markdownguide.org/basic-syntax/
 PyCharm and Markdown: https://www.jetbrains.com/help/pycharm/markdown.html 
 Convert Markdown to LaTeX or PDF: https://pandoc.org/getting-started.html (PS C:\Users\Max\PycharmProjects\mas\text> 
-pandoc .\draft.md --from markdown+footnotes+implicit_figures+tex_math_dollars --number-sections --bibliography biblio.bib --citeproc -o draft.pdf)
+pandoc .\draft.md --from markdown+footnotes+implicit_figures+tex_math_dollars --number-sections --bibliography biblio.bib --citeproc --toc -o draft.pdf)
 Write a research paper in Markdown: https://opensource.com/article/18/9/pandoc-research-paper
 -->
 
@@ -239,6 +239,12 @@ There are other methods for assessing machine indexing quality besides compariso
 # Appendix
 
 <!-- 
+Make main.tex like so:
+pandoc .\draft.md -s --number-sections --bibliography biblio.bib --citeproc --toc -o main.tex
+
+Make draft.tex like so:
+pandoc draft.md -o draft.tex
+
 How to cite:
 https://pandoc.org/demo/CITATIONS
 
