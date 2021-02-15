@@ -182,12 +182,12 @@ In addition to the already used algorithms we should also try https://ai.finto.f
  ://edoc.unibas.ch/79633/` + `1/` + `2020_18_Informed by wet feet_How do floods affect property prices.pdf` to get
   `https://edoc.unibas.ch/79633/1/2020_18_Informed by wet feet_How do floods affect property prices.pdf`
 
-## Assessment
+## Gold standard
 
 In this chapter I will construct three distinct gold standards in order to assess the quality of machine indexing the sample data set with Annif.  
 !! Say something about assessments of Annif that have already been carried out.
 
-### Gold standard
+### Definition
 
 The most common approach for assessing the output of machine indexing is by systematically comparing it with a gold standard (sometimes also referred to as model or reference). @Golub.2016 [p. 10]  define a gold standard as "a collection in which each document is assigned a set of [subject terms] that is assumed to be complete and correct" where "_complete_ means that all subjects that should be assigned to a document are in fact assigned, and _correct_ means
 that there are no subjects assigned that are irrelevant to the content". Put inversely, if an item in the gold standard lacks subject terms describing its content, the assignment is not complete; and if an item in the gold standard has been assigned subject terms that are not relevant to its content, the assignment is not correct. 
@@ -196,24 +196,54 @@ A gold standard is usually the product of manual indexing by "information expert
 
 There are other methods for assessing machine indexing quality besides comparison with a gold standard that are worth mentioning. These include an evaluation in the context of indexing workflows [@Golub.2016, p. 13ff.], the assessment of retrieval performance [@Golub.2016, p. 15-23.], and so-called model free assessments [@Louis.2013]. 
 
+### Native gold standard
+
+The construction of the native gold standard takes...
+
 #### Extract keywords
+
+!! We extract the keywords (per entry) from the sample entries with _Keywords.extract_keywords like so:
+keywords = _Keywords.extract_keywords(DIR + "/sample/sample_master.json")
+We the save the resulting list under edoc/keywords as keywords_raw.json like so:
+_Utility.save_json(keywords, DIR + "/keywords/keywords_extracted.json")
 
 #### Clean keywords
 
-#### Frequency analysis
+!! We clean the extracted keywords with _Keywords.clean_keywords. How and why this is done is explained elsewhere. This 
+is done as follows:
+keywords_extracted = _Utility.load_json(DIR + "/keywords/keywords_extracted.json")
+keywords_clean = _Keywords.clean_keywords(keywords_extracted)
+We the save the resulting list under edoc/keywords as keywords_clean.json like so:
+_Utility.save_json(clean, DIR + "keywords/keywords_clean.json")
 
-#### Mapping to controlled vocabularies
+#### Analysis
+
+!! Frequency
+
+#### Reconciliation
+
+!! Mapping to controlled vocabularies; explain why this is necessary.
+
+!! Does the OpenRefine project still exist? Export the list of changes!
+
+### Foreign gold standard
+
+!! Todo:
+- Explain MeSH  
+- Explain how to get MeSH for subset of sample data set
+
+## Assessment
 
 ### Precision, recall, F1-score
 !! Discussion of metrics
 
-### Annif versus gold standard
+### Annif versus native gold standard
 
 #### YSO
 
 #### Wikidata
 
-### Annif versus MeSH
+### Annif versus foreign gold standard
 
 ### Digression: truth-conditions for indexing
 (Correspondence theory of indexing: subject term T fits text X iff text X is about T)
