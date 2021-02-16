@@ -152,7 +152,8 @@ hand, the sample data set should be small enough to allow for easy
 handling and rapid iteration. On the other hand, the sample data set
 should not be trivial but reflect the quirks and inadequacies of the
 complete dataset. In other words, we are looking for an abstraction
-rather than an idealization in the sense of @Stokhof.2011.
+rather than an idealization in the sense of Stokhof and van Lambalgen
+(2011).
 
 \hypertarget{construction}{%
 \subsubsection{Construction}\label{construction}}
@@ -174,7 +175,7 @@ into account other data fields such as \texttt{type},
 be valuable when disambiguating homonymous or polysemous words. For
 example, consider the item
 \texttt{https://edoc.unibas.ch/id/eprint/76510} which is titled
-``Blacking Out''. Without further context, this title could refer
+``Blacking Out.'' Without further context, this title could refer
 (amongst others) to a physiological phenomenon, a sudden loss of
 electricity, or a measure taken in wartime. Knowing that the item was
 published by a researcher employed by the Faculty of Business and
@@ -227,9 +228,9 @@ constitutes 6\% of the raw data.
 
 In order to determine how well the sample data set represents the raw
 Edoc data, a one-sample chi-square test was conducted on each selection
-data field {[}see @Parke.2013, chapter 1{]}. The results indicate that
-the sample data proportions of items are significantly different from
-the raw Edoc data per department (see Figure 1 for more details).
+data field (see Parke 2013, chap. 1). The results indicate that the
+sample data proportions of items are significantly different from the
+raw Edoc data per department (see Figure 1 for more details).
 
 \begin{figure}
 \centering
@@ -303,8 +304,8 @@ do so: - the link to the fulltext is constructed from the data fields
 to get
 \texttt{https://edoc.unibas.ch/79633/1/2020\_18\_Informed\ by\ wet\ feet\_How\ do\ floods\ affect\ property\ prices.pdf}
 
-\hypertarget{assessment}{%
-\subsection{Assessment}\label{assessment}}
+\hypertarget{gold-standard}{%
+\subsection{Gold standard}\label{gold-standard}}
 
 In this chapter I will construct three distinct gold standards in order
 to assess the quality of machine indexing the sample data set with
@@ -312,17 +313,17 @@ Annif.\\
 !! Say something about assessments of Annif that have already been
 carried out.
 
-\hypertarget{gold-standard}{%
-\subsubsection{Gold standard}\label{gold-standard}}
+\hypertarget{definition}{%
+\subsubsection{Definition}\label{definition}}
 
 The most common approach for assessing the output of machine indexing is
 by systematically comparing it with a gold standard (sometimes also
-referred to as model or reference). @Golub.2016 {[}p. 10{]} define a
+referred to as model or reference). Golub et al. (2016, 10) define a
 gold standard as ``a collection in which each document is assigned a set
-of subjects that is assumed to be complete and correct'' where
-``\emph{complete} means that all subjects that should be assigned to a
-document are in fact assigned, and \emph{correct} means that there are
-no subjects assigned that are irrelevant to the content''. Put
+of {[}subject terms{]} that is assumed to be complete and correct''
+where ``\emph{complete} means that all subjects that should be assigned
+to a document are in fact assigned, and \emph{correct} means that there
+are no subjects assigned that are irrelevant to the content.'' Put
 inversely, if an item in the gold standard lacks subject terms
 describing its content, the assignment is not complete; and if an item
 in the gold standard has been assigned subject terms that are not
@@ -330,37 +331,131 @@ relevant to its content, the assignment is not correct.
 
 A gold standard is usually the product of manual indexing by
 ``information experts, subject experts, or potential or real end users''
-{[}@Golub.2016, p. 10{]}. This entails its own host of epistemic
-problems relating to objectivity and consistency of the assigned subject
-terms. Most importantly, however, the construction of a gold standard
-from scratch is very expensive. It is therefore not an option for the
-project at hand. Rather, I will construct what could be called
-derivative gold standards by reusing indexing data that is already
-available. Here we can distinguish two distinct kinds of derivative gold
-standards: first, I will construct a derivative gold standard based on
-the author keywords available in the sample data set; call this the
-``native'' gold standard. Second, I will construct a derivative gold
-standard based on indexing metadata available in repositories distinct
-from Edoc; call this the ``foreign'' gold standard.
+(Golub et al. 2016, 10). This entails its own host of epistemic problems
+relating to objectivity and consistency of the assigned subject terms.
+Most importantly, however, the construction of a gold standard from
+scratch is very expensive. It is therefore not an option for the project
+at hand. Rather, I will construct what could be called derivative gold
+standards by reusing indexing data that is already available. Here we
+can distinguish two distinct kinds of derivative gold standards: first,
+I will construct a derivative gold standard based on the author keywords
+available in the sample data set; call this the ``native'' gold
+standard. Second, I will construct a derivative gold standard based on
+indexing metadata available in repositories distinct from Edoc; call
+this the ``foreign'' gold standard.
 
 There are other methods for assessing machine indexing quality besides
 comparison with a gold standard that are worth mentioning. These include
-an evaluation in the context of indexing workflows {[}@Golub.2016, p.
-13ff.{]}, the assessment of retrieval performance {[}@Golub.2016, p.
-15-23.{]}, and so-called model free assessments {[}@Louis.2013{]}.
+an evaluation in the context of indexing workflows (Golub et al. 2016,
+13ff.), the assessment of retrieval performance (Golub et al. 2016,
+15--23.), and so-called model free assessments (Louis and Nenkova 2013).
+
+\hypertarget{native-gold-standard}{%
+\subsubsection{Native gold standard}\label{native-gold-standard}}
+
+The construction of the native gold standard takes x steps:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Extract the keywords from the sample data set.\\
+\item
+  Clean the extracted keywords.
+\item
+  Reconcile the extracted keywords with\ldots{}
+\end{enumerate}
+
+The intended output of this transformation process is\ldots{}
+
+These steps are explained in more detail in what follows.
 
 \hypertarget{extract-keywords}{%
 \paragraph{Extract keywords}\label{extract-keywords}}
 
+In a first step, the keywords must be extracted from the sample data set
+\texttt{/sample/sample\_master.json}. Recall that we mandated a
+non-empty \texttt{keywords} data field for an item to be selected from
+the raw Edoc data (see \protect\hyperlink{selection}{subsection
+``Selection''}). We can thus simply copy the information in the
+\texttt{keywords} data field on a per item basis. To do this, we call
+\texttt{\_Keywords.extract\_keywords} with the sample data set as
+argument and save the output as
+\texttt{keywords/keywords\_extracted.json} like so:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{keywords }\OperatorTok{=}\NormalTok{ \_Keywords.extract\_keywords(DIR }\OperatorTok{+} \StringTok{"/sample/sample\_master.json"}\NormalTok{)}
+\NormalTok{\_Utility.save\_json(keywords, DIR }\OperatorTok{+} \StringTok{"/keywords/keywords\_extracted.json"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
 \hypertarget{clean-keywords}{%
 \paragraph{Clean keywords}\label{clean-keywords}}
 
-\hypertarget{frequency-analysis}{%
-\paragraph{Frequency analysis}\label{frequency-analysis}}
+In second step, a list of all single keywords must be created. In order
+to do so, let us consider now in more detail the exact information
+extracted from the \texttt{keywords} data fields as per
+\texttt{keywords/keywords\_extracted.json}. In Edoc, the
+\texttt{keywords} data field of an item is a non-mandatory free text
+field that is filled in by the user (usually one of the authors) who
+undertakes the data entry of an item to Edoc. Even though the Edoc user
+manual specifies that keywords must be separated by commas (Universität
+Basel, n.d., 8), this requirement is neither validated by the input mask
+nor by an administrator of Edoc. Furthermore, neither the manual nor the
+input mask provide a definition of the term ``keyword.'' A vocabulary or
+a list of vocabularies from which to choose the keywords is also
+lacking. Taken together, these observations are indicative of very
+heterogeneous data in the \texttt{keywords} data field. To wit, the
+items of \texttt{keywords/keywords\_extracted.json} are strings where
+single keywords are individuated by any symbols the user saw fit. So,
+for each item in \texttt{keywords/keywords\_extracted.json}, the user
+input must be parsed into single keywords.
 
-\hypertarget{mapping-to-controlled-vocabularies}{%
-\paragraph{Mapping to controlled
-vocabularies}\label{mapping-to-controlled-vocabularies}}
+Next the so parsed single keywords must be cleaned or normalized: we
+want the keywords to follow a uniform format thereby joining
+morphological duplicates such as ``Gene,'' ``gene,'' " gene``,''/gene``.
+Also, some keywords are in fact keyword chains, for
+example''Dendrites/metabolism/ultrastructure". Keyword chains must be
+broken into their component keywords and then parsed again. The reason
+for this is that Annif only assigns flat keywords and not keyword
+chains.
+
+\texttt{\_Keywords.clean\_keywords} is the implementation the parser and
+the recursive cleaner is implemented by
+\texttt{\_Keywords.clean\_keyword}. To create the desired list of clean
+keywords, saved as \texttt{keywords/keywords\_clean.json}, we call
+\texttt{\_Keywords.clean\_keywords} with the extracted keywords as
+argument:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{keywords\_extracted }\OperatorTok{=}\NormalTok{ \_Utility.load\_json(DIR }\OperatorTok{+} \StringTok{"/keywords/keywords\_extracted.json"}\NormalTok{)}
+\NormalTok{keywords\_clean }\OperatorTok{=}\NormalTok{ \_Keywords.clean\_keywords(keywords\_extracted)}
+\NormalTok{\_Utility.save\_json(keywords\_clean, DIR }\OperatorTok{+} \StringTok{"keywords/keywords\_clean.json"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{analysis-1}{%
+\paragraph{Analysis}\label{analysis-1}}
+
+!! Frequency
+
+\hypertarget{reconciliation}{%
+\paragraph{Reconciliation}\label{reconciliation}}
+
+!! Mapping to controlled vocabularies; explain why this is necessary.
+
+!! Does the OpenRefine project still exist? Export the list of changes!
+
+\hypertarget{foreign-gold-standard}{%
+\subsubsection{Foreign gold standard}\label{foreign-gold-standard}}
+
+!! Todo: - Explain MeSH\\
+- Explain how to get MeSH for subset of sample data set
+
+\hypertarget{assessment}{%
+\subsection{Assessment}\label{assessment}}
 
 \hypertarget{precision-recall-f1-score}{%
 \subsubsection{Precision, recall,
@@ -368,9 +463,9 @@ F1-score}\label{precision-recall-f1-score}}
 
 !! Discussion of metrics
 
-\hypertarget{annif-versus-gold-standard}{%
-\subsubsection{Annif versus gold
-standard}\label{annif-versus-gold-standard}}
+\hypertarget{annif-versus-native-gold-standard}{%
+\subsubsection{Annif versus native gold
+standard}\label{annif-versus-native-gold-standard}}
 
 \hypertarget{yso}{%
 \paragraph{YSO}\label{yso}}
@@ -378,8 +473,9 @@ standard}\label{annif-versus-gold-standard}}
 \hypertarget{wikidata}{%
 \paragraph{Wikidata}\label{wikidata}}
 
-\hypertarget{annif-versus-mesh}{%
-\subsubsection{Annif versus MeSH}\label{annif-versus-mesh}}
+\hypertarget{annif-versus-foreign-gold-standard}{%
+\subsubsection{Annif versus foreign gold
+standard}\label{annif-versus-foreign-gold-standard}}
 
 \hypertarget{digression-truth-conditions-for-indexing}{%
 \subsubsection{Digression: truth-conditions for
@@ -388,8 +484,8 @@ indexing}\label{digression-truth-conditions-for-indexing}}
 (Correspondence theory of indexing: subject term T fits text X iff text
 X is about T) \#\#\# Targets !! Find out what I meant here.
 
-\hypertarget{analysis-1}{%
-\subsubsection{Analysis}\label{analysis-1}}
+\hypertarget{analysis-2}{%
+\subsubsection{Analysis}\label{analysis-2}}
 
 \hypertarget{discussion}{%
 \subsection{Discussion}\label{discussion}}
@@ -409,16 +505,40 @@ X is about T) \#\#\# Targets !! Find out what I meant here.
 \hypertarget{conclusion}{%
 \section{Conclusion}\label{conclusion}}
 
-\hypertarget{bibliography}{%
-\section{Bibliography}\label{bibliography}}
-
 \hypertarget{appendix}{%
 \section{Appendix}\label{appendix}}
 
-\begin{Shaded}
-\begin{Highlighting}[numbers=left,,]
-\KeywordTok{def}\NormalTok{ myfunction(var):}
-  \CommentTok{""" Oh how awesome this is. """}
-  \ControlFlowTok{pass}
-\end{Highlighting}
-\end{Shaded}
+\hypertarget{bibliography}{%
+\section{Bibliography}\label{bibliography}}
+
+\hypertarget{refs}{}
+\begin{CSLReferences}{1}{0}
+\leavevmode\hypertarget{ref-Golub.2016}{}%
+Golub, Koraljka, Dagobert Soergel, George Buchanan, Douglas Tudhope,
+Marianne Lykke, and Debra Hiom. 2016. {``A Framework for Evaluating
+Automatic Indexing or Classification in the Context of Retrieval.''}
+\emph{Journal of the Association for Information Science and Technology}
+67 (1): 3--16. \url{https://doi.org/10.1002/asi.23600}.
+
+\leavevmode\hypertarget{ref-Louis.2013}{}%
+Louis, Annie, and Ani Nenkova. 2013. {``Automatically Assessing Machine
+Summary Content Without a Gold Standard.''} \emph{Computational
+Linguistics} 39 (2): 267--300.
+\url{https://doi.org/10.1162/COLI\%7B/textunderscore\%20\%7Da\%7B/textunderscore\%20\%7D00123}.
+
+\leavevmode\hypertarget{ref-Parke.2013}{}%
+Parke, Carol. 2013. \emph{Essential First Steps to Data Analysis:
+Scenario-Based Examples Using SPSS}. Thousand Oaks: {SAGE Publications}.
+\url{https://doi.org/10.4135/9781506335148}.
+
+\leavevmode\hypertarget{ref-Stokhof.2011}{}%
+Stokhof, Martin, and Michiel van Lambalgen. 2011. {``Abstractions and
+Idealisations: The Construction of Modern Linguistics.''}
+\emph{Theoretical Linguistics} 37 (1-2): 1--26.
+\url{https://doi.org/10.1515/thli.2011.001}.
+
+\leavevmode\hypertarget{ref-UniversitatBasel.2021}{}%
+Universität Basel. n.d. {``Research Database of the University of Basel
+User Manual.''} Edited by Universität Basel.
+
+\end{CSLReferences}

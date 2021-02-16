@@ -198,23 +198,38 @@ There are other methods for assessing machine indexing quality besides compariso
 
 ### Native gold standard
 
-The construction of the native gold standard takes...
+The construction of the native gold standard takes x steps:
+
+1. Extract the keywords from the sample data set.  
+2. Clean the extracted keywords.
+3. Reconcile the extracted keywords with...  
+
+The intended output of this transformation process is...
+
+These steps are explained in more detail in what follows.
 
 #### Extract keywords
 
-!! We extract the keywords (per entry) from the sample entries with _Keywords.extract_keywords like so:
+In a first step, the keywords must be extracted from the sample data set `/sample/sample_master.json`. Recall that we mandated a non-empty `keywords` data field for an item to be selected from the raw Edoc data (see [subsection "Selection"](#selection)). We can thus simply copy the information in the `keywords` data field on a per item basis. To do this, we call `_Keywords.extract_keywords` with the sample data set as argument and save the output as `keywords/keywords_extracted.json` like so:
+
+~~~~{.Python caption="extract_keywords"}
 keywords = _Keywords.extract_keywords(DIR + "/sample/sample_master.json")
-We the save the resulting list under edoc/keywords as keywords_raw.json like so:
 _Utility.save_json(keywords, DIR + "/keywords/keywords_extracted.json")
+~~~~
 
 #### Clean keywords
 
-!! We clean the extracted keywords with _Keywords.clean_keywords. How and why this is done is explained elsewhere. This 
-is done as follows:
+In second step, a list of all single keywords must be created. In order to do so, let us consider now in more detail the exact information extracted from the `keywords` data fields as per `keywords/keywords_extracted.json`. In Edoc, the `keywords` data field of an item is a non-mandatory free text field that is filled in by the user (usually one of the authors) who undertakes the data entry of an item to Edoc. Even though the Edoc user manual specifies that keywords must be separated by commas [@UniversitatBasel.2021, p. 8], this requirement is neither validated by the input mask nor by an administrator of Edoc. Furthermore, neither the manual nor the input mask provide a definition of the term "keyword". A vocabulary or a list of vocabularies from which to choose the keywords is also lacking. Taken together, these observations are indicative of very heterogeneous data in the `keywords` data field. To wit, the items of `keywords/keywords_extracted.json` are strings where single keywords are individuated by any symbols the user saw fit. So, for each item in `keywords/keywords_extracted.json`, the user input must be parsed into single keywords. 
+
+Next the so parsed single keywords must be cleaned or normalized: we want the keywords to follow a uniform format thereby joining morphological duplicates such as "Gene", "gene", " gene", "/gene". Also, some keywords are in fact keyword chains, for example "Dendrites/metabolism/ultrastructure". Keyword chains must be broken into their component keywords and then parsed again. The reason for this is that Annif only assigns flat keywords and not keyword chains. 
+
+`_Keywords.clean_keywords` is the implementation the parser and the recursive cleaner is implemented by `_Keywords.clean_keyword`. To create the desired list of clean keywords, saved as `keywords/keywords_clean.json`, we call `_Keywords.clean_keywords` with the extracted keywords as argument:
+
+~~~~{.Python caption="extract_keywords"}
 keywords_extracted = _Utility.load_json(DIR + "/keywords/keywords_extracted.json")
 keywords_clean = _Keywords.clean_keywords(keywords_extracted)
-We the save the resulting list under edoc/keywords as keywords_clean.json like so:
-_Utility.save_json(clean, DIR + "keywords/keywords_clean.json")
+_Utility.save_json(keywords_clean, DIR + "keywords/keywords_clean.json")
+~~~~
 
 #### Analysis
 
@@ -264,16 +279,16 @@ _Utility.save_json(clean, DIR + "keywords/keywords_clean.json")
 
 # Conclusion
 
-# Bibliography
-
 # Appendix
+
+# Bibliography
 
 <!-- 
 Make main.tex like so:
 pandoc .\draft.md -s --number-sections --bibliography biblio.bib --citeproc --toc -o main.tex
 
 Make draft.tex like so:
-pandoc draft.md -o draft.tex
+pandoc draft.md --bibliography biblio.bib --citeproc -o draft.tex
 
 How to cite:
 https://pandoc.org/demo/CITATIONS
@@ -290,10 +305,4 @@ def myfunction(var):
   """ Oh how awesome this is. """
   pass
 ~~~~
---> 
-
-~~~~{.Python .numberLines caption="test"}
-def myfunction(var):
-  """ Oh how awesome this is. """
-  pass
-~~~~
+-->
