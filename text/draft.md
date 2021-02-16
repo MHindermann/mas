@@ -235,6 +235,8 @@ _Utility.save_json(keywords_clean, DIR + "keywords/keywords_clean.json")
 
 !! Frequency
 
+!! Cumulative sum histogram
+
 #### Reconciliation
 
 !! Mapping to controlled vocabularies; explain why this is necessary.
