@@ -221,7 +221,7 @@ _Utility.save_json(keywords, DIR + "/keywords/keywords_extracted.json")
 
 In second step, a list of all single keywords must be created. In order to do so, let us consider now in more detail the exact information extracted from the `keywords` data fields as per `keywords/keywords_extracted.json`. In Edoc, the `keywords` data field of an item is a non-mandatory free text field that is filled in by the user (usually one of the authors) who undertakes the data entry of an item to Edoc. Even though the Edoc user manual specifies that keywords must be separated by commas [@UniversitatBasel.2021, p. 8], this requirement is neither validated by the input mask nor by an administrator of Edoc. Furthermore, neither the manual nor the input mask provide a definition of the term "keyword". A vocabulary or a list of vocabularies from which to choose the keywords is also lacking. Taken together, these observations are indicative of very heterogeneous data in the `keywords` data field. To wit, the items of `keywords/keywords_extracted.json` are strings where single keywords are individuated by any symbols the user saw fit. So, for each item in `keywords/keywords_extracted.json`, the user input must be parsed into single keywords. 
 
-Next the so parsed single keywords must be cleaned or normalized: we want the keywords to follow a uniform format thereby joining morphological duplicates such as "Gene", "gene", " gene", "/gene". Also, some keywords are in fact keyword chains, for example "Dendrites/metabolism/ultrastructure". Keyword chains must be broken into their component keywords and then parsed again. The reason for this is that Annif only assigns flat keywords and not keyword chains. 
+Next the so parsed single keywords must be cleaned or normalized: we want the keywords to follow a uniform format thereby joining morphological duplicates such as "Gene", "gene", "gene_", "gene/", and so on. Also, some keywords are in fact keyword chains, for example "Dendrites/metabolism/ultrastructure". Keyword chains must be broken into their component keywords and then parsed again. The reason for this is that Annif only assigns flat keywords and not keyword chains. 
 
 `_Keywords.clean_keywords` is the implementation the parser and the recursive cleaner is implemented by `_Keywords.clean_keyword`. To create the desired list of clean keywords, saved as `keywords/keywords_clean.json`, we call `_Keywords.clean_keywords` with the extracted keywords as argument:
 
@@ -236,6 +236,10 @@ _Utility.save_json(keywords_clean, DIR + "keywords/keywords_clean.json")
 !! Frequency
 
 !! Cumulative sum histogram
+
+![Bla.](images/keywords_clean_histogram_a.pdf)
+
+![Bla.](images/keywords_clean_histogram_b.pdf)
 
 #### Reconciliation
 

@@ -414,11 +414,11 @@ input must be parsed into single keywords.
 
 Next the so parsed single keywords must be cleaned or normalized: we
 want the keywords to follow a uniform format thereby joining
-morphological duplicates such as ``Gene,'' ``gene,'' " gene``,''/gene``.
-Also, some keywords are in fact keyword chains, for
-example''Dendrites/metabolism/ultrastructure". Keyword chains must be
-broken into their component keywords and then parsed again. The reason
-for this is that Annif only assigns flat keywords and not keyword
+morphological duplicates such as ``Gene,'' ``gene,'' ``gene\_,''
+``gene/,'' and so on. Also, some keywords are in fact keyword chains,
+for example ``Dendrites/metabolism/ultrastructure.'' Keyword chains must
+be broken into their component keywords and then parsed again. The
+reason for this is that Annif only assigns flat keywords and not keyword
 chains.
 
 \texttt{\_Keywords.clean\_keywords} is the implementation the parser and
@@ -440,6 +440,20 @@ argument:
 \paragraph{Analysis}\label{analysis-1}}
 
 !! Frequency
+
+!! Cumulative sum histogram
+
+\begin{figure}
+\centering
+\includegraphics{images/keywords_clean_histogram_a.pdf}
+\caption{Bla.}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics{images/keywords_clean_histogram_b.pdf}
+\caption{Bla.}
+\end{figure}
 
 \hypertarget{reconciliation}{%
 \paragraph{Reconciliation}\label{reconciliation}}
