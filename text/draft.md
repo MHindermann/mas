@@ -237,9 +237,11 @@ _Utility.save_json(keywords_clean, DIR + "keywords/keywords_clean.json")
 
 !! Cumulative sum histogram
 
-![Bla.](images/keywords_clean_histogram_a.pdf)
+![In `keywords/keywords_clean_histogram.json`, the frequency distribution of keywords is strongly skewed right ($min = Q1 = M = Q3 = 1$ and $max = 910$).](images/keywords_clean_histogram_a.pdf)
 
 ![Bla.](images/keywords_clean_histogram_b.pdf)
+
+![Bla.](images/keywords_clean_histogram_c.pdf)
 
 #### Reconciliation
 
