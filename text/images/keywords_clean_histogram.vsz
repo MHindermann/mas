@@ -1,5 +1,5 @@
 # Veusz saved document (version 3.3.1)
-# Saved at 2021-02-18T10:57:17.615218
+# Saved at 2021-02-18T19:02:19.318599
 
 AddImportPath(u'C:\\Users\\Max\\PycharmProjects\\mas\\text\\images')
 ImportFileCSV(u'keywords_clean_histogram.csv', linked=True, numericlocale=u'de_CH')
@@ -385,7 +385,7 @@ Add('graph', name=u'graph2', autoadd=False)
 To(u'graph2')
 Set('hide', False)
 Set('leftMargin', u'1.775cm')
-Set('rightMargin', u'0.9cm')
+Set('rightMargin', u'1.061cm')
 Set('topMargin', u'8.25cm')
 Set('bottomMargin', u'3.726cm')
 Add('axis', name=u'x', autoadd=False)

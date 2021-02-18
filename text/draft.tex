@@ -465,9 +465,9 @@ Figure 3 for details).
 distribution of keywords is strongly skewed right
 (\(min = Q1 = M = Q3 = 1\) and \(max = 910\)). However, even though
 keywords with only one occurrence constitute over 75\% of the total
-keywords, they constitute less than 35\% of the total occurrences. The
-most common keywords with 50 or more occurrences are extreme outliers
-but make up almost 20\% of the total occurrences.}
+keywords, their occurrences constitute less than 35\% of the total
+occurrences. The most common keywords with 50 or more occurrences are
+extreme outliers but make up almost 20\% of the total occurrences.}
 \end{figure}
 
 \hypertarget{reconciliation}{%
@@ -478,12 +478,22 @@ vocabulary. If we want to assess the quality of the indexing via a gold
 standard, we must therefore ensure that the gold standard makes use of
 the vocabulary used by Annif. As seen in section Y, the relevant
 (English) vocabularies are Wikidata YSO. The next step in constructing
-the native gold standard is hence to reconcile the extracted and cleaned
-keywords with YSO and Wikidata.
+the native gold standard is hence to match the extracted and cleaned
+keywords with keywords from YSO and Wikidata. This process is called
+``reconciliation'' (see https://docs.openrefine.org/manual/reconciling)
+and the tool of choice for this task is OpenRefine (see
+\protect\hyperlink{openrefine}{section OpenRefine}).
 
-The tool of choice for reconciliation is OpenRefine (see
-\protect\hyperlink{openrefine}{section OpenRefine}). We import
-\texttt{keywords/keywords\_clean\_histogram.json} as a new project.
+In what follows, I will describe how the cleaned keywords were
+reconciled with Wikidata and YSO, and which additional steps for
+refinement were undertaken. In total, 2'104 data transformation
+operations were performed; the complete operation history is available
+as \texttt{/keywords/operation\_history.json}. First
+\texttt{keywords/keywords\_clean\_histogram.json} was set as a new
+project in OpenRefine. The \texttt{keyword} column was then duplicated
+and reconciled with Wikidata. Here the parameters were chosen as
+follows: reconcile against no particular type, and auto-match candidates
+with high confidence.
 
 Before we do so, let us briefly look at the data in
 \texttt{keywords/keywords\_clean.json}.

@@ -241,16 +241,20 @@ keywords_histogram = _Keywords.make_histogram(keywords_clean)
 _Utility.save_json(keywords_histogram, DIR + "keywords/keywords_clean_histogram.json")
 ~~~~
 
-An analysis of `keywords/keywords_clean_histogram.json` shows that the distribution of keywords is strongly skewed right but that (see Figure 3 for details).
-
+An analysis of `keywords/keywords_clean_histogram.json` shows that the lion's share of keywords has only one occurrence but that the total occurrences are predominantly made up of keywords with more than one occurrence (see Figure 3 for details).
 
 ![In `keywords/keywords_clean_histogram.json`, the distribution of keywords is strongly skewed right ($min = Q1 = M = Q3 = 1$ and $max = 910$). However, even though keywords with only one occurrence constitute over 75% of the total keywords, their occurrences constitute less than 35% of the total occurrences. The most common keywords with 50 or more occurrences are extreme outliers but make up almost 20% of the total occurrences.](images/keywords_clean_histogram_abc.pdf)
 
 #### Reconciliation
 
-As explained in section X, Annif assigns index terms from a controlled vocabulary. If we want to assess the quality of the indexing via a gold standard, we must therefore ensure that the gold standard makes use of the vocabulary used by Annif. As seen in section Y, the relevant (English) vocabularies are Wikidata YSO. The next step in constructing the native gold standard is hence to reconcile the extracted and cleaned keywords with YSO and Wikidata. 
+As explained in section X, Annif assigns index terms from a controlled vocabulary. If we want to assess the quality of the indexing via a gold standard, we must therefore ensure that the gold standard makes use of the vocabulary used by Annif. As seen in section Y, the relevant (English) vocabularies are Wikidata YSO. The next step in constructing the native gold standard is hence to match the extracted and cleaned keywords with keywords from YSO and Wikidata. This process is called "reconciliation" (see https://docs.openrefine.org/manual/reconciling) and the tool of choice for this task is OpenRefine (see [section OpenRefine](#openrefine)). 
 
-The tool of choice for reconciliation is OpenRefine (see [section OpenRefine](#openrefine)). We import `keywords/keywords_clean_histogram.json` as a new project. 
+In what follows, I will describe how the cleaned keywords were reconciled with Wikidata and YSO, and which additional steps for refinement were undertaken. In total, 2'104 data transformation operations were performed; the complete operation history is available as `/keywords/operation_history.json`. 
+
+A new project in OpenRefine was created and the data from `keywords/keywords_clean_histogram.json` was imported. The `keyword` column was then duplicated and reconciled with Wikidata. Here the parameters were chosen as follows: reconcile against no particular type, and auto-match candidates with high confidence. There were X automatic matches. Unfortunately, random sampling showed that the overall quality of the automatic matches was not satisfactory. A two-pronged strategy was adopted to ameliorate the quality of the reonciliation:
+
+1. manual matching of the top results
+2. automated processes for the rest
 
 
 
@@ -261,7 +265,7 @@ for a given input text, Annif assigns index terms from some controlled vocabular
 
 !! Mapping to controlled vocabularies; explain why this is necessary.
 
-!! Does the OpenRefine project still exist? Export the list of changes!
+!! Does the OpenRefine project still exist? Export the list of changes! http://127.0.0.1:3333/project?project=2501403769019&ui=%7B%22facets%22%3A%5B%7B%22c%22%3A%7B%22type%22%3A%22list%22%2C%22name%22%3A%22qid%22%2C%22columnName%22%3A%22qid%22%2C%22expression%22%3A%22isBlank(value)%22%2C%22omitBlank%22%3Afalse%2C%22omitError%22%3Afalse%2C%22selectBlank%22%3Afalse%2C%22selectError%22%3Afalse%2C%22invert%22%3Afalse%7D%2C%22o%22%3A%7B%22sort%22%3A%22name%22%7D%2C%22s%22%3A%5B%5D%7D%5D%7D
 
 ### Foreign gold standard
 
