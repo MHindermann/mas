@@ -223,7 +223,7 @@ In second step, a list of all single keywords must be created. In order to do so
 
 Next the so parsed single keywords must be cleaned or normalized: we want the keywords to follow a uniform format thereby joining morphological duplicates such as "Gene", "gene", "gene_", "gene/", and so on. Also, some keywords are in fact keyword chains, for example "Dendrites/metabolism/ultrastructure". Keyword chains must be broken into their component keywords and then parsed again. The reason for this is that Annif only assigns flat keywords and not keyword chains. 
 
-`_Keywords.clean_keywords` is the implementation the parser and the recursive cleaner is implemented by `_Keywords.clean_keyword`. To create the desired list of clean keywords, saved as `keywords/keywords_clean.json`, we call `_Keywords.clean_keywords` with the extracted keywords as argument:
+`_Keywords.clean_keywords` is the implementation the parser while the recursive cleaner is implemented by `_Keywords.clean_keyword`. To create the desired list of clean keywords, saved as `keywords/keywords_clean.json`, we call `_Keywords.clean_keywords` with the extracted keywords as argument:
 
 ~~~~{.Python caption="extract_keywords"}
 keywords_extracted = _Utility.load_json(DIR + "/keywords/keywords_extracted.json")
@@ -233,17 +233,31 @@ _Utility.save_json(keywords_clean, DIR + "keywords/keywords_clean.json")
 
 #### Analysis
 
-!! Frequency
+`keywords/keywords_clean.json` has 36'901 entries many of which are duplicates. We hence deduplicate and count the number of occurrences of each keyword. This is achieved by calling `_Keywords.make_histogram` on `keywords/keywords_clean.json` and saving the output as `keywords/keywords_clean_histogram.json`:
 
-!! Cumulative sum histogram
+~~~~{.Python caption="make_histogram"}
+keywords_clean = _Utility.load_json(DIR + "/keywords/keywords_clean.json")
+keywords_histogram = _Keywords.make_histogram(keywords_clean)
+_Utility.save_json(keywords_histogram, DIR + "keywords/keywords_clean_histogram.json")
+~~~~
 
-![In `keywords/keywords_clean_histogram.json`, the frequency distribution of keywords is strongly skewed right ($min = Q1 = M = Q3 = 1$ and $max = 910$).](images/keywords_clean_histogram_a.pdf)
+An analysis of `keywords/keywords_clean_histogram.json` shows that the distribution of keywords is strongly skewed right but that (see Figure 3 for details).
 
-![Bla.](images/keywords_clean_histogram_b.pdf)
 
-![Bla.](images/keywords_clean_histogram_c.pdf)
+![In `keywords/keywords_clean_histogram.json`, the distribution of keywords is strongly skewed right ($min = Q1 = M = Q3 = 1$ and $max = 910$). However, even though keywords with only one occurrence constitute over 75% of the total keywords, their occurrences constitute less than 35% of the total occurrences. The most common keywords with 50 or more occurrences are extreme outliers but make up almost 20% of the total occurrences.](images/keywords_clean_histogram_abc.pdf)
 
 #### Reconciliation
+
+As explained in section X, Annif assigns index terms from a controlled vocabulary. If we want to assess the quality of the indexing via a gold standard, we must therefore ensure that the gold standard makes use of the vocabulary used by Annif. As seen in section Y, the relevant (English) vocabularies are Wikidata YSO. The next step in constructing the native gold standard is hence to reconcile the extracted and cleaned keywords with YSO and Wikidata. 
+
+The tool of choice for reconciliation is OpenRefine (see [section OpenRefine](#openrefine)). We import `keywords/keywords_clean_histogram.json` as a new project. 
+
+
+
+Before we do so, let us briefly look at the data in `keywords/keywords_clean.json`. 
+
+
+for a given input text, Annif assigns index terms from some controlled vocabulary. Any gold standard employed to assess the quality of this indexing must therefore make use of the same controlled vocabulary. 
 
 !! Mapping to controlled vocabularies; explain why this is necessary.
 

@@ -421,8 +421,8 @@ be broken into their component keywords and then parsed again. The
 reason for this is that Annif only assigns flat keywords and not keyword
 chains.
 
-\texttt{\_Keywords.clean\_keywords} is the implementation the parser and
-the recursive cleaner is implemented by
+\texttt{\_Keywords.clean\_keywords} is the implementation the parser
+while the recursive cleaner is implemented by
 \texttt{\_Keywords.clean\_keyword}. To create the desired list of clean
 keywords, saved as \texttt{keywords/keywords\_clean.json}, we call
 \texttt{\_Keywords.clean\_keywords} with the extracted keywords as
@@ -439,32 +439,58 @@ argument:
 \hypertarget{analysis-1}{%
 \paragraph{Analysis}\label{analysis-1}}
 
-!! Frequency
+\texttt{keywords/keywords\_clean.json} has 36'901 entries many of which
+are duplicates. We hence deduplicate and count the number of occurrences
+of each keyword. This is achieved by calling
+\texttt{\_Keywords.make\_histogram} on
+\texttt{keywords/keywords\_clean.json} and saving the output as
+\texttt{keywords/keywords\_clean\_histogram.json}:
 
-!! Cumulative sum histogram
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{keywords\_clean }\OperatorTok{=}\NormalTok{ \_Utility.load\_json(DIR }\OperatorTok{+} \StringTok{"/keywords/keywords\_clean.json"}\NormalTok{)}
+\NormalTok{keywords\_histogram }\OperatorTok{=}\NormalTok{ \_Keywords.make\_histogram(keywords\_clean)}
+\NormalTok{\_Utility.save\_json(keywords\_histogram, DIR }\OperatorTok{+} \StringTok{"keywords/keywords\_clean\_histogram.json"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+An analysis of \texttt{keywords/keywords\_clean\_histogram.json} shows
+that the distribution of keywords is strongly skewed right but that (see
+Figure 3 for details).
 
 \begin{figure}
 \centering
-\includegraphics{images/keywords_clean_histogram_a.pdf}
+\includegraphics{images/keywords_clean_histogram_abc.pdf}
 \caption{In \texttt{keywords/keywords\_clean\_histogram.json}, the
-frequency distribution of keywords is strongly skewed right
-(\(min = Q1 = M = Q3 = 1\) and \(max = 910\)).}
-\end{figure}
-
-\begin{figure}
-\centering
-\includegraphics{images/keywords_clean_histogram_b.pdf}
-\caption{Bla.}
-\end{figure}
-
-\begin{figure}
-\centering
-\includegraphics{images/keywords_clean_histogram_c.pdf}
-\caption{Bla.}
+distribution of keywords is strongly skewed right
+(\(min = Q1 = M = Q3 = 1\) and \(max = 910\)). However, even though
+keywords with only one occurrence constitute over 75\% of the total
+keywords, they constitute less than 35\% of the total occurrences. The
+most common keywords with 50 or more occurrences are extreme outliers
+but make up almost 20\% of the total occurrences.}
 \end{figure}
 
 \hypertarget{reconciliation}{%
 \paragraph{Reconciliation}\label{reconciliation}}
+
+As explained in section X, Annif assigns index terms from a controlled
+vocabulary. If we want to assess the quality of the indexing via a gold
+standard, we must therefore ensure that the gold standard makes use of
+the vocabulary used by Annif. As seen in section Y, the relevant
+(English) vocabularies are Wikidata YSO. The next step in constructing
+the native gold standard is hence to reconcile the extracted and cleaned
+keywords with YSO and Wikidata.
+
+The tool of choice for reconciliation is OpenRefine (see
+\protect\hyperlink{openrefine}{section OpenRefine}). We import
+\texttt{keywords/keywords\_clean\_histogram.json} as a new project.
+
+Before we do so, let us briefly look at the data in
+\texttt{keywords/keywords\_clean.json}.
+
+for a given input text, Annif assigns index terms from some controlled
+vocabulary. Any gold standard employed to assess the quality of this
+indexing must therefore make use of the same controlled vocabulary.
 
 !! Mapping to controlled vocabularies; explain why this is necessary.
 
