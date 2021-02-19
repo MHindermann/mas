@@ -249,33 +249,17 @@ An analysis of `keywords/keywords_clean_histogram.json` shows that the lion's sh
 
 As explained in section X, Annif assigns index terms from a controlled vocabulary. If we want to assess the quality of the indexing via a gold standard, we must therefore ensure that the gold standard makes use of the vocabulary used by Annif. As seen in section Y, the relevant (English) vocabularies are Wikidata YSO. The next step in constructing the native gold standard is hence to match the extracted and cleaned keywords with keywords from YSO and Wikidata. This process is called "reconciliation" (see https://docs.openrefine.org/manual/reconciling) and the tool of choice for this task is OpenRefine (see [section OpenRefine](#openrefine)). 
 
-In what follows, I will describe how the cleaned keywords were reconciled with Wikidata and YSO, and which additional steps for refinement were undertaken. In total, 2'104 data transformation operations were performed; the complete operation history is available as `/keywords/operation_history.json`. 
+In this section, I will describe how the cleaned keywords were reconciled with Wikidata and YSO, and which additional steps for refinement were undertaken. In total, 2'104 data transformation operations were performed; the complete operation history is available as `/keywords/operation_history.json`. 
 
 A new project in OpenRefine was created and the data from `keywords/keywords_clean_histogram.json` was imported. The `keyword` column was then duplicated and reconciled with Wikidata. Here the parameters were chosen as follows: reconcile against no particular type, and auto-match candidates with high confidence.
 
-There were X automatic matches (call them "suggestions"). These suggestions are deemed to be correct by the reconciliation service API. A suggestion is correct if and only if the meaning of the keyword from `keywords/keywords_clean_histogram.json` corresponds to the meaning of the suggested concept from Wikidata. Note that for homonymous or polysemous keywords, it is impossible to confirm a correct match without further context; those keywords therefore cannot be reconciled (but see [section "Construction"](#construction) for a possible solution).
+There were X automatic matches (call them "suggestions"). A suggestion is correct if and only if the meaning of the keyword from `keywords/keywords_clean_histogram.json` corresponds to the meaning of the suggested concept from Wikidata. Note that for homonymous or polysemous keywords, it is impossible to confirm a correct match without further context; those keywords therefore cannot be reconciled (but see [section "Construction"](#construction) for a possible solution). Unfortunately, random sampling showed that the overall quality of the reconciliation was not satisfactory, that is, there were too many incorrect suggestions. A two-pronged strategy was adopted to ameliorate the quality of the reconciliation. 
 
- Unfortunately, random sampling showed that the overall quality of the reconciliation was not satisfactory, that is, there were too many incorrect suggestions. A two-pronged strategy was adopted to ameliorate the quality of the reconciliation: First, systematic biases were identified and removed. There were two major biases:
+First, the suggestions to the top 500 keywords were manually verified. These keywords account for 14'996 occurrences or 40.638% of the total occurrences and thus constitute an effective lever.
 
-1. As stated above, the concepts from Wikidata were not constrained by type. Since Wikidata is an ontology that encompasses everything, it also features types whose concepts cannot qualify as subject terms (at least in the present context). The most prominent example is the type Q13442814 `scholarly article`. Wikidata contains the metadata of many scholarly articles. Now, for some of our keywords, there is a scholarly article with a title that exactly matches the keyword; and since there is no restriction concerning the type, the scholarly article is suggested with high confidence (see https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation-Service-API for details). For example, [keyword/article]. To generalize, suggestions with types whose concepts are proper names are usually incorrect. 
+Second, systematic biases were identified and removed. The most prevalent bias was an due to a suggestion's type. As stated above, the reconciliation service API was not constrained by type but had access to the complete Wikidata database. Since Wikidata is an ontology that encompasses everything, it also features types whose concepts cannot qualify as subject terms (at least in the present context). The most prominent example is the type Q13442814 "scholarly article". Wikidata contains the metadata of many scholarly articles. Now, for some of our keywords, there is a scholarly article with a title that exactly matches the keyword; and since there is no restriction concerning the type, the scholarly article is suggested with high confidence (see https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation-Service-API for details). For example, [keyword/article]. To generalize, suggestions with types whose concepts are proper names are usually incorrect. Based on this observation, suggestions with the following types were rejected: "scholarly article", "clinical trial", "scientific journal", "academic journal", "open access journal", "thesis", "doctoral thesis", "natural number". Suggestions with the following types were manually verified (i.e., checked for correctness): "human", "album", "film", "musical group", "business", "literary work", "television series", "organization", "family name", "written work", "video game", "single, television series episode", "painting", "commune of France", "city of the United States", "magazine", "studio album", "year", "nonprofit organization", "border town", "international organization", "political party", "software", "song", "website", "article comic strip", "collection", "commune of Italy", "fictional human", "film", "government agency", "village", "academic journal article", "female given name", "poem".
 
-
-
-Suggestions with the following types were rejected: scholarly article, clinical trial, scientific journal, academic journal, open access journal, thesis, doctoral thesis, natural number. Suggestions with the following types were manually verified: .
-   
-,  human,  album, , film, musical group, business, literary work, television series, organization, family name, written work, video game, , single, television series episode, painting, commune of France, city of the United States, magazine, studio album, year, nonprofit organization, border town, international organization, political party, software, song, website, article comic strip, collection, commune of Italy, fictional human, film, government agency, village, academic journal article, female given name, poem
-
-
-2. Plural sing. 
-   
-then suggests this scholarly article with high confidence. 
-   
-
-However, certain types of concepts cannot qualify as subject terms
-
-1. Identify and remove systematic biases, and
-2. manually validate the top 500 keywords.
-3. 
+!! Perhaps add other biases, such as plural/singular.
 
 !! probabilistic random sampling to assess quality, weighted by occurrences
 
@@ -284,15 +268,7 @@ However, certain types of concepts cannot qualify as subject terms
 - Yso: 14557 occurrences, 3185 keywords
 - Mesh: 19775 occurrences, 4619 keywords
 
-
-Before we do so, let us briefly look at the data in `keywords/keywords_clean.json`. 
-
-
-for a given input text, Annif assigns index terms from some controlled vocabulary. Any gold standard employed to assess the quality of this indexing must therefore make use of the same controlled vocabulary. 
-
-!! Mapping to controlled vocabularies; explain why this is necessary.
-
-!! Does the OpenRefine project still exist? Export the list of changes! http://127.0.0.1:3333/project?project=2501403769019&ui=%7B%22facets%22%3A%5B%7B%22c%22%3A%7B%22type%22%3A%22list%22%2C%22name%22%3A%22qid%22%2C%22columnName%22%3A%22qid%22%2C%22expression%22%3A%22isBlank(value)%22%2C%22omitBlank%22%3Afalse%2C%22omitError%22%3Afalse%2C%22selectBlank%22%3Afalse%2C%22selectError%22%3Afalse%2C%22invert%22%3Afalse%7D%2C%22o%22%3A%7B%22sort%22%3A%22name%22%7D%2C%22s%22%3A%5B%5D%7D%5D%7D
+!! Talk about enrichment with yso and mesh
 
 ### Foreign gold standard
 

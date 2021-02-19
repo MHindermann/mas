@@ -28,7 +28,8 @@ history whenever appropriate. Note that when using OpenRefine with
 larger files (and there are many such files in this project), the memory
 allocation to OpenRefine must be manually increased (see
 https://docs.openrefine.org/manual/installing/\#increasing-memory-allocation
-for details).
+for details). ALso note that OpenRefine always counts the number of
+records by the first column (a fact which caused me many headaches).
 
 \hypertarget{prototype}{%
 \section{Prototype}\label{prototype}}
@@ -497,31 +498,69 @@ A new project in OpenRefine was created and the data from
 Wikidata. Here the parameters were chosen as follows: reconcile against
 no particular type, and auto-match candidates with high confidence.
 
-There were X automatic matches (call them ``suggestions''). The quality
-of these suggestions was then evaluated by random sampling. A suggestion
-is considered to be correct if and only if the meaning of the keyword
-from \texttt{keywords/keywords\_clean\_histogram.json} corresponds to
-the meaning of the suggested subject term from Wikidata. Note that for
-homonymous or polysemous keywords, it is impossible to confirm a correct
-match without further context; those keywords therefore cannot be
-reconciled (but see \protect\hyperlink{construction}{section
-``Construction''} for a possible solution).
+There were X automatic matches (call them ``suggestions''). A suggestion
+is correct if and only if the meaning of the keyword from
+\texttt{keywords/keywords\_clean\_histogram.json} corresponds to the
+meaning of the suggested concept from Wikidata. Note that for homonymous
+or polysemous keywords, it is impossible to confirm a correct match
+without further context; those keywords therefore cannot be reconciled
+(but see \protect\hyperlink{construction}{section ``Construction''} for
+a possible solution). Unfortunately, random sampling showed that the
+overall quality of the reconciliation was not satisfactory, that is,
+there were too many incorrect suggestions. A two-pronged strategy was
+adopted to ameliorate the quality of the reconciliation.
 
-Unfortunately, random sampling showed that the overall quality of the
-suggestions was not satisfactory. A two-pronged strategy was adopted to
-ameliorate the quality of the reonciliation:
+First, the suggestions to the top 500 keywords were manually verified.
+These keywords account for 14'996 occurrences or 40.638\% of the total
+occurrences and are constitute thus an effective lever.
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\tightlist
-\item
-  manual matching of the top results
-\item
-  automated processes for the rest
-\end{enumerate}
+Second, systematic biases were identified and removed. The most
+prevalent bias was an due to a suggestion's type. As stated above, the
+reconciliation service API was not constrained by type but had access to
+the complete Wikidata database. Since Wikidata is an ontology that
+encompasses everything, it also features types whose concepts cannot
+qualify as subject terms (at least in the present context). The most
+prominent example is the type Q13442814 ``scholarly article.'' Wikidata
+contains the metadata of many scholarly articles. Now, for some of our
+keywords, there is a scholarly article with a title that exactly matches
+the keyword; and since there is no restriction concerning the type, the
+scholarly article is suggested with high confidence (see
+https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation-Service-API
+for details). For example, {[}keyword/article{]}. To generalize,
+suggestions with types whose concepts are proper names are usually
+incorrect. Based on this observation, suggestions with the following
+types were rejected: ``scholarly article,'' ``clinical trial,''
+``scientific journal,'' ``academic journal,'' ``open access journal,''
+``thesis,'' ``doctoral thesis,'' ``natural number.'' Suggestions with
+the following types were manually verified (i.e., checked for
+correctness): ``human,'' ``album,'' ``film,'' ``musical group,''
+``business,'' ``literary work,'' ``television series,''
+``organization,'' ``family name,'' ``written work,'' ``video game,''
+``single, television series episode,'' ``painting,'' ``commune of
+France,'' ``city of the United States,'' ``magazine,'' ``studio album,''
+``year,'' ``nonprofit organization,'' ``border town,'' ``international
+organization,'' ``political party,'' ``software,'' ``song,''
+``website,'' ``article comic strip,'' ``collection,'' ``commune of
+Italy,'' ``fictional human,'' ``film,'' ``government agency,''
+``village,'' ``academic journal article,'' ``female given name,''
+``poem.''
+
+A second bias found was
+
+After completing these steps to ameliorate the quality of the
+reconciliation,
+
+then suggests this scholarly article with high confidence.
+
+However, certain types of concepts cannot qualify as subject terms
+
+!! probabilistic random sampling to assess quality, weighted by
+occurrences
 
 !! calculate for each of annif yso mesh how many percent of keywords or
-total occurrences are covered by reonciliated data.
+total occurrences are covered by reonciliated data: - Qid: 28789
+occurrences, 9635 keywords - Yso: 14557 occurrences, 3185 keywords -
+Mesh: 19775 occurrences, 4619 keywords
 
 Before we do so, let us briefly look at the data in
 \texttt{keywords/keywords\_clean.json}.
