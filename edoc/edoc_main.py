@@ -509,10 +509,29 @@ class _Analysis:
         print(f"Results for {name}")
         print(scipy.stats.chisquare(f_obs=observed, f_exp=expected))
 
+    @classmethod
+    def make_random_sample(cls,
+                           file_path: str,
+                           save_path: str,
+                           size: int) -> None:
+        """ Save a random sample from the population in the file.
+
+        :param file_path: complete path to file including filename and extension
+        :param save_path: complete path to save folder including filename and extension
+        :param size: the sample size
+        """
+
+        population = _Utility.load_json(file_path)
+        import random
+
+        sample = random.sample(population=population, k=size)
+        _Utility.save_json(sample, save_path)
 
 
+_Analysis.make_random_sample(DIR + "/keywords/keywords_reference.json", DIR + "/analysis/random_keywords.json", 500)
 
-_Analysis.chi_square_fit(DIR + "/analysis/chi_square_language.csv")
+
+exit()
 
 #_Keywords.enrich_with_yso(DIR + "/keywords/keywords_reference.json", DIR + "/keywords/keywords_reference_test.json")
 

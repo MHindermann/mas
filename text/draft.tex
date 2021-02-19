@@ -237,7 +237,7 @@ raw Edoc data per department (see Figure 1 for more details).
 \centering
 \includegraphics{images/chi_square_selection_fields.pdf}
 \caption{The sample data set (\(n\) = 4'111) is not representative of
-the raw Edoc data (\(n\) = 68'345) per department. Data field
+the raw Edoc data (\(N\) = 68'345) per department. Data field
 \texttt{abstract}: \(\chi^2 (df=9) =\) 3'160.556, \(p < 0.001\); data
 field \texttt{id\_number}: \(\chi^2 (df=9) =\) 4'209.0285,
 \(p < 0.001\); data field \texttt{keywords}: \(\chi^2 (df=9) =\)
@@ -266,7 +266,7 @@ towards English (data field \texttt{language}: \(\chi^2 (df=3) =\)
 sciences, medicine and economics (data field \texttt{department}:
 \(\chi^2 (df=9) =\) 14'447.276\$, \(p < 0.001\)) from the 21st (data
 field \texttt{date}: \(\chi^2 (df=7) =\) 35'878.493, \(p < 0.001\))
-century as compared to the raw Edoc data (\(n\) = 68'345). The data
+century as compared to the raw Edoc data (\(N\) = 68'345). The data
 foundation is available at \texttt{/edoc/analysis} and the chi-square
 statistic can be calculated by calling
 \texttt{\_Analysis.chi\_square\_fit}.}
@@ -486,17 +486,17 @@ keywords with keywords from YSO and Wikidata. This process is called
 and the tool of choice for this task is OpenRefine (see
 \protect\hyperlink{openrefine}{section OpenRefine}).
 
-In what follows, I will describe how the cleaned keywords were
+In this section, I will describe how the cleaned keywords were
 reconciled with Wikidata and YSO, and which additional steps for
 refinement were undertaken. In total, 2'104 data transformation
 operations were performed; the complete operation history is available
 as \texttt{/keywords/operation\_history.json}.
 
-A new project in OpenRefine was created and the data from
-\texttt{keywords/keywords\_clean\_histogram.json} was imported. The
-\texttt{keyword} column was then duplicated and reconciled with
-Wikidata. Here the parameters were chosen as follows: reconcile against
-no particular type, and auto-match candidates with high confidence.
+The data from \texttt{keywords/keywords\_clean\_histogram.json} was
+imported into OpenRefine. The \texttt{keyword} column was then
+duplicated and reconciled with Wikidata. Here the parameters were chosen
+as follows: reconcile against no particular type, and auto-match
+candidates with high confidence.
 
 There were X automatic matches (call them ``suggestions''). A suggestion
 is correct if and only if the meaning of the keyword from
@@ -512,7 +512,7 @@ adopted to ameliorate the quality of the reconciliation.
 
 First, the suggestions to the top 500 keywords were manually verified.
 These keywords account for 14'996 occurrences or 40.638\% of the total
-occurrences and are constitute thus an effective lever.
+occurrences and thus constitute an effective lever.
 
 Second, systematic biases were identified and removed. The most
 prevalent bias was an due to a suggestion's type. As stated above, the
@@ -545,34 +545,45 @@ Italy,'' ``fictional human,'' ``film,'' ``government agency,''
 ``village,'' ``academic journal article,'' ``female given name,''
 ``poem.''
 
-A second bias found was
+With these improvements in place, each keyword with a suggestion was
+assigned a QID via the ``Add cloumns from reconciled values''-function
+(and similar for YSO and MeSH identifiers). The data was then exported
+and saved as \texttt{/keywords/keywords\_reference.json}. Keywords with
+a QID now constitute 69\% of all keywords and 78\% of their total
+occurrences in the sample data set, but these numbers are much lower for
+YSO and MeSH identifiers (see Figure 4 for details).
 
-After completing these steps to ameliorate the quality of the
-reconciliation,
+\begin{figure}
+\centering
+\includegraphics{images/native_gold_standard.pdf}
+\caption{The coverage of \texttt{/keywords/keywords\_reference.json} by
+the controlled vocabularies of Wikidata (QID), Medical Subject Headings
+(MeSH), and YSO (General Finnish Ontology). Both MeSH and YSO are
+dependent on QID but independent of each other.}
+\end{figure}
 
-then suggests this scholarly article with high confidence.
+Let us now turn to the evaluation of the reconciliation: how many of the
+suggestions were correct? This question was answered via random
+sampling. The random sample (\(n=500\)) was created by calling
+\texttt{\_Analysis.make\_random\_sample} on
+\texttt{/keywords/reference\_keywords.json}; it is available at
+\texttt{analysis/random\_keywords.json}. The sample was then imported
+into OpenRefine and the judgement (1 for correct, 0 for incorrect) of
+the manual verification was recorded in the column
+\texttt{verification}. The data was then exported and is available at
+\texttt{analysis/random\_keywords\_verified.csv}.
 
-However, certain types of concepts cannot qualify as subject terms
+An analysis of this data shows that 53\% of the suggestions in the
+random sample were correct with a 95\% confidence interval of 48.8\% to
+57.3\%. We can therefore conclude that 8'507 \(\pm\) 692.1 of the 16'050
+keywords in \texttt{/keywords/reference\_keywords.json} have correct
+suggestions. Note that of the 235 incorrect suggestions in the random
+sample, 188 were incorrect by default because they were missing a QID;
+the share of non-empty yet incorrect suggestions is only 9.4\% in the
+random sample meaning that the quality of the reconciliation is not as
+disappointing as it might seem at first glance.
 
-!! probabilistic random sampling to assess quality, weighted by
-occurrences
-
-!! calculate for each of annif yso mesh how many percent of keywords or
-total occurrences are covered by reonciliated data: - Qid: 28789
-occurrences, 9635 keywords - Yso: 14557 occurrences, 3185 keywords -
-Mesh: 19775 occurrences, 4619 keywords
-
-Before we do so, let us briefly look at the data in
-\texttt{keywords/keywords\_clean.json}.
-
-for a given input text, Annif assigns index terms from some controlled
-vocabulary. Any gold standard employed to assess the quality of this
-indexing must therefore make use of the same controlled vocabulary.
-
-!! Mapping to controlled vocabularies; explain why this is necessary.
-
-!! Does the OpenRefine project still exist? Export the list of changes!
-http://127.0.0.1:3333/project?project=2501403769019\&ui=\%7B\%22facets\%22\%3A\%5B\%7B\%22c\%22\%3A\%7B\%22type\%22\%3A\%22list\%22\%2C\%22name\%22\%3A\%22qid\%22\%2C\%22columnName\%22\%3A\%22qid\%22\%2C\%22expression\%22\%3A\%22isBlank(value)\%22\%2C\%22omitBlank\%22\%3Afalse\%2C\%22omitError\%22\%3Afalse\%2C\%22selectBlank\%22\%3Afalse\%2C\%22selectError\%22\%3Afalse\%2C\%22invert\%22\%3Afalse\%7D\%2C\%22o\%22\%3A\%7B\%22sort\%22\%3A\%22name\%22\%7D\%2C\%22s\%22\%3A\%5B\%5D\%7D\%5D\%7D
+!! Talk about enrichment with yso and mesh
 
 \hypertarget{foreign-gold-standard}{%
 \subsubsection{Foreign gold standard}\label{foreign-gold-standard}}
