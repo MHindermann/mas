@@ -22,7 +22,7 @@ Machine indexing of institutional repositories: indexing Edoc with Annif and BAR
 
 For data refinement I use OpenRefine version 3.4.1 (https://openrefine.org/). Data manipulation in OpenRefine is 
 tracked: 
-the manipulation history of some data can be exported as JSON file and then reproduced (on the same data on a different machine or on different data) by loading said file. I will supply a corresponding manipulation history whenever appropriate. Note that when using OpenRefine with larger files (and there are many such files in this project), the memory allocation to OpenRefine must be manually increased (see https://docs.openrefine.org/manual/installing/#increasing-memory-allocation for details).
+the manipulation history of some data can be exported as JSON file and then reproduced (on the same data on a different machine or on different data) by loading said file. I will supply a corresponding manipulation history whenever appropriate. Note that when using OpenRefine with larger files (and there are many such files in this project), the memory allocation to OpenRefine must be manually increased (see https://docs.openrefine.org/manual/installing/#increasing-memory-allocation for details). ALso note that OpenRefine always counts the number of records by the first column (a fact which caused me many headaches). 
 
 # Prototype
 
@@ -251,11 +251,38 @@ As explained in section X, Annif assigns index terms from a controlled vocabular
 
 In what follows, I will describe how the cleaned keywords were reconciled with Wikidata and YSO, and which additional steps for refinement were undertaken. In total, 2'104 data transformation operations were performed; the complete operation history is available as `/keywords/operation_history.json`. 
 
-A new project in OpenRefine was created and the data from `keywords/keywords_clean_histogram.json` was imported. The `keyword` column was then duplicated and reconciled with Wikidata. Here the parameters were chosen as follows: reconcile against no particular type, and auto-match candidates with high confidence. There were X automatic matches. Unfortunately, random sampling showed that the overall quality of the automatic matches was not satisfactory. A two-pronged strategy was adopted to ameliorate the quality of the reonciliation:
+A new project in OpenRefine was created and the data from `keywords/keywords_clean_histogram.json` was imported. The `keyword` column was then duplicated and reconciled with Wikidata. Here the parameters were chosen as follows: reconcile against no particular type, and auto-match candidates with high confidence.
 
-1. manual matching of the top results
-2. automated processes for the rest
+There were X automatic matches (call them "suggestions"). These suggestions are deemed to be correct by the reconciliation service API. A suggestion is correct if and only if the meaning of the keyword from `keywords/keywords_clean_histogram.json` corresponds to the meaning of the suggested concept from Wikidata. Note that for homonymous or polysemous keywords, it is impossible to confirm a correct match without further context; those keywords therefore cannot be reconciled (but see [section "Construction"](#construction) for a possible solution).
 
+ Unfortunately, random sampling showed that the overall quality of the reconciliation was not satisfactory, that is, there were too many incorrect suggestions. A two-pronged strategy was adopted to ameliorate the quality of the reconciliation: First, systematic biases were identified and removed. There were two major biases:
+
+1. As stated above, the concepts from Wikidata were not constrained by type. Since Wikidata is an ontology that encompasses everything, it also features types whose concepts cannot qualify as subject terms (at least in the present context). The most prominent example is the type Q13442814 `scholarly article`. Wikidata contains the metadata of many scholarly articles. Now, for some of our keywords, there is a scholarly article with a title that exactly matches the keyword; and since there is no restriction concerning the type, the scholarly article is suggested with high confidence (see https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation-Service-API for details). For example, [keyword/article]. To generalize, suggestions with types whose concepts are proper names are usually incorrect. 
+
+
+
+Suggestions with the following types were rejected: scholarly article, clinical trial, scientific journal, academic journal, open access journal, thesis, doctoral thesis, natural number. Suggestions with the following types were manually verified: .
+   
+,  human,  album, , film, musical group, business, literary work, television series, organization, family name, written work, video game, , single, television series episode, painting, commune of France, city of the United States, magazine, studio album, year, nonprofit organization, border town, international organization, political party, software, song, website, article comic strip, collection, commune of Italy, fictional human, film, government agency, village, academic journal article, female given name, poem
+
+
+2. Plural sing. 
+   
+then suggests this scholarly article with high confidence. 
+   
+
+However, certain types of concepts cannot qualify as subject terms
+
+1. Identify and remove systematic biases, and
+2. manually validate the top 500 keywords.
+3. 
+
+!! probabilistic random sampling to assess quality, weighted by occurrences
+
+!! calculate for each of annif yso mesh how many percent of keywords or total occurrences are covered by reonciliated data:
+- Qid: 28789 occurrences, 9635 keywords
+- Yso: 14557 occurrences, 3185 keywords
+- Mesh: 19775 occurrences, 4619 keywords
 
 
 Before we do so, let us briefly look at the data in `keywords/keywords_clean.json`. 

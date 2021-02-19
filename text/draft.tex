@@ -455,8 +455,9 @@ of each keyword. This is achieved by calling
 \end{Shaded}
 
 An analysis of \texttt{keywords/keywords\_clean\_histogram.json} shows
-that the distribution of keywords is strongly skewed right but that (see
-Figure 3 for details).
+that the lion's share of keywords has only one occurrence but that the
+total occurrences are predominantly made up of keywords with more than
+one occurrence (see Figure 3 for details).
 
 \begin{figure}
 \centering
@@ -488,12 +489,39 @@ In what follows, I will describe how the cleaned keywords were
 reconciled with Wikidata and YSO, and which additional steps for
 refinement were undertaken. In total, 2'104 data transformation
 operations were performed; the complete operation history is available
-as \texttt{/keywords/operation\_history.json}. First
-\texttt{keywords/keywords\_clean\_histogram.json} was set as a new
-project in OpenRefine. The \texttt{keyword} column was then duplicated
-and reconciled with Wikidata. Here the parameters were chosen as
-follows: reconcile against no particular type, and auto-match candidates
-with high confidence.
+as \texttt{/keywords/operation\_history.json}.
+
+A new project in OpenRefine was created and the data from
+\texttt{keywords/keywords\_clean\_histogram.json} was imported. The
+\texttt{keyword} column was then duplicated and reconciled with
+Wikidata. Here the parameters were chosen as follows: reconcile against
+no particular type, and auto-match candidates with high confidence.
+
+There were X automatic matches (call them ``suggestions''). The quality
+of these suggestions was then evaluated by random sampling. A suggestion
+is considered to be correct if and only if the meaning of the keyword
+from \texttt{keywords/keywords\_clean\_histogram.json} corresponds to
+the meaning of the suggested subject term from Wikidata. Note that for
+homonymous or polysemous keywords, it is impossible to confirm a correct
+match without further context; those keywords therefore cannot be
+reconciled (but see \protect\hyperlink{construction}{section
+``Construction''} for a possible solution).
+
+Unfortunately, random sampling showed that the overall quality of the
+suggestions was not satisfactory. A two-pronged strategy was adopted to
+ameliorate the quality of the reonciliation:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  manual matching of the top results
+\item
+  automated processes for the rest
+\end{enumerate}
+
+!! calculate for each of annif yso mesh how many percent of keywords or
+total occurrences are covered by reonciliated data.
 
 Before we do so, let us briefly look at the data in
 \texttt{keywords/keywords\_clean.json}.
@@ -505,6 +533,7 @@ indexing must therefore make use of the same controlled vocabulary.
 !! Mapping to controlled vocabularies; explain why this is necessary.
 
 !! Does the OpenRefine project still exist? Export the list of changes!
+http://127.0.0.1:3333/project?project=2501403769019\&ui=\%7B\%22facets\%22\%3A\%5B\%7B\%22c\%22\%3A\%7B\%22type\%22\%3A\%22list\%22\%2C\%22name\%22\%3A\%22qid\%22\%2C\%22columnName\%22\%3A\%22qid\%22\%2C\%22expression\%22\%3A\%22isBlank(value)\%22\%2C\%22omitBlank\%22\%3Afalse\%2C\%22omitError\%22\%3Afalse\%2C\%22selectBlank\%22\%3Afalse\%2C\%22selectError\%22\%3Afalse\%2C\%22invert\%22\%3Afalse\%7D\%2C\%22o\%22\%3A\%7B\%22sort\%22\%3A\%22name\%22\%7D\%2C\%22s\%22\%3A\%5B\%5D\%7D\%5D\%7D
 
 \hypertarget{foreign-gold-standard}{%
 \subsubsection{Foreign gold standard}\label{foreign-gold-standard}}
