@@ -1,6 +1,3 @@
-Machine indexing of institutional repositories: indexing Edoc with Annif
-and BARTOC FAST as proof of concept
-
 \hypertarget{introduction}{%
 \section{Introduction}\label{introduction}}
 
@@ -397,7 +394,7 @@ argument and save the output as
 In second step, a list of all single keywords must be created. In order
 to do so, let us consider now in more detail the exact information
 extracted from the \texttt{keywords} data fields as per
-\texttt{keywords/keywords\_extracted.json}. In Edoc, the
+\texttt{/keywords/keywords\_extracted.json}. In Edoc, the
 \texttt{keywords} data field of an item is a non-mandatory free text
 field that is filled in by the user (usually one of the authors) who
 undertakes the data entry of an item to Edoc. Even though the Edoc user
@@ -408,9 +405,9 @@ input mask provide a definition of the term ``keyword.'' A vocabulary or
 a list of vocabularies from which to choose the keywords is also
 lacking. Taken together, these observations are indicative of very
 heterogeneous data in the \texttt{keywords} data field. To wit, the
-items of \texttt{keywords/keywords\_extracted.json} are strings where
+items of \texttt{/keywords/keywords\_extracted.json} are strings where
 single keywords are individuated by any symbols the user saw fit. So,
-for each item in \texttt{keywords/keywords\_extracted.json}, the user
+for each item in \texttt{/keywords/keywords\_extracted.json}, the user
 input must be parsed into single keywords.
 
 Next the so parsed single keywords must be cleaned or normalized: we
@@ -425,7 +422,7 @@ chains.
 \texttt{\_Keywords.clean\_keywords} is the implementation the parser
 while the recursive cleaner is implemented by
 \texttt{\_Keywords.clean\_keyword}. To create the desired list of clean
-keywords, saved as \texttt{keywords/keywords\_clean.json}, we call
+keywords, saved as \texttt{/keywords/keywords\_clean.json}, we call
 \texttt{\_Keywords.clean\_keywords} with the extracted keywords as
 argument:
 
@@ -440,12 +437,12 @@ argument:
 \hypertarget{analysis-1}{%
 \paragraph{Analysis}\label{analysis-1}}
 
-\texttt{keywords/keywords\_clean.json} has 36'901 entries many of which
+\texttt{/keywords/keywords\_clean.json} has 36'901 entries many of which
 are duplicates. We hence deduplicate and count the number of occurrences
 of each keyword. This is achieved by calling
 \texttt{\_Keywords.make\_histogram} on
-\texttt{keywords/keywords\_clean.json} and saving the output as
-\texttt{keywords/keywords\_clean\_histogram.json}:
+\texttt{/keywords/keywords\_clean.json} and saving the output as
+\texttt{/keywords/keywords\_clean\_histogram.json}:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -455,7 +452,7 @@ of each keyword. This is achieved by calling
 \end{Highlighting}
 \end{Shaded}
 
-An analysis of \texttt{keywords/keywords\_clean\_histogram.json} shows
+An analysis of \texttt{/keywords/keywords\_clean\_histogram.json} shows
 that the lion's share of keywords has only one occurrence but that the
 total occurrences are predominantly made up of keywords with more than
 one occurrence (see Figure 3 for details).
@@ -492,7 +489,7 @@ refinement were undertaken. In total, 2'104 data transformation
 operations were performed; the complete operation history is available
 as \texttt{/keywords/operation\_history.json}.
 
-The data from \texttt{keywords/keywords\_clean\_histogram.json} was
+The data from \texttt{/keywords/keywords\_clean\_histogram.json} was
 imported into OpenRefine. The \texttt{keyword} column was then
 duplicated and reconciled with Wikidata. Here the parameters were chosen
 as follows: reconcile against no particular type, and auto-match
@@ -500,7 +497,7 @@ candidates with high confidence.
 
 There were X automatic matches (call them ``suggestions''). A suggestion
 is correct if and only if the meaning of the keyword from
-\texttt{keywords/keywords\_clean\_histogram.json} corresponds to the
+\texttt{/keywords/keywords\_clean\_histogram.json} corresponds to the
 meaning of the suggested concept from Wikidata. Note that for homonymous
 or polysemous keywords, it is impossible to confirm a correct match
 without further context; those keywords therefore cannot be reconciled
@@ -550,28 +547,56 @@ assigned a QID via the ``Add cloumns from reconciled values''-function
 (and similar for YSO and MeSH identifiers). The data was then exported
 and saved as \texttt{/keywords/keywords\_reference.json}. Keywords with
 a QID now constitute 69\% of all keywords and 78\% of their total
-occurrences in the sample data set, but these numbers are much lower for
-YSO and MeSH identifiers (see Figure 4 for details).
+occurrences in the sample data set, but these numbers are significantly
+lower for the MeSH identifier (53.6\% of all keywords with only 28.8\%
+of all occurrences) and especially low for the YSO identifier (X of all
+keywords with Y of all occurrences). In both cases, the problem is due
+to the fact that Wikidata's mapping of MeSH respectively YSO is only
+partial. There can be two reasons for this state of affairs for a given
+entry: either there is no match between Wikidata and YSO or MeSH (after
+all, Wikidata is much larger than MeSH and YSO taken together), or there
+is a match but it has not yet been added to the mapping. In the latter
+case, at least with respect to YSO, there is a solution: Finto provides
+a REST-sytle API to access the YSO vocabulary directly (see
+https://api.finto.fi/). For each keyword in in the list of reference
+keywords that lacks a YSO identifier, the Finto API is queried; if a
+term turns up, it is added to the keyword. The effect of this second
+reconcilement is detailed in Figure 4. It is achieved by calling
+\texttt{\_Keywords.enrich\_with\_yso} on
+\texttt{/keywords/keywords\_reference.json} and saving the output as
+\texttt{/keywords/keywords\_reference\_master.json}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{keywords\_reference }\OperatorTok{=}\NormalTok{ \_Utility.load\_json(DIR }\OperatorTok{+} \StringTok{"/keywords/keywords\_reference.json"}\NormalTok{)}
+\NormalTok{keywords\_reference\_new }\OperatorTok{=}\NormalTok{ \_Keywords.enrich\_with\_yso(keywords\_reference)}
+\NormalTok{\_Utility.save\_json(keywords\_histogram, DIR }\OperatorTok{+} \StringTok{"keywords/keywords\_reference\_master.json"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
 
 \begin{figure}
 \centering
 \includegraphics{images/native_gold_standard.pdf}
-\caption{The coverage of \texttt{/keywords/keywords\_reference.json} by
-the controlled vocabularies of Wikidata (QID), Medical Subject Headings
-(MeSH), and YSO (General Finnish Ontology). Both MeSH and YSO are
-dependent on QID but independent of each other.}
+\caption{The coverage of
+\texttt{/keywords/keywords\_reference\_master.json} by the controlled
+vocabularies of Wikidata (QID), Medical Subject Headings (MeSH), and YSO
+(General Finnish Ontology). Both MeSH and YSO are dependent on QID but
+independent of each other. YSO enriched is the superset of YSO created
+by reconciling keywords that lack a YSO identifier directly with the YSO
+database provided by the Finto API; it is hence independent of
+Wikidata.}
 \end{figure}
 
 Let us now turn to the evaluation of the reconciliation: how many of the
 suggestions were correct? This question was answered via random
 sampling. The random sample (\(n=500\)) was created by calling
 \texttt{\_Analysis.make\_random\_sample} on
-\texttt{/keywords/reference\_keywords.json}; it is available at
-\texttt{analysis/random\_keywords.json}. The sample was then imported
+\texttt{/keywords/reference\_keywords\_master.json}; it is available at
+\texttt{/analysis/random\_keywords.json}. The sample was then imported
 into OpenRefine and the judgement (1 for correct, 0 for incorrect) of
 the manual verification was recorded in the column
 \texttt{verification}. The data was then exported and is available at
-\texttt{analysis/random\_keywords\_verified.csv}.
+\texttt{/analysis/random\_keywords\_verified.csv}.
 
 An analysis of this data shows that 53\% of the suggestions in the
 random sample were correct with a 95\% confidence interval of 48.8\% to
@@ -583,13 +608,16 @@ the share of non-empty yet incorrect suggestions is only 9.4\% in the
 random sample meaning that the quality of the reconciliation is not as
 disappointing as it might seem at first glance.
 
-!! Talk about enrichment with yso and mesh
-
 \hypertarget{foreign-gold-standard}{%
 \subsubsection{Foreign gold standard}\label{foreign-gold-standard}}
 
-!! Todo: - Explain MeSH\\
-- Explain how to get MeSH for subset of sample data set
+\begin{itemize}
+\tightlist
+\item
+  !! Explain MeSH
+\item
+  !! Explain how to get MeSH for subset of sample data set
+\end{itemize}
 
 \hypertarget{assessment}{%
 \subsection{Assessment}\label{assessment}}

@@ -6,8 +6,6 @@ pandoc .\draft.md --from markdown+footnotes+implicit_figures+tex_math_dollars --
 Write a research paper in Markdown: https://opensource.com/article/18/9/pandoc-research-paper
 -->
 
-Machine indexing of institutional repositories: indexing Edoc with Annif and BARTOC FAST as proof of concept
-
 # Introduction
 
 ## Outline
@@ -219,11 +217,11 @@ _Utility.save_json(keywords, DIR + "/keywords/keywords_extracted.json")
 
 #### Clean keywords
 
-In second step, a list of all single keywords must be created. In order to do so, let us consider now in more detail the exact information extracted from the `keywords` data fields as per `keywords/keywords_extracted.json`. In Edoc, the `keywords` data field of an item is a non-mandatory free text field that is filled in by the user (usually one of the authors) who undertakes the data entry of an item to Edoc. Even though the Edoc user manual specifies that keywords must be separated by commas [@UniversitatBasel.2021, p. 8], this requirement is neither validated by the input mask nor by an administrator of Edoc. Furthermore, neither the manual nor the input mask provide a definition of the term "keyword". A vocabulary or a list of vocabularies from which to choose the keywords is also lacking. Taken together, these observations are indicative of very heterogeneous data in the `keywords` data field. To wit, the items of `keywords/keywords_extracted.json` are strings where single keywords are individuated by any symbols the user saw fit. So, for each item in `keywords/keywords_extracted.json`, the user input must be parsed into single keywords. 
+In second step, a list of all single keywords must be created. In order to do so, let us consider now in more detail the exact information extracted from the `keywords` data fields as per `/keywords/keywords_extracted.json`. In Edoc, the `keywords` data field of an item is a non-mandatory free text field that is filled in by the user (usually one of the authors) who undertakes the data entry of an item to Edoc. Even though the Edoc user manual specifies that keywords must be separated by commas [@UniversitatBasel.2021, p. 8], this requirement is neither validated by the input mask nor by an administrator of Edoc. Furthermore, neither the manual nor the input mask provide a definition of the term "keyword". A vocabulary or a list of vocabularies from which to choose the keywords is also lacking. Taken together, these observations are indicative of very heterogeneous data in the `keywords` data field. To wit, the items of `/keywords/keywords_extracted.json` are strings where single keywords are individuated by any symbols the user saw fit. So, for each item in `/keywords/keywords_extracted.json`, the user input must be parsed into single keywords. 
 
 Next the so parsed single keywords must be cleaned or normalized: we want the keywords to follow a uniform format thereby joining morphological duplicates such as "Gene", "gene", "gene_", "gene/", and so on. Also, some keywords are in fact keyword chains, for example "Dendrites/metabolism/ultrastructure". Keyword chains must be broken into their component keywords and then parsed again. The reason for this is that Annif only assigns flat keywords and not keyword chains. 
 
-`_Keywords.clean_keywords` is the implementation the parser while the recursive cleaner is implemented by `_Keywords.clean_keyword`. To create the desired list of clean keywords, saved as `keywords/keywords_clean.json`, we call `_Keywords.clean_keywords` with the extracted keywords as argument:
+`_Keywords.clean_keywords` is the implementation the parser while the recursive cleaner is implemented by `_Keywords.clean_keyword`. To create the desired list of clean keywords, saved as `/keywords/keywords_clean.json`, we call `_Keywords.clean_keywords` with the extracted keywords as argument:
 
 ~~~~{.Python caption="extract_keywords"}
 keywords_extracted = _Utility.load_json(DIR + "/keywords/keywords_extracted.json")
@@ -233,7 +231,7 @@ _Utility.save_json(keywords_clean, DIR + "keywords/keywords_clean.json")
 
 #### Analysis
 
-`keywords/keywords_clean.json` has 36'901 entries many of which are duplicates. We hence deduplicate and count the number of occurrences of each keyword. This is achieved by calling `_Keywords.make_histogram` on `keywords/keywords_clean.json` and saving the output as `keywords/keywords_clean_histogram.json`:
+`/keywords/keywords_clean.json` has 36'901 entries many of which are duplicates. We hence deduplicate and count the number of occurrences of each keyword. This is achieved by calling `_Keywords.make_histogram` on `/keywords/keywords_clean.json` and saving the output as `/keywords/keywords_clean_histogram.json`:
 
 ~~~~{.Python caption="make_histogram"}
 keywords_clean = _Utility.load_json(DIR + "/keywords/keywords_clean.json")
@@ -241,7 +239,7 @@ keywords_histogram = _Keywords.make_histogram(keywords_clean)
 _Utility.save_json(keywords_histogram, DIR + "keywords/keywords_clean_histogram.json")
 ~~~~
 
-An analysis of `keywords/keywords_clean_histogram.json` shows that the lion's share of keywords has only one occurrence but that the total occurrences are predominantly made up of keywords with more than one occurrence (see Figure 3 for details).
+An analysis of `/keywords/keywords_clean_histogram.json` shows that the lion's share of keywords has only one occurrence but that the total occurrences are predominantly made up of keywords with more than one occurrence (see Figure 3 for details).
 
 ![In `keywords/keywords_clean_histogram.json`, the distribution of keywords is strongly skewed right ($min = Q1 = M = Q3 = 1$ and $max = 910$). However, even though keywords with only one occurrence constitute over 75% of the total keywords, their occurrences constitute less than 35% of the total occurrences. The most common keywords with 50 or more occurrences are extreme outliers but make up almost 20% of the total occurrences.](images/keywords_clean_histogram_abc.pdf)
 
@@ -251,29 +249,32 @@ As explained in section X, Annif assigns index terms from a controlled vocabular
 
 In this section, I will describe how the cleaned keywords were reconciled with Wikidata and YSO, and which additional steps for refinement were undertaken. In total, 2'104 data transformation operations were performed; the complete operation history is available as `/keywords/operation_history.json`. 
 
-The data from `keywords/keywords_clean_histogram.json` was imported into OpenRefine. The `keyword` column was then duplicated and reconciled with Wikidata. Here the parameters were chosen as follows: reconcile against no particular type, and auto-match candidates with high confidence.
+The data from `/keywords/keywords_clean_histogram.json` was imported into OpenRefine. The `keyword` column was then duplicated and reconciled with Wikidata. Here the parameters were chosen as follows: reconcile against no particular type, and auto-match candidates with high confidence.
 
-There were X automatic matches (call them "suggestions"). A suggestion is correct if and only if the meaning of the keyword from `keywords/keywords_clean_histogram.json` corresponds to the meaning of the suggested concept from Wikidata. Note that for homonymous or polysemous keywords, it is impossible to confirm a correct match without further context; those keywords therefore cannot be reconciled (but see [section "Construction"](#construction) for a possible solution). Unfortunately, random sampling showed that the overall quality of the reconciliation was not satisfactory, that is, there were too many incorrect suggestions. A two-pronged strategy was adopted to ameliorate the quality of the reconciliation. 
+There were X automatic matches (call them "suggestions"). A suggestion is correct if and only if the meaning of the keyword from `/keywords/keywords_clean_histogram.json` corresponds to the meaning of the suggested concept from Wikidata. Note that for homonymous or polysemous keywords, it is impossible to confirm a correct match without further context; those keywords therefore cannot be reconciled (but see [section "Construction"](#construction) for a possible solution). Unfortunately, random sampling showed that the overall quality of the reconciliation was not satisfactory, that is, there were too many incorrect suggestions. A two-pronged strategy was adopted to ameliorate the quality of the reconciliation. 
 
 First, the suggestions to the top 500 keywords were manually verified. These keywords account for 14'996 occurrences or 40.638% of the total occurrences and thus constitute an effective lever.
 
 Second, systematic biases were identified and removed. The most prevalent bias was an due to a suggestion's type. As stated above, the reconciliation service API was not constrained by type but had access to the complete Wikidata database. Since Wikidata is an ontology that encompasses everything, it also features types whose concepts cannot qualify as subject terms (at least in the present context). The most prominent example is the type Q13442814 "scholarly article". Wikidata contains the metadata of many scholarly articles. Now, for some of our keywords, there is a scholarly article with a title that exactly matches the keyword; and since there is no restriction concerning the type, the scholarly article is suggested with high confidence (see https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation-Service-API for details). For example, [keyword/article]. To generalize, suggestions with types whose concepts are proper names are usually incorrect. Based on this observation, suggestions with the following types were rejected: "scholarly article", "clinical trial", "scientific journal", "academic journal", "open access journal", "thesis", "doctoral thesis", "natural number". Suggestions with the following types were manually verified (i.e., checked for correctness): "human", "album", "film", "musical group", "business", "literary work", "television series", "organization", "family name", "written work", "video game", "single, television series episode", "painting", "commune of France", "city of the United States", "magazine", "studio album", "year", "nonprofit organization", "border town", "international organization", "political party", "software", "song", "website", "article comic strip", "collection", "commune of Italy", "fictional human", "film", "government agency", "village", "academic journal article", "female given name", "poem".
 
-With these improvements in place, each keyword with a suggestion was assigned a QID via the "Add cloumns from reconciled values"-function (and similar for YSO and MeSH identifiers). The data was then exported and saved as `/keywords/keywords_reference.json`. Keywords with a QID now constitute 69% of all keywords and 78% of their total occurrences in the sample data set, but these numbers are much lower for YSO and MeSH identifiers (see Figure 4 for details).
+With these improvements in place, each keyword with a suggestion was assigned a QID via the "Add cloumns from reconciled values"-function (and similar for YSO and MeSH identifiers). The data was then exported and saved as `/keywords/keywords_reference.json`. Keywords with a QID now constitute 69% of all keywords and 78% of their total occurrences in the sample data set, but these numbers are significantly lower for the MeSH identifier (53.6% of all keywords with only 28.8% of all occurrences) and especially low for the YSO identifier (X of all keywords with Y of all occurrences). In both cases, the problem is due to the fact that Wikidata's mapping of MeSH respectively YSO is only partial. There can be two reasons for this state of affairs for a given entry: either there is no match between Wikidata and YSO or MeSH (after all, Wikidata is much larger than MeSH and YSO taken together), or there is a match but it has not yet been added to the mapping. In the latter case, at least with respect to YSO, there is a solution: Finto provides a REST-sytle API to access the YSO vocabulary directly (see https://api.finto.fi/). For each keyword in in the list of reference keywords that lacks a YSO identifier, the Finto API is queried; if a term turns up, it is added to the keyword. The effect of this second reconcilement is detailed in Figure 4. It is achieved by calling `_Keywords.enrich_with_yso` on `/keywords/keywords_reference.json` and saving the output as `/keywords/keywords_reference_master.json`
 
-![The coverage of `/keywords/keywords_reference.json` by the controlled vocabularies of Wikidata (QID), Medical Subject Headings (MeSH), and YSO (General Finnish Ontology). Both MeSH and YSO are dependent on QID but independent of each other.](images/native_gold_standard.pdf)
+~~~~{.Python caption="enrich_with_yso"}
+keywords_reference = _Utility.load_json(DIR + "/keywords/keywords_reference.json")
+keywords_reference_new = _Keywords.enrich_with_yso(keywords_reference)
+_Utility.save_json(keywords_histogram, DIR + "keywords/keywords_reference_master.json")
+~~~~
 
-Let us now turn to the evaluation of the reconciliation: how many of the suggestions were correct? This question was answered via random sampling. The random sample ($n=500$) was created by calling `_Analysis.make_random_sample` on `/keywords/reference_keywords.json`; it is available at `analysis/random_keywords.json`. The sample was then imported into OpenRefine and the judgement (1 for correct, 0 for incorrect) of the manual verification was recorded in the column `verification`. The data was then exported and is available at `analysis/random_keywords_verified.csv`. 
+![The coverage of `/keywords/keywords_reference_master.json` by the controlled vocabularies of Wikidata (QID), Medical Subject Headings (MeSH), and YSO (General Finnish Ontology). Both MeSH and YSO are dependent on QID but independent of each other. YSO enriched is the superset of YSO created by reconciling keywords that lack a YSO identifier directly with the YSO database provided by the Finto API; it is hence independent of Wikidata.](images/native_gold_standard.pdf)
+
+Let us now turn to the evaluation of the reconciliation: how many of the suggestions were correct? This question was answered via random sampling. The random sample ($n=500$) was created by calling `_Analysis.make_random_sample` on `/keywords/reference_keywords_master.json`; it is available at `/analysis/random_keywords.json`. The sample was then imported into OpenRefine and the judgement (1 for correct, 0 for incorrect) of the manual verification was recorded in the column `verification`. The data was then exported and is available at `/analysis/random_keywords_verified.csv`. 
 
 An analysis of this data shows that 53% of the suggestions in the random sample were correct with a 95% confidence interval of 48.8% to 57.3%. We can therefore conclude that 8'507 $\pm$ 692.1 of the 16'050 keywords in `/keywords/reference_keywords.json` have correct suggestions. Note that of the 235 incorrect suggestions in the random sample, 188 were incorrect by default because they were missing a QID; the share of non-empty yet incorrect suggestions is only 9.4% in the random sample meaning that the quality of the reconciliation is not as disappointing as it might seem at first glance.
 
-!! Talk about enrichment with yso and mesh
-
 ### Foreign gold standard
 
-!! Todo:
-- Explain MeSH  
-- Explain how to get MeSH for subset of sample data set
+- !! Explain MeSH
+- !! Explain how to get MeSH for subset of sample data set
 
 ## Assessment
 

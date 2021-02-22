@@ -533,7 +533,7 @@ _Analysis.make_random_sample(DIR + "/keywords/keywords_reference.json", DIR + "/
 
 exit()
 
-#_Keywords.enrich_with_yso(DIR + "/keywords/keywords_reference.json", DIR + "/keywords/keywords_reference_test.json")
+#_Keywords.enrich_with_yso(DIR + "/keywords/keywords_reference.json", DIR + "/keywords/keywords_reference_master.json")
 
 #print(_Keywords.fetch_yso("drug"))
 
