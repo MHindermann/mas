@@ -9,6 +9,7 @@ import urllib3
 import xmltodict
 import ast
 import scipy.stats
+from sklearn.metrics import recall_score, precision_score
 
 
 DIR = os.path.dirname(__file__)
@@ -587,13 +588,34 @@ class _Analysis:
         # construct the correct annif marker:
         marker = f"{project_id}-{abstract}-{fulltext}-{limit}-{threshold}"
 
-        # get the annif suggestions for marker:
+        # get the annif suggestions for the marker from the item:
         annif_suggestions = item.get("annif").get(marker)
         print(annif_suggestions)
+
+        # get the IDs from the suggestions:
+        annif_suggestions_ids = []
+        for suggestion in annif_suggestions:
+            annif_suggestions_ids.append(suggestion.get("uri"))
 
         # get gold standard:
         gold_standard = item.get("keywords enriched")
         print(gold_standard)
+
+        # get ID type from marker:
+        if project_id == "wikidata-en":
+            id_type = "qid"
+        else:
+            id_type = "yso id"
+
+        # get IDs from the gold standard:
+        gold_standard_ids = []
+        for keyword in gold_standard:
+            if keyword.get(id_type) is "":
+                continue
+            else:
+                gold_standard_ids.append(keyword.get(id_type))
+
+        print(gold_standard_ids)
 
         # transform gold standard (Abgleich der IDs mit annif)
         pass
@@ -601,18 +623,15 @@ class _Analysis:
         # calculate precision
         # https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_score.html#sklearn.metrics.precision_score
 
-
-
-
-
-
 _Analysis.precision(DIR + "/indexed/indexed_master_mesh_enriched.json",
                     project_id="wikidata-en",
                     abstract=True)
+exit()
+y_true = [0, 1, 1]
+y_pred = [1, 1, 0]
 
-
-
-
+print(f"recall: {recall_score(y_true, y_pred)}")
+print(f"precision: {precision_score(y_true, y_pred)}")
 
 exit()
 """
