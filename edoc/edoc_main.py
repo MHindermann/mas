@@ -527,20 +527,94 @@ class _Analysis:
         sample = random.sample(population=population, k=size)
         _Utility.save_json(sample, save_path)
 
+    @classmethod
+    def precision(cls,
+                  file_path: str,
+                  project_id: str,
+                  abstract: bool = False,
+                  fulltext: bool = False,
+                  limit: int = None,
+                  threshold: int = None) -> None:
 
-_Analysis.make_random_sample(DIR + "/keywords/keywords_reference.json", DIR + "/analysis/random_keywords.json", 500)
+        """ Calculate precision for items in file.
+
+        Available Annif-client project IDs are yso-en, yso-maui-en, yso-bonsai-en, yso-fasttext-en, wikidata-en.
+
+        :param file_path: complete path to file including filename and extension
+        :param project_id: Annif-client project ID
+        :param abstract: toggle use abstract for indexing, defaults to False
+        :param fulltext: toggle use fulltext for indexing, defaults to False
+        :param limit: Annif-client limit, defaults to None
+        :param threshold: Annif-client threshold, defaults to None
+        """
+
+        data = _Utility.load_json(file_path)
+
+        debug_c = 0
+
+        for item in data:
+            if debug_c > 0:
+                break
+            cls.item_precision(item,
+                               project_id,
+                               abstract,
+                               fulltext,
+                               limit,
+                               threshold)
+            debug_c = debug_c + 1
+
+    @classmethod
+    def item_precision(cls,
+                       item: dict,
+                       project_id: str,
+                       abstract: bool = False,
+                       fulltext: bool = False,
+                       limit: int = None,
+                       threshold: int = None) -> None:
+
+        """ Calculate precision for an item.
+
+        Available Annif-client project IDs are yso-en, yso-maui-en, yso-bonsai-en, yso-fasttext-en, wikidata-en.
+
+        :param item: sample data set item
+        :param project_id: Annif-client project ID
+        :param abstract: toggle use abstract for indexing, defaults to False
+        :param fulltext: toggle use fulltext for indexing, defaults to False
+        :param limit: Annif-client limit, defaults to None
+        :param threshold: Annif-client threshold, defaults to None
+        """
+
+        # construct the correct annif marker:
+        marker = f"{project_id}-{abstract}-{fulltext}-{limit}-{threshold}"
+
+        # get the annif suggestions for marker:
+        annif_suggestions = item.get("annif").get(marker)
+        print(annif_suggestions)
+
+        # get gold standard:
+        gold_standard = item.get("keywords enriched")
+        print(gold_standard)
+
+        # transform gold standard (Abgleich der IDs mit annif)
+        pass
+
+        # calculate precision
+        # https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_score.html#sklearn.metrics.precision_score
+
+
+
+
+
+
+_Analysis.precision(DIR + "/indexed/indexed_master_mesh_enriched.json",
+                    project_id="wikidata-en",
+                    abstract=True)
+
+
+
 
 
 exit()
-
-#_Keywords.enrich_with_yso(DIR + "/keywords/keywords_reference.json", DIR + "/keywords/keywords_reference_master.json")
-
-#print(_Keywords.fetch_yso("drug"))
-
-
-# call this after completing the construction of the reference keywords:
-# _Data.enrich_author_keywords(DIR + "/indexed/indexed_master_mesh.json", DIR + "/indexed/indexed_master_mesh_enriched")
-
 """
 Here I describe _Utility and _Data in relation to the files in the edoc folder. 
 
