@@ -180,8 +180,8 @@ class _Data:
         :param keyword: the keyword
         """
 
-        # load reference keywords (for now keywords_clean_histogram_enriched.csv):
-        keywords_reference = _Utility.load_json(DIR + "/keywords/keywords_reference.json")
+        # load reference keywords:
+        keywords_reference = _Utility.load_json(DIR + "/keywords/keywords_reference_master.json")
 
         # enrich keywords
         for entry in keywords_reference:
@@ -577,13 +577,13 @@ histogram = _Keyword.make_histogram(keywords)
 We the save the resulting histogram under edoc/keywords as keywords_clean_histogram.json like so:
 _Utility.save_json(histogram, "/keywords/keywords_clean_histogram.json")
 
-7a. We create a list of reference keywords from the author keywords. To do this we use OpenRefine to match keywords from 
+ok 7a. We create a list of reference keywords from the author keywords. To do this we use OpenRefine to match keywords from 
 keywords_clean_histogram.json to Wikidata and other ontologies. This is explained elsewhere: draft-document OpenRefine 
 methods up to 20210121. The resulting file is exported as keywords_clean_histogram_enriched.csv and then transformed to 
 keywords_reference.json. Problem with exports here: multiple IDs are lost  (e.g., keyword clean ethnology has two mesh 
 ids Q000208 and D005007 but the second is on different line and exported as standing alone...). 
 
-7b. We try to enrich the reference keywords with YSO ids wherever they are missing. Increases YSO coverage from 1759 to
+ok 7b. We try to enrich the reference keywords with YSO ids wherever they are missing. Increases YSO coverage from 1759 to
 3185. To do this:
 _Keywords.enrich_with_yso(DIR + "/keywords/keywords_reference.json", DIR + "/keywords/keywords_reference-test.json")
 
@@ -595,7 +595,7 @@ be indexed with MeSH on PubMed, 1653 items match this requirement); the resultin
 so: 
 _Data.enrich_with_mesh(DIR + "/indexed/indexed_master.json", DIR + "/indexed/indexed_master_mesh")
 
-10. We enrich the sample items with cleaned author keywords (including, if available, Qid, MeSH ID, YSO ID) based on 
+OK 10. We enrich the sample items with cleaned author keywords (including, if available, Qid, MeSH ID, YSO ID) based on 
 the reference keywords; the resulting file is indexed_master_mesh_enriched.json. To do so:
 _Data.enrich_author_keywords(DIR + "/indexed/indexed_master_mesh.json", DIR + "/indexed/indexed_master_mesh_enriched")
 NOTE: rerun this whenever we amend the reference keywords! WE MUST DO THIS NOW

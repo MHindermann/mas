@@ -305,9 +305,8 @@ to get
 \hypertarget{gold-standard}{%
 \subsection{Gold standard}\label{gold-standard}}
 
-In this chapter I will construct three distinct gold standards in order
-to assess the quality of machine indexing the sample data set with
-Annif.\\
+In this chapter I will construct two distinct gold standards in order to
+assess the quality of machine indexing the sample data set with Annif.\\
 !! Say something about assessments of Annif that have already been
 carried out.
 
@@ -622,11 +621,67 @@ disappointing as it might seem at first glance.
 \hypertarget{assessment}{%
 \subsection{Assessment}\label{assessment}}
 
+In this chapter I will assess the quality of the sample data set's
+indexing with Annif based on the native and foreign gold standards.
+
 \hypertarget{precision-recall-f1-score}{%
 \subsubsection{Precision, recall,
 F1-score}\label{precision-recall-f1-score}}
 
-!! Discussion of metrics
+The metrics used for the assessment are precision, recall and F1 score.
+Precision and recall are standard metrics for indexing quality (e.g.,
+Gantert 2016, 197) whereby the F1 score plays are more prominent role in
+the assessment of machine indexing (e.g., Suominen 2018, 11--14; Toepfer
+and Kempf 2016, 93f.). Of course, there is a host of alternative metrics
+(such as indexing consistency, transparency, reproducability) that are
+neglected here.
+
+Let us briefly look at the definitions and motivations of the chosen
+metrics. Recall that a suggestion of a subject term is correct if and
+only if the subject term is in the native gold standard. The possible
+outcomes are summarized in Table 1.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lllll}
+ &                       & \multicolumn{2}{l}{Suggested by Annif?}            &  \\ \cline{3-4}
+ & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{No} & \multicolumn{1}{l|}{Yes} &  \\ \cline{2-4}
+\multicolumn{1}{l|}{\multirow{2}{*}{In gold standard?}} & \multicolumn{1}{l|}{No}  & \multicolumn{1}{l|}{True negative}  & \multicolumn{1}{l|}{False positive} &  \\ \cline{2-4}
+\multicolumn{1}{l|}{}                                   & \multicolumn{1}{l|}{Yes} & \multicolumn{1}{l|}{False negative} & \multicolumn{1}{l|}{True positive}  &  \\ \cline{2-4}
+\end{tabular}
+\caption{Annif confusion matrix.}
+\label{tab:confusion-matrix}
+\end{table}
+
+\hypertarget{precision}{%
+\paragraph{Precision}\label{precision}}
+
+``Precision'' is the fraction of the correctly suggested subject terms;
+a suggestion is correct if and only if it is in the native gold
+standard:
+
+\(\text{Precision} = \displaystyle \frac{\text{True positive}}{\text{True positive} + \text{False positive}}\)
+
+Or put as question: what fraction of the subject terms suggested by
+Annif are also in the native gold standard?
+
+\hypertarget{recall}{%
+\paragraph{Recall}\label{recall}}
+
+``Recall'' is the fraction of correct subject terms out of all correct
+subject terms:
+
+\(\text{Precision} = \displaystyle \frac{\text{True positive}}{\text{False negative} + \text{False positive}}\)
+
+Put as question: what fraction of the subject terms in the gold standard
+were suggested by Annif?
+
+\hypertarget{f1-score}{%
+\paragraph{F1-score}\label{f1-score}}
+
+The F1-score is the harmonic mean between precision and recall:
+
+\(\text{F1} = \displaystyle 2 * \frac{\text{Precision} * \text{Recall}}{\text{Precision} + \text{Recall}}\)
 
 \hypertarget{annif-versus-native-gold-standard}{%
 \subsubsection{Annif versus native gold
@@ -678,6 +733,11 @@ X is about T) \#\#\# Targets !! Find out what I meant here.
 
 \hypertarget{refs}{}
 \begin{CSLReferences}{1}{0}
+\leavevmode\hypertarget{ref-Gantert.2016}{}%
+Gantert, Klaus. 2016. \emph{Bibliothekarisches Grundwissen}. 9.,
+vollst{ä}ndig neu bearbeitete und erweiterte Auflage. Berlin: {De
+Gruyter Saur}. \url{https://doi.org/10.1515/9783110321500}.
+
 \leavevmode\hypertarget{ref-Golub.2016}{}%
 Golub, Koraljka, Dagobert Soergel, George Buchanan, Douglas Tudhope,
 Marianne Lykke, and Debra Hiom. 2016. {``A Framework for Evaluating
@@ -701,6 +761,18 @@ Stokhof, Martin, and Michiel van Lambalgen. 2011. {``Abstractions and
 Idealisations: The Construction of Modern Linguistics.''}
 \emph{Theoretical Linguistics} 37 (1-2): 1--26.
 \url{https://doi.org/10.1515/thli.2011.001}.
+
+\leavevmode\hypertarget{ref-Suominen.2018}{}%
+Suominen, Osma. 2018. {``Annif: DIY Automated Subject Indexing Using
+Multiple Algorithms.''} \emph{LIBER Quarterly} 29 (1): 1--25.
+\url{https://doi.org/10.18352/lq.10285}.
+
+\leavevmode\hypertarget{ref-Toepfer.2016}{}%
+Toepfer, Martin, and Andreas Oskar Kempf. 2016. {``Automatische
+Indexierung Auf Basis von Titeln Und Autoren-Keywords -- Ein
+Werkstattbericht.''} \emph{027.7 Zeitschrift f{ü}r Bibliothekskultur /
+Journal for Library Culture} 4 (2): 84--97.
+\url{https://0277.ch/ojs/index.php/cdrs_0277/article/view/156/354}.
 
 \leavevmode\hypertarget{ref-UniversitatBasel.2021}{}%
 Universität Basel. n.d. {``Research Database of the University of Basel

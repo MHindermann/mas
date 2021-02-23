@@ -182,7 +182,7 @@ In addition to the already used algorithms we should also try https://ai.finto.f
 
 ## Gold standard
 
-In this chapter I will construct three distinct gold standards in order to assess the quality of machine indexing the sample data set with Annif.  
+In this chapter I will construct two distinct gold standards in order to assess the quality of machine indexing the sample data set with Annif.  
 !! Say something about assessments of Annif that have already been carried out.
 
 ### Definition
@@ -278,8 +278,47 @@ An analysis of this data shows that 53% of the suggestions in the random sample 
 
 ## Assessment
 
+In this chapter I will assess the quality of the sample data set's indexing with Annif based on the native and foreign gold standards. 
+
 ### Precision, recall, F1-score
-!! Discussion of metrics
+
+The metrics used for the assessment are precision, recall and F1 score. Precision and recall are standard metrics for indexing quality [e.g., @Gantert.2016, p. 197] whereby the F1 score plays are more prominent role in the assessment of machine indexing [e.g., @Suominen.2018, pp. 11-14; @Toepfer.2016, p. 93f.]. Of course, there is a host of alternative metrics (such as indexing consistency, transparency, reproducability) that are neglected here.
+
+Let us briefly look at the definitions and motivations of the chosen metrics. Recall that a suggestion of a subject term is correct if and only if the subject term is in the native gold standard. The possible outcomes are summarized in Table 1.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lllll}
+ &                       & \multicolumn{2}{l}{Suggested by Annif?}            &  \\ \cline{3-4}
+ & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{No} & \multicolumn{1}{l|}{Yes} &  \\ \cline{2-4}
+\multicolumn{1}{l|}{\multirow{2}{*}{In gold standard?}} & \multicolumn{1}{l|}{No}  & \multicolumn{1}{l|}{True negative}  & \multicolumn{1}{l|}{False positive} &  \\ \cline{2-4}
+\multicolumn{1}{l|}{}                                   & \multicolumn{1}{l|}{Yes} & \multicolumn{1}{l|}{False negative} & \multicolumn{1}{l|}{True positive}  &  \\ \cline{2-4}
+\end{tabular}
+\caption{Annif confusion matrix.}
+\label{tab:confusion-matrix}
+\end{table}
+
+#### Precision
+
+"Precision" is the fraction of the correctly suggested subject terms; a suggestion is correct if and only if it is in the native gold standard: 
+
+$\text{Precision} = \displaystyle \frac{\text{True positive}}{\text{True positive} + \text{False positive}}$
+
+Or put as question: what fraction of the subject terms suggested by Annif are also in the native gold standard?
+
+#### Recall
+
+"Recall" is the fraction of correct subject terms out of all correct subject terms:
+
+$\text{Precision} = \displaystyle \frac{\text{True positive}}{\text{False negative} + \text{False positive}}$
+
+Put as question: what fraction of the subject terms in the gold standard were suggested by Annif?
+
+#### F1-score
+
+The F1-score is the harmonic mean between precision and recall:
+
+$\text{F1} = \displaystyle 2 * \frac{\text{Precision} * \text{Recall}}{\text{Precision} + \text{Recall}}$
 
 ### Annif versus native gold standard
 
