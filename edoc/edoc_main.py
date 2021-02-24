@@ -588,33 +588,11 @@ class _Analysis:
         # construct the correct annif marker:
         marker = f"{project_id}-{abstract}-{fulltext}-{limit}-{threshold}"
 
-        # get ID type from marker:
-        if project_id == "wikidata-en":
-            id_type = "qid"
-        else:
-            id_type = "yso id"
+        # extract suggestion IDs:
+        suggestions_ids = cls.extract_suggestions(item=item, marker=marker)
 
-        # get the annif suggestions for the marker from the item:
-        suggestions = item.get("annif").get(marker)
-
-        # get the IDs of the suggestions:
-        # TODO: add option for top n suggestions like so: suggestions[:n]. For this we need to calculate which n is best
-        suggestions_ids = []
-        for suggestion in suggestions:
-            uri = suggestion.get("uri")
-            if id_type == "qid":
-                suggestions_ids.append(uri.split("http://www.wikidata.org/entity/")[1])
-
-        # get the gold standard:
-        gold_standard = item.get("keywords enriched")
-
-        # get IDs from the gold standard:
-        gold_standard_ids = []
-        for keyword in gold_standard:
-            if keyword.get(id_type) == "":
-                continue
-            else:
-                gold_standard_ids.append(keyword.get(id_type))
+        # extract gold standard IDs:
+        gold_standard_ids = cls.extract_standard(item=item, marker=marker)
 
         print(suggestions_ids)
         print(gold_standard_ids)
@@ -635,12 +613,59 @@ class _Analysis:
         print("***")
 
     @classmethod
-    def extract_suggestions(cls):
-        pass
+    def get_id_type(cls, marker: str) -> str:
+        """ Get the ID type from the project ID.
+
+        :param marker: project_id-abstract-fulltext-limit-threshold
+        """
+
+        if marker.split("-")[0] == "wikidata":
+            return "qid"
+        else:
+            return "yso id"
 
     @classmethod
-    def extract_standard(cls):
-        pass
+    def extract_suggestions(cls,
+                            item: dict,
+                            marker: str):
+
+        """ Extract Annif suggestion IDs from item.
+
+        :param item: the Edoc item
+        :param marker: project_id-abstract-fulltext-limit-threshold
+        """
+
+        suggestions = item.get("annif").get(marker)
+
+        # TODO: add option for top n suggestions like so: suggestions[:n]. For this we need to calculate which n is best
+        suggestions_ids = []
+        for suggestion in suggestions:
+            uri = suggestion.get("uri")
+            if cls.get_id_type(marker) == "qid":
+                suggestions_ids.append(uri.split("http://www.wikidata.org/entity/")[1])
+
+        return suggestions_ids
+
+    @classmethod
+    def extract_standard(cls,
+                         item: dict,
+                         marker: str) -> list:
+        """ Extract gold standard IDs from item.
+
+        :param item: the Edoc item
+        :param marker: the type of ID
+        """
+
+        id_type = cls.get_id_type(marker)
+        gold_standard = item.get("keywords enriched")
+        gold_standard_ids = []
+        for keyword in gold_standard:
+            if keyword.get(id_type) == "":
+                continue
+            else:
+                gold_standard_ids.append(keyword.get(id_type))
+
+        return gold_standard_ids
 
     @classmethod
     def get_precision(cls,
