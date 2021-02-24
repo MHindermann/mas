@@ -556,12 +556,12 @@ class _Analysis:
         for item in data:
             if debug_c > 10:
                 break
-            cls.item_metrics(item,
+            print(cls.item_metrics(item,
                              project_id,
                              abstract,
                              fulltext,
                              limit,
-                             threshold)
+                             threshold))
             debug_c = debug_c + 1
 
     @classmethod
@@ -571,7 +571,7 @@ class _Analysis:
                      abstract: bool = False,
                      fulltext: bool = False,
                      limit: int = None,
-                     threshold: int = None) -> None:
+                     threshold: int = None) -> Union[dict, None]:
 
         """ Get metrics for an item.
 
@@ -594,23 +594,14 @@ class _Analysis:
         # extract gold standard IDs:
         gold_standard_ids = cls.extract_standard(item=item, marker=marker)
 
-        print(suggestions_ids)
-        print(gold_standard_ids)
+        # calculate metrics:
+        if gold_standard_ids is None:
+            return None
+        precision = cls.get_precision(standard=gold_standard_ids, suggestions=suggestions_ids)
+        recall = cls.get_recall(standard=gold_standard_ids, suggestions=suggestions_ids)
+        f1_score = cls.get_f1(standard=gold_standard_ids, suggestions=suggestions_ids)
 
-        # calculate precision:
-        precision = cls.get_precision(standard=gold_standard_ids,
-                                      suggestions=suggestions_ids)
-        print(f"precision: {precision}")
-        # calculate recall:
-        recall = cls.get_recall(standard=gold_standard_ids,
-                                suggestions=suggestions_ids)
-        print(f"recall: {recall}")
-        # calculate recall:
-        f1_score = cls.get_f1(standard=gold_standard_ids,
-                              suggestions=suggestions_ids)
-        print(f"F1-score: {f1_score }")
-
-        print("***")
+        return {"precision": precision, "recall": recall, "f1": f1_score}
 
     @classmethod
     def get_id_type(cls, marker: str) -> str:
@@ -649,7 +640,7 @@ class _Analysis:
     @classmethod
     def extract_standard(cls,
                          item: dict,
-                         marker: str) -> list:
+                         marker: str) -> Union[list, None]:
         """ Extract gold standard IDs from item.
 
         :param item: the Edoc item
@@ -658,14 +649,21 @@ class _Analysis:
 
         id_type = cls.get_id_type(marker)
         gold_standard = item.get("keywords enriched")
-        gold_standard_ids = []
-        for keyword in gold_standard:
-            if keyword.get(id_type) == "":
-                continue
-            else:
-                gold_standard_ids.append(keyword.get(id_type))
 
-        return gold_standard_ids
+        try:
+            gold_standard_ids = []
+            for keyword in gold_standard:
+                if keyword.get(id_type) == "":
+                    continue
+                else:
+                    gold_standard_ids.append(keyword.get(id_type))
+        except AttributeError:
+            return None
+
+        if len(gold_standard_ids) == 0:
+            return None
+        else:
+            return gold_standard_ids
 
     @classmethod
     def get_precision(cls,
