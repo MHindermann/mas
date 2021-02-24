@@ -529,15 +529,15 @@ class _Analysis:
         _Utility.save_json(sample, save_path)
 
     @classmethod
-    def precision(cls,
-                  file_path: str,
-                  project_id: str,
-                  abstract: bool = False,
-                  fulltext: bool = False,
-                  limit: int = None,
-                  threshold: int = None) -> None:
+    def metrics(cls,
+                file_path: str,
+                project_id: str,
+                abstract: bool = False,
+                fulltext: bool = False,
+                limit: int = None,
+                threshold: int = None) -> None:
 
-        """ Calculate precision for items in file.
+        """ Get metrics for items in file.
 
         Available Annif-client project IDs are yso-en, yso-maui-en, yso-bonsai-en, yso-fasttext-en, wikidata-en.
 
@@ -554,26 +554,26 @@ class _Analysis:
         debug_c = 0
 
         for item in data:
-            if debug_c > 0:
+            if debug_c > 10:
                 break
-            cls.item_precision(item,
-                               project_id,
-                               abstract,
-                               fulltext,
-                               limit,
-                               threshold)
+            cls.item_metrics(item,
+                             project_id,
+                             abstract,
+                             fulltext,
+                             limit,
+                             threshold)
             debug_c = debug_c + 1
 
     @classmethod
-    def item_precision(cls,
-                       item: dict,
-                       project_id: str,
-                       abstract: bool = False,
-                       fulltext: bool = False,
-                       limit: int = None,
-                       threshold: int = None) -> None:
+    def item_metrics(cls,
+                     item: dict,
+                     project_id: str,
+                     abstract: bool = False,
+                     fulltext: bool = False,
+                     limit: int = None,
+                     threshold: int = None) -> None:
 
-        """ Calculate precision for an item.
+        """ Get metrics for an item.
 
         Available Annif-client project IDs are yso-en, yso-maui-en, yso-bonsai-en, yso-fasttext-en, wikidata-en.
 
@@ -588,44 +588,124 @@ class _Analysis:
         # construct the correct annif marker:
         marker = f"{project_id}-{abstract}-{fulltext}-{limit}-{threshold}"
 
-        # get the annif suggestions for the marker from the item:
-        annif_suggestions = item.get("annif").get(marker)
-        print(annif_suggestions)
-
-        # get the IDs from the suggestions:
-        annif_suggestions_ids = []
-        for suggestion in annif_suggestions:
-            annif_suggestions_ids.append(suggestion.get("uri"))
-
-        # get gold standard:
-        gold_standard = item.get("keywords enriched")
-        print(gold_standard)
-
         # get ID type from marker:
         if project_id == "wikidata-en":
             id_type = "qid"
         else:
             id_type = "yso id"
 
+        # get the annif suggestions for the marker from the item:
+        suggestions = item.get("annif").get(marker)
+
+        # get the IDs of the suggestions:
+        # TODO: add option for top n suggestions like so: suggestions[:n]. For this we need to calculate which n is best
+        suggestions_ids = []
+        for suggestion in suggestions:
+            uri = suggestion.get("uri")
+            if id_type == "qid":
+                suggestions_ids.append(uri.split("http://www.wikidata.org/entity/")[1])
+
+        # get the gold standard:
+        gold_standard = item.get("keywords enriched")
+
         # get IDs from the gold standard:
         gold_standard_ids = []
         for keyword in gold_standard:
-            if keyword.get(id_type) is "":
+            if keyword.get(id_type) == "":
                 continue
             else:
                 gold_standard_ids.append(keyword.get(id_type))
 
+        print(suggestions_ids)
         print(gold_standard_ids)
 
-        # transform gold standard (Abgleich der IDs mit annif)
+        # calculate precision:
+        precision = cls.get_precision(standard=gold_standard_ids,
+                                      suggestions=suggestions_ids)
+        print(f"precision: {precision}")
+        # calculate recall:
+        recall = cls.get_recall(standard=gold_standard_ids,
+                                suggestions=suggestions_ids)
+        print(f"recall: {recall}")
+        # calculate recall:
+        f1_score = cls.get_f1(standard=gold_standard_ids,
+                              suggestions=suggestions_ids)
+        print(f"F1-score: {f1_score }")
+
+        print("***")
+
+    @classmethod
+    def extract_suggestions(cls):
         pass
 
-        # calculate precision
-        # https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_score.html#sklearn.metrics.precision_score
+    @classmethod
+    def extract_standard(cls):
+        pass
 
-_Analysis.precision(DIR + "/indexed/indexed_master_mesh_enriched.json",
-                    project_id="wikidata-en",
-                    abstract=True)
+    @classmethod
+    def get_precision(cls,
+                      standard: list,
+                      suggestions: list) -> float:
+        """ Get precision for suggestion according to standard.
+
+        See https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_score.html#sklearn.metrics.precision_score.
+
+        :param standard: the gold standard
+        :param suggestions: the suggestions resp. predictions
+        """
+
+        true_positive = 0
+        false_positive = 0
+        for suggestion in suggestions:
+            if suggestion in standard:
+                true_positive = true_positive + 1
+            else:
+                false_positive = false_positive + 1
+
+        return true_positive / (true_positive + false_positive)
+
+    @classmethod
+    def get_recall(cls,
+                   standard: list,
+                   suggestions: list) -> float:
+        """ Get recall for suggestion according to standard.
+
+        See https://scikit-learn.org/stable/modules/generated/sklearn.metrics.recall_score.html#sklearn.metrics.recall_score.
+
+        :param standard: the gold standard
+        :param suggestions: the suggestions resp. predictions
+        """
+
+        true_positive = 0
+        for suggestion in suggestions:
+            if suggestion in standard:
+                true_positive = true_positive + 1
+
+        return true_positive / len(standard)
+
+    @classmethod
+    def get_f1(cls,
+               standard: list,
+               suggestions: list) -> float:
+        """ Get F1-score for suggestion according to standard.
+
+        See https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html#sklearn.metrics.f1_score.
+
+        :param standard: the gold standard
+        :param suggestions: the suggestions resp. predictions
+        """
+
+        precision = cls.get_precision(standard, suggestions)
+        recall = cls.get_recall(standard, suggestions)
+
+        try:
+            return 2 * ((precision * recall) / (precision + recall))
+        except ZeroDivisionError:
+            return 0
+
+_Analysis.metrics(DIR + "/indexed/indexed_master_mesh_enriched.json",
+                  project_id="wikidata-en",
+                  abstract=True)
 exit()
 y_true = [0, 1, 1]
 y_pred = [1, 1, 0]

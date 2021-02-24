@@ -310,7 +310,7 @@ Or put as question: what fraction of the subject terms suggested by Annif are al
 
 "Recall" is the fraction of correct subject terms out of all correct subject terms:
 
-$\text{Precision} = \displaystyle \frac{\text{True positive}}{\text{False negative} + \text{False positive}}$
+$\text{Precision} = \displaystyle \frac{\text{True positive}}{\text{True positive} + \text{False negative}}$
 
 Put as question: what fraction of the subject terms in the gold standard were suggested by Annif?
 
