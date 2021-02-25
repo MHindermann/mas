@@ -225,30 +225,32 @@ above data fields to be non-empty;
 constitutes 6\% of the raw data.
 
 In order to determine how well the sample data set represents the raw
-Edoc data, a one-sample chi-square test was conducted on each selection
-data field (see Parke 2013, chap. 1). The results indicate that the
-sample data proportions of items are significantly different from the
-raw Edoc data per department (see Figure 1 for more details).
+Edoc data, a one-sample \(\chi^2\) goodnes of fit test was conducted on
+each selection data field (following Parke 2013, chap. 1). The results
+indicate that the sample data proportions of items are significantly
+different from the raw Edoc data per department (see Figure 1 for more
+details).
 
 \begin{figure}
 \centering
 \includegraphics{images/chi_square_selection_fields.pdf}
 \caption{The sample data set (\(n\) = 4'111) is not representative of
-the raw Edoc data (\(N\) = 68'345) per department. Data field
-\texttt{abstract}: \(\chi^2 (df=9) =\) 3'160.556, \(p < 0.001\); data
-field \texttt{id\_number}: \(\chi^2 (df=9) =\) 4'209.0285,
-\(p < 0.001\); data field \texttt{keywords}: \(\chi^2 (df=9) =\)
-2'314.533, \(p < 0.001\). The data foundation is available at
-\texttt{/edoc/analysis} and the chi-square statistic can be calculated
-by calling
-\texttt{\_Analysis.get\_\textasciitilde{}\textasciitilde{}\textasciitilde{}\textasciitilde{}chi\_square\_fit}.}
+the raw Edoc data per department. Data field \texttt{abstract}:
+\(\chi^2 (df=9) =\) 3'160.556, \(p < 0.001\); data field
+\texttt{id\_number}: \(\chi^2 (df=9) =\) 4'209.0285, \(p < 0.001\); data
+field \texttt{keywords}: \(\chi^2 (df=9) =\) 2'314.533, \(p < 0.001\).
+The data foundation is available at
+\texttt{/edoc/analysis/chi\_square...} and the \(\chi^2\)-statistic can
+be calculated by calling \texttt{\_Analysis.get\_chi\_square\_fit} on
+the data foundation files.}
 \end{figure}
 
 The sample data set is hence not representative of the raw Edoc data.
 This is not surprising since its construction is strongly biased. This
 bias has the effect that the sample data set is significantly skewed
 towards English journal publications in the sciences, medicine and
-economics from the 21st century (see Figure 2 for more details). The
+economics from the 21st century (again, this is shown by a one-sample
+\(\chi^2\) goodness of fit test, see Figure 2 for more details). The
 upshot of this analysis is that the humanities are underrepresented in
 the sample data set. Therefore, any results with respect to the quality
 of machine indexing discussed below might not be applicable to the
@@ -262,12 +264,12 @@ towards English (data field \texttt{language}: \(\chi^2 (df=3) =\)
 1'441.414, \(p < 0.001\)) journal publications (data field
 \texttt{type}: \(\chi^2 (df=10) =\) 52'519.743, \(p < 0.001\)) in the
 sciences, medicine and economics (data field \texttt{department}:
-\(\chi^2 (df=9) =\) 14'447.276\$, \(p < 0.001\)) from the 21st (data
-field \texttt{date}: \(\chi^2 (df=7) =\) 35'878.493, \(p < 0.001\))
-century as compared to the raw Edoc data (\(N\) = 68'345). The data
-foundation is available at \texttt{/edoc/analysis} and the chi-square
-statistic can be calculated by calling
-\texttt{\_Analysis.chi\_square\_fit}.}
+\(\chi^2 (df=9) =\) 14'447.276, \(p < 0.001\)) from the 21st (data field
+\texttt{date}: \(\chi^2 (df=7) =\) 35'878.493, \(p < 0.001\)) century as
+compared to the raw Edoc data. The data foundation is available at
+\texttt{/edoc/analysis/chi\_square...} and the \(\chi^2\)-statistic can
+be calculated by calling \texttt{\_Analysis.get\_chi\_square\_fit} on
+the data foundation files.}
 \end{figure}
 
 \hypertarget{machine-indexing}{%
@@ -483,13 +485,13 @@ output as \texttt{/analysis/keywords\_counted.json}:
 \end{Shaded}
 
 The median number of keywords for an item in the sample data set is 6
-with an \(IQR\) of 4 (\(min = 0\), \(Q1 = 4\), \(M = 6\), \(Q3 = 8\),
-\(max = 87\)). Of course, items in the sample data set with a number of
-keywords below the first and above the third quartile are highly suspect
-from a qualitative point of view: when it comes to subject indexing,
-some terms are required, but more is usually worse {[}!! source{]}.
-Items with too few or too many keywords will be discussed in more detail
-in section \protect\hyperlink{assessment}{section Assessment}
+with an IQR of 4 (min = 0, Q1 = 4, M = 6, Q3 = 8, max = 87). Of course,
+items in the sample data set with a number of keywords below the first
+and above the third quartile are highly suspect from a qualitative point
+of view: when it comes to subject indexing, some terms are required, but
+more is usually worse {[}!! source{]}. Items with too few or too many
+keywords will be discussed in more detail in section
+\protect\hyperlink{assessment}{section Assessment}
 
 \hypertarget{reconciliation}{%
 \paragraph{Reconciliation}\label{reconciliation}}
@@ -639,8 +641,9 @@ represent an adequate indexing.}
 \paragraph{Discussion}\label{discussion}}
 
 Let us now turn to the evaluation of the reconciliation: how many of the
-suggestions were correct? This question was answered via random
-sampling. The random sample (\(n=500\)) was created by calling
+suggestions were correct? This question was answered via random sampling
+(following Roth and Heidenreich 1993, 204--25). The random sample
+(\(n=500\)) was created by calling
 \texttt{\_Analysis.make\_random\_sample} on
 \texttt{/keywords/reference\_keywords\_master.json}; it is available at
 \texttt{/analysis/random\_keywords.json}. The sample was then imported
@@ -816,6 +819,12 @@ Linguistics} 39 (2): 267--300.
 Parke, Carol. 2013. \emph{Essential First Steps to Data Analysis:
 Scenario-Based Examples Using SPSS}. Thousand Oaks: {SAGE Publications}.
 \url{https://doi.org/10.4135/9781506335148}.
+
+\leavevmode\hypertarget{ref-Roth.1993}{}%
+Roth, Erwin, and Klaus Heidenreich. 1993. \emph{Sozialwissenschaftliche
+Methoden: Lehr- Und Handbuch f{ü}r Forschung Und Praxis}. 3., v{ö}llig
+{ü}berarbeitete und erweiterte Auflage. M{ü}nchen {[}etc.{]}: {R.
+Oldenbourg Verlag}.
 
 \leavevmode\hypertarget{ref-Stokhof.2011}{}%
 Stokhof, Martin, and Michiel van Lambalgen. 2011. {``Abstractions and
