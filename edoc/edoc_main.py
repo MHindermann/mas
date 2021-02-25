@@ -481,8 +481,8 @@ class _Analysis:
     """ A collection of data analysis functions. """
 
     @classmethod
-    def chi_square_fit(cls,
-                       file_path: str) -> None:
+    def get_chi_square_fit(cls,
+                           file_path: str) -> None:
 
         """ Print chi square goodness of fit.
 
@@ -535,7 +535,8 @@ class _Analysis:
                 abstract: bool = False,
                 fulltext: bool = False,
                 limit: int = None,
-                threshold: int = None) -> None:
+                threshold: int = None,
+                n: int = 10) -> None:
 
         """ Get metrics for items in file.
 
@@ -547,6 +548,7 @@ class _Analysis:
         :param fulltext: toggle use fulltext for indexing, defaults to False
         :param limit: Annif-client limit, defaults to None
         :param threshold: Annif-client threshold, defaults to None
+        :param n: number of top IDs (by score) to be extracted per item, defaults to 10
         """
 
         data = _Utility.load_json(file_path)
@@ -556,12 +558,13 @@ class _Analysis:
         for item in data:
             if debug_c > 10:
                 break
-            print(cls.item_metrics(item,
-                             project_id,
-                             abstract,
-                             fulltext,
-                             limit,
-                             threshold))
+            print(cls.item_metrics(item=item,
+                                   project_id=project_id,
+                                   abstract=abstract,
+                                   fulltext=fulltext,
+                                   limit=limit,
+                                   threshold=threshold,
+                                   n=n))
             debug_c = debug_c + 1
 
     @classmethod
@@ -571,7 +574,8 @@ class _Analysis:
                      abstract: bool = False,
                      fulltext: bool = False,
                      limit: int = None,
-                     threshold: int = None) -> Union[dict, None]:
+                     threshold: int = None,
+                     n: int = 10) -> Union[dict, None]:
 
         """ Get metrics for an item.
 
@@ -583,13 +587,14 @@ class _Analysis:
         :param fulltext: toggle use fulltext for indexing, defaults to False
         :param limit: Annif-client limit, defaults to None
         :param threshold: Annif-client threshold, defaults to None
+        :param n: number of top IDs (by score) to be extracted, defaults to 10
         """
 
         # construct the correct annif marker:
         marker = f"{project_id}-{abstract}-{fulltext}-{limit}-{threshold}"
 
         # extract suggestion IDs:
-        suggestions_ids = cls.extract_suggestions(item=item, marker=marker)
+        suggestions_ids = cls.extract_suggestions(item=item, marker=marker, n=n)
 
         # extract gold standard IDs:
         gold_standard_ids = cls.extract_standard(item=item, marker=marker)
@@ -618,19 +623,20 @@ class _Analysis:
     @classmethod
     def extract_suggestions(cls,
                             item: dict,
-                            marker: str):
+                            marker: str,
+                            n: int = 10):
 
-        """ Extract Annif suggestion IDs from item.
+        """ Extract top n Annif suggestion IDs from item.
 
         :param item: the Edoc item
         :param marker: project_id-abstract-fulltext-limit-threshold
+        :param n: number of top IDs (by score) to be extracted, defaults to 10
         """
 
         suggestions = item.get("annif").get(marker)
 
-        # TODO: add option for top n suggestions like so: suggestions[:n]. For this we need to calculate which n is best
         suggestions_ids = []
-        for suggestion in suggestions:
+        for suggestion in suggestions[:n]:
             uri = suggestion.get("uri")
             if cls.get_id_type(marker) == "qid":
                 suggestions_ids.append(uri.split("http://www.wikidata.org/entity/")[1])
@@ -726,9 +732,47 @@ class _Analysis:
         except ZeroDivisionError:
             return 0
 
+    @classmethod
+    def count_all(cls,
+                  file_path: str,
+                  save_path: str) -> None:
+        """ Count all keywords and their respective IDs per item in file.
+
+        :param file_path: complete path to file including filename and extension
+        :param save_path: complete path to save folder including filename and extension
+        """
+
+        data = _Utility.load_json(file_path)
+        output = []
+
+        for item in data:
+            gold_standard = item.get("keywords enriched")
+            qid = 0
+            mesh = 0
+            yso = 0
+            try:
+                for keyword in gold_standard:
+                    if keyword.get("qid") != "":
+                        qid = qid + 1
+                    if keyword.get("mesh id") != "":
+                        mesh = mesh + 1
+                    if keyword.get("yso id") != "":
+                        yso = yso + 1
+                output.append({"gold standard": len(gold_standard), "qid": qid, "mesh id": mesh, "yso id": yso})
+            except AttributeError:
+                continue
+
+        _Utility.save_json(output, save_path)
+
+
+_Analysis.count_all(DIR + "/indexed/indexed_master_mesh_enriched.json", DIR + "/keywords/keywords_counted.json")
+
+exit()
+
 _Analysis.metrics(DIR + "/indexed/indexed_master_mesh_enriched.json",
                   project_id="wikidata-en",
-                  abstract=True)
+                  abstract=True,
+                  n=10)
 exit()
 y_true = [0, 1, 1]
 y_pred = [1, 1, 0]

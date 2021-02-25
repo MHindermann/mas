@@ -240,7 +240,8 @@ field \texttt{id\_number}: \(\chi^2 (df=9) =\) 4'209.0285,
 \(p < 0.001\); data field \texttt{keywords}: \(\chi^2 (df=9) =\)
 2'314.533, \(p < 0.001\). The data foundation is available at
 \texttt{/edoc/analysis} and the chi-square statistic can be calculated
-by calling \texttt{\_Analysis.chi\_square\_fit}.}
+by calling
+\texttt{\_Analysis.get\_\textasciitilde{}\textasciitilde{}\textasciitilde{}\textasciitilde{}chi\_square\_fit}.}
 \end{figure}
 
 The sample data set is hence not representative of the raw Edoc data.
@@ -548,16 +549,16 @@ and saved as \texttt{/keywords/keywords\_reference.json}. Keywords with
 a QID now constitute 69\% of all keywords and 78\% of their total
 occurrences in the sample data set, but these numbers are significantly
 lower for the MeSH identifier (53.6\% of all keywords with only 28.8\%
-of all occurrences) and especially low for the YSO identifier (X of all
-keywords with Y of all occurrences). In both cases, the problem is due
-to the fact that Wikidata's mapping of MeSH respectively YSO is only
-partial. There can be two reasons for this state of affairs for a given
-entry: either there is no match between Wikidata and YSO or MeSH (after
-all, Wikidata is much larger than MeSH and YSO taken together), or there
-is a match but it has not yet been added to the mapping. In the latter
-case, at least with respect to YSO, there is a solution: Finto provides
-a REST-sytle API to access the YSO vocabulary directly (see
-https://api.finto.fi/). For each keyword in in the list of reference
+of all occurrences) and especially low for the YSO identifier (26.9\% of
+all keywords with 11\% of all occurrences). In both cases, the problem
+is due to the fact that Wikidata's mapping of MeSH respectively YSO is
+only partial. There can be two reasons for this state of affairs for a
+given entry: either there is no match between Wikidata and YSO or MeSH
+(after all, Wikidata is much larger than MeSH and YSO taken together),
+or there is a match but it has not yet been added to the mapping. In the
+latter case, at least with respect to YSO, there is a solution: Finto
+provides a REST-sytle API to access the YSO vocabulary directly (see
+https://api.finto.fi/). For each keyword in the list of reference
 keywords that lacks a YSO identifier, the Finto API is queried; if a
 term turns up, it is added to the keyword. The effect of this second
 reconcilement is detailed in Figure 4. It is achieved by calling
@@ -586,6 +587,9 @@ database provided by the Finto API; it is hence independent of
 Wikidata.}
 \end{figure}
 
+\hypertarget{discussion}{%
+\paragraph{Discussion}\label{discussion}}
+
 Let us now turn to the evaluation of the reconciliation: how many of the
 suggestions were correct? This question was answered via random
 sampling. The random sample (\(n=500\)) was created by calling
@@ -606,6 +610,9 @@ sample, 188 were incorrect by default because they were missing a QID;
 the share of non-empty yet incorrect suggestions is only 9.4\% in the
 random sample meaning that the quality of the reconciliation is not as
 disappointing as it might seem at first glance.
+
+!! How many author keywords per item? !! How many suggestions per item
+are correct?
 
 \hypertarget{foreign-gold-standard}{%
 \subsubsection{Foreign gold standard}\label{foreign-gold-standard}}
@@ -687,6 +694,10 @@ The F1-score is the harmonic mean between precision and recall:
 \subsubsection{Annif versus native gold
 standard}\label{annif-versus-native-gold-standard}}
 
+!! number of keywords per item; number of keywords with qid per item
+
+!! how to deal with items that have more than 10 keywords in standard??
+
 \hypertarget{yso}{%
 \paragraph{YSO}\label{yso}}
 
@@ -707,8 +718,8 @@ X is about T) \#\#\# Targets !! Find out what I meant here.
 \hypertarget{analysis-2}{%
 \subsubsection{Analysis}\label{analysis-2}}
 
-\hypertarget{discussion}{%
-\subsection{Discussion}\label{discussion}}
+\hypertarget{discussion-1}{%
+\subsection{Discussion}\label{discussion-1}}
 
 \hypertarget{outlook}{%
 \section{Outlook}\label{outlook}}
