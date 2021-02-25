@@ -476,6 +476,38 @@ class _Keywords:
         except (IndexError, SyntaxError):
             return None
 
+    @classmethod
+    def count_all(cls,
+                  file_path: str,
+                  save_path: str) -> None:
+        """ Count all keywords and their respective IDs per item in file.
+
+        :param file_path: complete path to file including filename and extension
+        :param save_path: complete path to save folder including filename and extension
+        """
+
+        data = _Utility.load_json(file_path)
+        output = []
+
+        for item in data:
+            gold_standard = item.get("keywords enriched")
+            qid = 0
+            mesh = 0
+            yso = 0
+            try:
+                for keyword in gold_standard:
+                    if keyword.get("qid") != "":
+                        qid = qid + 1
+                    if keyword.get("mesh id") != "":
+                        mesh = mesh + 1
+                    if keyword.get("yso id") != "":
+                        yso = yso + 1
+                output.append({"gold standard": len(gold_standard), "qid": qid, "mesh id": mesh, "yso id": yso})
+            except AttributeError:
+                continue
+
+        _Utility.save_json(output, save_path)
+
 
 class _Analysis:
     """ A collection of data analysis functions. """
@@ -732,40 +764,10 @@ class _Analysis:
         except ZeroDivisionError:
             return 0
 
-    @classmethod
-    def count_all(cls,
-                  file_path: str,
-                  save_path: str) -> None:
-        """ Count all keywords and their respective IDs per item in file.
-
-        :param file_path: complete path to file including filename and extension
-        :param save_path: complete path to save folder including filename and extension
-        """
-
-        data = _Utility.load_json(file_path)
-        output = []
-
-        for item in data:
-            gold_standard = item.get("keywords enriched")
-            qid = 0
-            mesh = 0
-            yso = 0
-            try:
-                for keyword in gold_standard:
-                    if keyword.get("qid") != "":
-                        qid = qid + 1
-                    if keyword.get("mesh id") != "":
-                        mesh = mesh + 1
-                    if keyword.get("yso id") != "":
-                        yso = yso + 1
-                output.append({"gold standard": len(gold_standard), "qid": qid, "mesh id": mesh, "yso id": yso})
-            except AttributeError:
-                continue
-
-        _Utility.save_json(output, save_path)
 
 
-_Analysis.count_all(DIR + "/indexed/indexed_master_mesh_enriched.json", DIR + "/keywords/keywords_counted.json")
+
+_Keywords.count_all(DIR + "/indexed/indexed_master_mesh_enriched.json", DIR + "/keywords/keywords_counted.json")
 
 exit()
 

@@ -462,12 +462,34 @@ one occurrence (see Figure 3 for details).
 \includegraphics{images/keywords_clean_histogram_abc.pdf}
 \caption{In \texttt{keywords/keywords\_clean\_histogram.json}, the
 distribution of keywords is strongly skewed right
-(\(min = Q1 = M = Q3 = 1\) and \(max = 910\)). However, even though
+(\(min = Q1 = M = Q3 = 1\), \(max = 910\)). However, even though
 keywords with only one occurrence constitute over 75\% of the total
 keywords, their occurrences constitute less than 35\% of the total
 occurrences. The most common keywords with 50 or more occurrences are
 extreme outliers but make up almost 20\% of the total occurrences.}
 \end{figure}
+
+To analyse the spread of keywords in the sample data set, the keywords
+per item are counted. To do so, we call \texttt{\_Keywords.count\_all}
+on \texttt{/indexed/indexed\_master\_mesh\_enriched.json} and save the
+output as \texttt{/analysis/keywords\_counted.json}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sample\_data\_set }\OperatorTok{=}\NormalTok{ \_Utility.load\_json(DIR }\OperatorTok{+} \StringTok{"/indexed/indexed\_master\_mesh\_enriched.json"}\NormalTok{)}
+\NormalTok{keywords\_counted }\OperatorTok{=}\NormalTok{ \_Keywords.count\_all(sample\_data\_set)}
+\NormalTok{\_Utility.save\_json(keywords\_counted, DIR }\OperatorTok{+} \StringTok{"/analysis/keywords\_counted.json"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+The median number of keywords for an item in the sample data set is 6
+with an \(IQR\) of 4 (\(min = 0\), \(Q1 = 4\), \(M = 6\), \(Q3 = 8\),
+\(max = 87\)). Of course, items in the sample data set with a number of
+keywords below the first and above the third quartile are highly suspect
+from a qualitative point of view: when it comes to subject indexing,
+some terms are required, but more is usually worse {[}!! source{]}.
+Items with too few or too many keywords will be discussed in more detail
+in section \protect\hyperlink{assessment}{section Assessment}
 
 \hypertarget{reconciliation}{%
 \paragraph{Reconciliation}\label{reconciliation}}
@@ -495,17 +517,18 @@ duplicated and reconciled with Wikidata. Here the parameters were chosen
 as follows: reconcile against no particular type, and auto-match
 candidates with high confidence.
 
-There were X automatic matches (call them ``suggestions''). A suggestion
-is correct if and only if the meaning of the keyword from
-\texttt{/keywords/keywords\_clean\_histogram.json} corresponds to the
-meaning of the suggested concept from Wikidata. Note that for homonymous
-or polysemous keywords, it is impossible to confirm a correct match
-without further context; those keywords therefore cannot be reconciled
-(but see \protect\hyperlink{construction}{section ``Construction''} for
-a possible solution). Unfortunately, random sampling showed that the
-overall quality of the reconciliation was not satisfactory, that is,
-there were too many incorrect suggestions. A two-pronged strategy was
-adopted to ameliorate the quality of the reconciliation.
+The reconciliation service API returns automatic matches (call them
+``suggestions''). A suggestion is correct if and only if the meaning of
+the keyword from \texttt{/keywords/keywords\_clean\_histogram.json}
+corresponds to the meaning of the suggested concept from Wikidata. Note
+that for homonymous or polysemous keywords, it is impossible to confirm
+a correct match without further context; those keywords therefore cannot
+be reconciled (but see \protect\hyperlink{construction}{section
+``Construction''} for a possible solution). Unfortunately, random
+sampling showed that the overall quality of the reconciliation was not
+satisfactory, that is, there were too many incorrect suggestions. A
+two-pronged strategy was adopted to ameliorate the quality of the
+reconciliation.
 
 First, the suggestions to the top 500 keywords were manually verified.
 These keywords account for 14'996 occurrences or 40.638\% of the total
@@ -587,6 +610,31 @@ database provided by the Finto API; it is hence independent of
 Wikidata.}
 \end{figure}
 
+Finally, consider the distribution of the cleaned and reconciled
+keywords per item in the Edoc sample data set. The corresponding data is
+generated with \texttt{\_Keywords.count\_all} as described in
+\protect\hyperlink{analysis}{subsection Analysis} above and available as
+\texttt{/analysis/keywords\_counted.json}. Figure 5 shows that the
+median number of keywords from MeSH or YSO might be too low to be
+adequate. This problem can be amended by imposing further constraints on
+the sample data set and such a solution is discussed in section {[}!!
+section{]}.
+
+\begin{figure}
+\centering
+\includegraphics{images/keywords_counted.pdf}
+\caption{The distribution of keywords per item in the Edoc sample data
+set. The leftmost boxplot shows the distribution of cleaned keywords
+(\(min = 0\), \(Q1 = 4\), \(M = 6\), \(Q3 = 8\), \(max = 87\)); the
+other boxplots show the distribution of cleaned keywords with reconciled
+QID (\(min = 0\), \(Q1 = 2\), \(M = 4\), \(Q3 = 6\), \(max = 80\)), MeSH
+ID (\(min = Q1 = 0\), \(M = 2\), \(Q3 = 4\), \(max = 63\)), and YSO ID
+(\(min = Q1 = 0\), \(M = 1\), \(Q3 = 2\), \(max = 46\)). All four
+distributions are equally consistent, but there is a linear shrinkage of
+the center leaving MeSH and YSO with potentially too few descriptors to
+represent an adequate indexing.}
+\end{figure}
+
 \hypertarget{discussion}{%
 \paragraph{Discussion}\label{discussion}}
 
@@ -610,9 +658,6 @@ sample, 188 were incorrect by default because they were missing a QID;
 the share of non-empty yet incorrect suggestions is only 9.4\% in the
 random sample meaning that the quality of the reconciliation is not as
 disappointing as it might seem at first glance.
-
-!! How many author keywords per item? !! How many suggestions per item
-are correct?
 
 \hypertarget{foreign-gold-standard}{%
 \subsubsection{Foreign gold standard}\label{foreign-gold-standard}}
@@ -670,7 +715,8 @@ standard:
 \(\text{Precision} = \displaystyle \frac{\text{True positive}}{\text{True positive} + \text{False positive}}\)
 
 Or put as question: what fraction of the subject terms suggested by
-Annif are also in the native gold standard?
+Annif are also in the native gold standard? The metric of precision is
+implemented by \texttt{\_Analysis.get\_precision}.
 
 \hypertarget{recall}{%
 \paragraph{Recall}\label{recall}}
@@ -681,7 +727,8 @@ subject terms:
 \(\text{Precision} = \displaystyle \frac{\text{True positive}}{\text{True positive} + \text{False negative}}\)
 
 Put as question: what fraction of the subject terms in the gold standard
-were suggested by Annif?
+were suggested by Annif? The metric of recall is implemented by
+\texttt{\_Analysis.get\_recall}.
 
 \hypertarget{f1-score}{%
 \paragraph{F1-score}\label{f1-score}}
@@ -694,9 +741,8 @@ The F1-score is the harmonic mean between precision and recall:
 \subsubsection{Annif versus native gold
 standard}\label{annif-versus-native-gold-standard}}
 
-!! number of keywords per item; number of keywords with qid per item
-
 !! how to deal with items that have more than 10 keywords in standard??
+just look at data in IQR?
 
 \hypertarget{yso}{%
 \paragraph{YSO}\label{yso}}
@@ -735,6 +781,10 @@ X is about T) \#\#\# Targets !! Find out what I meant here.
 
 \hypertarget{conclusion}{%
 \section{Conclusion}\label{conclusion}}
+
+!! Clean up: rename
+\texttt{/indexed/indexed\_master\_mesh\_enriched.json} to
+\texttt{/indexed/master\_final.json} or something short.
 
 \hypertarget{appendix}{%
 \section{Appendix}\label{appendix}}

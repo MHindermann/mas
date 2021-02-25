@@ -241,9 +241,17 @@ _Utility.save_json(keywords_histogram, DIR + "keywords/keywords_clean_histogram.
 
 An analysis of `/keywords/keywords_clean_histogram.json` shows that the lion's share of keywords has only one occurrence but that the total occurrences are predominantly made up of keywords with more than one occurrence (see Figure 3 for details).
 
-![In `keywords/keywords_clean_histogram.json`, the distribution of keywords is strongly skewed right ($min = Q1 = M = Q3 = 1$ and $max = 910$). However, even though keywords with only one occurrence constitute over 75% of the total keywords, their occurrences constitute less than 35% of the total occurrences. The most common keywords with 50 or more occurrences are extreme outliers but make up almost 20% of the total occurrences.](images/keywords_clean_histogram_abc.pdf)
+![In `keywords/keywords_clean_histogram.json`, the distribution of keywords is strongly skewed right ($min = Q1 = M = Q3 = 1$, $max = 910$). However, even though keywords with only one occurrence constitute over 75% of the total keywords, their occurrences constitute less than 35% of the total occurrences. The most common keywords with 50 or more occurrences are extreme outliers but make up almost 20% of the total occurrences.](images/keywords_clean_histogram_abc.pdf)
 
-The median number of keywords for an item in the sample data set is 6 with an IQR of 4 ($min = 0, Q1 = 4, M = 6, Q3 = 8$ and $max = 87$). Of course, items in the sample data set with a number of keywords below the first and above the third quartile are highly suspect from a qualitative point of view: when it comes to subject indexing, some terms are required, but more is usually worse [!! source]. Items with too few or too many keywords will be discussed in more detail in section [section Assessment](#assessment)
+To analyse the spread of keywords in the sample data set, the keywords per item are counted. To do so, we call `_Keywords.count_all` on `/indexed/indexed_master_mesh_enriched.json` and save the output as `/analysis/keywords_counted.json`:
+
+~~~~{.Python caption="count_keywords"}
+sample_data_set = _Utility.load_json(DIR + "/indexed/indexed_master_mesh_enriched.json")
+keywords_counted = _Keywords.count_all(sample_data_set)
+_Utility.save_json(keywords_counted, DIR + "/analysis/keywords_counted.json")
+~~~~
+
+The median number of keywords for an item in the sample data set is 6 with an $IQR$ of 4 ($min = 0$, $Q1 = 4$, $M = 6$, $Q3 = 8$, $max = 87$). Of course, items in the sample data set with a number of keywords below the first and above the third quartile are highly suspect from a qualitative point of view: when it comes to subject indexing, some terms are required, but more is usually worse [!! source]. Items with too few or too many keywords will be discussed in more detail in section [section Assessment](#assessment)
 
 #### Reconciliation
 
@@ -269,14 +277,15 @@ _Utility.save_json(keywords_histogram, DIR + "keywords/keywords_reference_master
 
 ![The coverage of `/keywords/keywords_reference_master.json` by the controlled vocabularies of Wikidata (QID), Medical Subject Headings (MeSH), and YSO (General Finnish Ontology). Both MeSH and YSO are dependent on QID but independent of each other. YSO enriched is the superset of YSO created by reconciling keywords that lack a YSO identifier directly with the YSO database provided by the Finto API; it is hence independent of Wikidata.](images/native_gold_standard.pdf)
 
+Finally, consider the distribution of the cleaned and reconciled keywords per item in the Edoc sample data set. The corresponding data is generated with `_Keywords.count_all` as described in [subsection Analysis](#analysis) above and available as `/analysis/keywords_counted.json`. Figure 5 shows that the median number of keywords from MeSH or YSO might be too low to be adequate. This problem can be amended by imposing further constraints on the sample data set and such a solution is discussed in section [!! section].
+
+![The distribution of keywords per item in the Edoc sample data set. The leftmost boxplot shows the distribution of cleaned keywords ($min = 0$, $Q1 = 4$, $M = 6$, $Q3 = 8$, $max = 87$); the other boxplots show the distribution of cleaned keywords with reconciled QID ($min = 0$, $Q1 = 2$, $M = 4$, $Q3 = 6$, $max = 80$), MeSH ID ($min = Q1 = 0$, $M = 2$, $Q3 = 4$, $max = 63$), and YSO ID ($min = Q1 = 0$, $M = 1$, $Q3 = 2$, $max = 46$). All four distributions are equally consistent, but there is a linear shrinkage of the center leaving MeSH and YSO with potentially too few descriptors to represent an adequate indexing.](images/keywords_counted.pdf)
+
 #### Discussion
 
 Let us now turn to the evaluation of the reconciliation: how many of the suggestions were correct? This question was answered via random sampling. The random sample ($n=500$) was created by calling `_Analysis.make_random_sample` on `/keywords/reference_keywords_master.json`; it is available at `/analysis/random_keywords.json`. The sample was then imported into OpenRefine and the judgement (1 for correct, 0 for incorrect) of the manual verification was recorded in the column `verification`. The data was then exported and is available at `/analysis/random_keywords_verified.csv`. 
 
 An analysis of this data shows that 53% of the suggestions in the random sample were correct with a 95% confidence interval of 48.8% to 57.3%. We can therefore conclude that 8'507 $\pm$ 692.1 of the 16'050 keywords in `/keywords/reference_keywords.json` have correct suggestions. Note that of the 235 incorrect suggestions in the random sample, 188 were incorrect by default because they were missing a QID; the share of non-empty yet incorrect suggestions is only 9.4% in the random sample meaning that the quality of the reconciliation is not as disappointing as it might seem at first glance.
-
-!! How many author keywords per item?
-!! How many suggestions per item are correct?
 
 ### Foreign gold standard
 
@@ -311,7 +320,7 @@ Let us briefly look at the definitions and motivations of the chosen metrics. Re
 
 $\text{Precision} = \displaystyle \frac{\text{True positive}}{\text{True positive} + \text{False positive}}$
 
-Or put as question: what fraction of the subject terms suggested by Annif are also in the native gold standard?
+Or put as question: what fraction of the subject terms suggested by Annif are also in the native gold standard? The metric of precision is implemented by `_Analysis.get_precision`.
 
 #### Recall
 
@@ -319,7 +328,7 @@ Or put as question: what fraction of the subject terms suggested by Annif are al
 
 $\text{Precision} = \displaystyle \frac{\text{True positive}}{\text{True positive} + \text{False negative}}$
 
-Put as question: what fraction of the subject terms in the gold standard were suggested by Annif?
+Put as question: what fraction of the subject terms in the gold standard were suggested by Annif? The metric of recall is implemented by `_Analysis.get_recall`.
 
 #### F1-score
 
@@ -329,9 +338,8 @@ $\text{F1} = \displaystyle 2 * \frac{\text{Precision} * \text{Recall}}{\text{Pre
 
 ### Annif versus native gold standard
 
-!! number of keywords per item; number of keywords with qid per item
 
-!! how to deal with items that have more than 10 keywords in standard??
+!! how to deal with items that have more than 10 keywords in standard?? just look at data in IQR?
 
 #### YSO
 
@@ -357,6 +365,8 @@ $\text{F1} = \displaystyle 2 * \frac{\text{Precision} * \text{Recall}}{\text{Pre
 ## Other use cases
 
 # Conclusion
+
+!! Clean up: rename `/indexed/indexed_master_mesh_enriched.json` to `/indexed/master_final.json` or something short.
 
 # Appendix
 
