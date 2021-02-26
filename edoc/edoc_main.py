@@ -9,7 +9,7 @@ import urllib3
 import xmltodict
 import ast
 import scipy.stats
-from sklearn.metrics import recall_score, precision_score
+import numpy
 
 
 DIR = os.path.dirname(__file__)
@@ -513,8 +513,8 @@ class _Analysis:
     """ A collection of data analysis functions. """
 
     @classmethod
-    def get_chi_square_fit(cls,
-                           file_path: str) -> None:
+    def print_chi_square_fit(cls,
+                             file_path: str) -> None:
 
         """ Print chi square goodness of fit.
 
@@ -561,16 +561,18 @@ class _Analysis:
         _Utility.save_json(sample, save_path)
 
     @classmethod
-    def metrics(cls,
-                file_path: str,
-                project_id: str,
-                abstract: bool = False,
-                fulltext: bool = False,
-                limit: int = None,
-                threshold: int = None,
-                n: int = 10) -> None:
+    def make_metrics(cls,
+                     file_path: str,
+                     project_id: str,
+                     abstract: bool = False,
+                     fulltext: bool = False,
+                     limit: int = None,
+                     threshold: int = None,
+                     n: int = 10) -> None:
 
         """ Get metrics for items in file.
+
+        The output is saved as /assessment/metrics_{marker}.
 
         Available Annif-client project IDs are yso-en, yso-maui-en, yso-bonsai-en, yso-fasttext-en, wikidata-en.
 
@@ -585,29 +587,30 @@ class _Analysis:
 
         data = _Utility.load_json(file_path)
 
-        debug_c = 0
-
+        metrics = []
         for item in data:
-            if debug_c > 10:
-                break
-            print(cls.item_metrics(item=item,
-                                   project_id=project_id,
-                                   abstract=abstract,
-                                   fulltext=fulltext,
-                                   limit=limit,
-                                   threshold=threshold,
-                                   n=n))
-            debug_c = debug_c + 1
+            metrics.append(cls.get_item_metrics(item=item,
+                                                project_id=project_id,
+                                                abstract=abstract,
+                                                fulltext=fulltext,
+                                                limit=limit,
+                                                threshold=threshold,
+                                                n=n))
+
+        # construct the correct annif marker:
+        marker = f"{project_id}-{abstract}-{fulltext}-{limit}-{threshold}"
+
+        _Utility.save_json(metrics, DIR + f"/assessment/metrics_{marker}")
 
     @classmethod
-    def item_metrics(cls,
-                     item: dict,
-                     project_id: str,
-                     abstract: bool = False,
-                     fulltext: bool = False,
-                     limit: int = None,
-                     threshold: int = None,
-                     n: int = 10) -> Union[dict, None]:
+    def get_item_metrics(cls,
+                         item: dict,
+                         project_id: str,
+                         abstract: bool = False,
+                         fulltext: bool = False,
+                         limit: int = None,
+                         threshold: int = None,
+                         n: int = 10) -> Union[dict, None]:
 
         """ Get metrics for an item.
 
@@ -764,23 +767,56 @@ class _Analysis:
         except ZeroDivisionError:
             return 0
 
+    @classmethod
+    def get_stats(cls,
+                  file_path: str) -> list:
+        """ Get quantiles, IQR, mean for F1, precision, recall in file.
+
+        :param file_path: complete path to file including filename and extension
+        """
+
+        scores = _Utility.load_json(file_path)
+
+        f1_scores = []
+        precision_scores = []
+        recall_scores = []
+        for item in scores:
+            try:
+                f1_scores.append(item.get("f1"))
+                precision_scores.append(item.get("precision"))
+                recall_scores.append(item.get("recall"))
+            except AttributeError:
+                continue
+
+        return [{"f1-stat": cls.get_quantiles(f1_scores)},
+                {"precision-stat": cls.get_quantiles(precision_scores)},
+                {"recall-stat": cls.get_quantiles(recall_scores)}]
+
+    @classmethod
+    def get_quantiles(cls,
+                      data: list) -> dict:
+        """ Get quantiles, IQR, mean for data.
+
+        :param data: the data
+        """
+
+        return {"minimum": numpy.quantile(data, 0),
+                "q1": numpy.quantile(data, 0.25),
+                "q2": numpy.quantile(data, 0.5),
+                "q3": numpy.quantile(data, 0.75),
+                "maximum": numpy.quantile(data, 1),
+                "iqr": numpy.quantile(data, 0.75) - numpy.quantile(data, 0.25),
+                "mean": numpy.mean(data)}
 
 
 
-_Keywords.count_all(DIR + "/indexed/indexed_master_mesh_enriched.json", DIR + "/keywords/keywords_counted.json")
 
-exit()
 
-_Analysis.metrics(DIR + "/indexed/indexed_master_mesh_enriched.json",
-                  project_id="wikidata-en",
-                  abstract=True,
-                  n=10)
-exit()
-y_true = [0, 1, 1]
-y_pred = [1, 1, 0]
-
-print(f"recall: {recall_score(y_true, y_pred)}")
-print(f"precision: {precision_score(y_true, y_pred)}")
+_Analysis.make_metrics(file_path=DIR + "/indexed/indexed_master_mesh_enriched.json",
+                       project_id="wikidata-en",
+                       abstract=True,
+                       n=10)
+print(_Analysis.get_stats(DIR + "/assessment/test.json"))
 
 exit()
 """

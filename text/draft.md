@@ -152,11 +152,11 @@ Of the 68'345 items in `/edoc/raw`, all have a title (non-empty `title` data fie
 
 In order to determine how well the sample data set represents the raw Edoc data, a one-sample $\chi^2$ goodnes of fit test was conducted on each selection data field [following @Parke.2013, chapter 1]. The results indicate that the sample data proportions of items are significantly different from the raw Edoc data per department (see Figure 1 for more details).
 
-![The sample data set ($n$ = 4'111) is not representative of the raw Edoc data per department. Data field `abstract`: $\chi^2 (df=9) =$ 3'160.556, $p < 0.001$; data field `id_number`: $\chi^2 (df=9) =$ 4'209.0285, $p < 0.001$; data field `keywords`: $\chi^2 (df=9) =$ 2'314.533, $p < 0.001$. The data foundation is available at `/edoc/analysis/chi_square...` and the $\chi^2$-statistic can be calculated by calling `_Analysis.get_chi_square_fit` on the data foundation files.](images/chi_square_selection_fields.pdf)
+![The sample data set ($n$ = 4'111) is not representative of the raw Edoc data per department. Data field `abstract`: $\chi^2 (df=9) =$ 3'160.556, $p < 0.001$; data field `id_number`: $\chi^2 (df=9) =$ 4'209.0285, $p < 0.001$; data field `keywords`: $\chi^2 (df=9) =$ 2'314.533, $p < 0.001$. The data foundation is available at `/edoc/analysis/chi_square...` and the $\chi^2$-statistic can be calculated by calling `_Analysis.print_chi_square_fit` on the data foundation files.](images/chi_square_selection_fields.pdf)
 
  The sample data set is hence not representative of the raw Edoc data. This is not surprising since its construction is strongly biased. This bias has the effect that the sample data set is significantly skewed towards English journal publications in the sciences, medicine and economics from the 21st century (again, this is shown by a one-sample $\chi^2$ goodness of fit test, see Figure 2 for more details). The upshot of this analysis is that the humanities are underrepresented in the sample data set. Therefore, any results with respect to the quality of machine indexing discussed below might not be applicable to the humanities.
 
-![The sample data set ($n$ = 4'111) is significantly skewed towards English (data field `language`: $\chi^2 (df=3) =$ 1'441.414, $p < 0.001$) journal publications (data field `type`: $\chi^2 (df=10) =$ 52'519.743, $p < 0.001$) in the sciences, medicine and economics (data field `department`: $\chi^2 (df=9) =$ 14'447.276, $p < 0.001$) from the 21st (data field `date`: $\chi^2 (df=7) =$ 35'878.493, $p < 0.001$) century as compared to the raw Edoc data. The data foundation is available at `/edoc/analysis/chi_square...` and the $\chi^2$-statistic can be calculated by calling `_Analysis.get_chi_square_fit` on the data foundation files.](images/raw_sample_analysis.pdf)
+![The sample data set ($n$ = 4'111) is significantly skewed towards English (data field `language`: $\chi^2 (df=3) =$ 1'441.414, $p < 0.001$) journal publications (data field `type`: $\chi^2 (df=10) =$ 52'519.743, $p < 0.001$) in the sciences, medicine and economics (data field `department`: $\chi^2 (df=9) =$ 14'447.276, $p < 0.001$) from the 21st century (data field `date`: $\chi^2 (df=7) =$ 35'878.493, $p < 0.001$) as compared to the raw Edoc data. The data foundation is available at `/edoc/analysis/chi_square...` and the $\chi^2$-statistic can be calculated by calling `_Analysis.print_chi_square_fit` on the data foundation files.](images/raw_sample_analysis.pdf)
 
 ## Machine indexing
 
@@ -241,7 +241,7 @@ _Utility.save_json(keywords_histogram, DIR + "keywords/keywords_clean_histogram.
 
 An analysis of `/keywords/keywords_clean_histogram.json` shows that the lion's share of keywords has only one occurrence but that the total occurrences are predominantly made up of keywords with more than one occurrence (see Figure 3 for details).
 
-![In `keywords/keywords_clean_histogram.json`, the distribution of keywords is strongly skewed right ($min = Q1 = M = Q3 = 1$, $max = 910$). However, even though keywords with only one occurrence constitute over 75% of the total keywords, their occurrences constitute less than 35% of the total occurrences. The most common keywords with 50 or more occurrences are extreme outliers but make up almost 20% of the total occurrences.](images/keywords_clean_histogram_abc.pdf)
+![In `keywords/keywords_clean_histogram.json`, the distribution of keywords is strongly skewed right (min = Q1 = M = Q3 = 1, max = 910). However, even though keywords with only one occurrence constitute over 75% of the total keywords, their occurrences constitute less than 35% of the total occurrences. The most common keywords with 50 or more occurrences are extreme outliers but make up almost 20% of the total occurrences.](images/keywords_clean_histogram_abc.pdf)
 
 To analyse the spread of keywords in the sample data set, the keywords per item are counted. To do so, we call `_Keywords.count_all` on `/indexed/indexed_master_mesh_enriched.json` and save the output as `/analysis/keywords_counted.json`:
 
@@ -279,7 +279,7 @@ _Utility.save_json(keywords_histogram, DIR + "keywords/keywords_reference_master
 
 Finally, consider the distribution of the cleaned and reconciled keywords per item in the Edoc sample data set. The corresponding data is generated with `_Keywords.count_all` as described in [subsection Analysis](#analysis) above and available as `/analysis/keywords_counted.json`. Figure 5 shows that the median number of keywords from MeSH or YSO might be too low to be adequate. This problem can be amended by imposing further constraints on the sample data set and such a solution is discussed in section [!! section].
 
-![The distribution of keywords per item in the Edoc sample data set. The leftmost boxplot shows the distribution of cleaned keywords ($min = 0$, $Q1 = 4$, $M = 6$, $Q3 = 8$, $max = 87$); the other boxplots show the distribution of cleaned keywords with reconciled QID ($min = 0$, $Q1 = 2$, $M = 4$, $Q3 = 6$, $max = 80$), MeSH ID ($min = Q1 = 0$, $M = 2$, $Q3 = 4$, $max = 63$), and YSO ID ($min = Q1 = 0$, $M = 1$, $Q3 = 2$, $max = 46$). All four distributions are equally consistent, but there is a linear shrinkage of the center leaving MeSH and YSO with potentially too few descriptors to represent an adequate indexing.](images/keywords_counted.pdf)
+![The distribution of keywords per item in the Edoc sample data set. The leftmost boxplot shows the distribution of cleaned keywords (min = 0, Q1 = 4, M = 6, Q3 = 8, max = 87); the other boxplots show the distribution of cleaned keywords with reconciled QID (min = 0, Q1 = 2, M = 4, Q3 = 6, max = 80), MeSH ID (min = Q1 = 0, M = 2, Q3 = 4, max = 63), and YSO ID respectively (min = Q1 = 0, M = 1, Q3 = 2, max = 46). All four distributions are similarly consistent, but there is a linear shrinkage of the center leaving MeSH and YSO with potentially too few descriptors to represent an adequate indexing.](images/keywords_counted.pdf)
 
 #### Discussion
 
@@ -336,16 +336,24 @@ The F1-score is the harmonic mean between precision and recall:
 
 $\text{F1} = \displaystyle 2 * \frac{\text{Precision} * \text{Recall}}{\text{Precision} + \text{Recall}}$
 
+The metric of F1-score is implemented by `_Analysis_get_f1`.
+
 ### Annif versus native gold standard
 
+There are different axes of comparision that need to be distinguished (all relative comparisions, absolute scores are not that important):
 
-!! how to deal with items that have more than 10 keywords in standard?? just look at data in IQR?
+1. Title versus title + abstract (versus title + abstract + fulltext)
+2. yso-en versus yso-maui-en versus yso-bonsai-en versus yso-fasttext-en versus wikidata-en
+
+we can then discuss whether the best performance is actually useful; perhaps do this by comparing absolute scores with other assessments. if results are much lower it is to be suspected that the native gold standard is not very good (i.e., that the measure we use to judge annif performance is inadequte => motivation for foreign standard)
 
 #### YSO
 
 #### Wikidata
 
 ### Annif versus foreign gold standard
+
+!! but to do this we would first have to map the annif suggested terms to mesh...! yes.
 
 ### Digression: truth-conditions for indexing
 (Correspondence theory of indexing: subject term T fits text X iff text X is about T)
