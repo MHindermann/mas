@@ -573,16 +573,27 @@ class _Analysis:
 
         project_ids = ["yso-en", "yso-maui-en", "yso-bonsai-en", "yso-fasttext-en", "wikidata-en"]
 
-        # only title:
-        for project_id in project_ids:
-            cls.make_metrics(file_path=file_path,
-                             project_id=project_id)
-
-        # title + abstract:
-        for project_id in project_ids:
-            cls.make_metrics(file_path=file_path,
-                             project_id=project_id,
-                             abstract=True)
+        n = 1
+        while n < 11:
+            for project_id in project_ids:
+                print(f"Working on {project_id}...")
+                # title:
+                cls.make_metrics(file_path=file_path,
+                                 project_id=project_id)
+                # title + abstract:
+                cls.make_metrics(file_path=file_path,
+                                 project_id=project_id,
+                                 abstract=True)
+                # title + limit:
+                cls.make_metrics(file_path=file_path,
+                                 project_id=project_id,
+                                 n=n)
+                # title + limit:
+                cls.make_metrics(file_path=file_path,
+                                 project_id=project_id,
+                                 abstract=True,
+                                 n=n)
+            n = n + 1
 
     @classmethod
     def make_metrics(cls,
@@ -622,7 +633,7 @@ class _Analysis:
                                                 n=n))
 
         # construct the correct annif marker:
-        marker = f"{project_id}-{abstract}-{fulltext}-{limit}-{threshold}"
+        marker = f"{project_id}-{abstract}-{fulltext}-{n}-{threshold}"
 
         _Utility.save_json(metrics, DIR + f"/metrics/metrics_{marker}.json")
 
@@ -811,7 +822,6 @@ class _Analysis:
 
         _Utility.save_json(stats, DIR + "/analysis/metrics_stats.json")
 
-
     @classmethod
     def get_stats(cls,
                   file_path: str) -> dict:
@@ -854,7 +864,6 @@ class _Analysis:
                 "maximum": numpy.quantile(data, 1),
                 "iqr": numpy.quantile(data, 0.75) - numpy.quantile(data, 0.25),
                 "mean": numpy.mean(data)}
-
 
 
 _Analysis.super_make_stats()

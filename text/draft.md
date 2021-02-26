@@ -348,6 +348,12 @@ There are different axes of comparision that need to be distinguished (all relat
 
 we can then discuss whether the best performance is actually useful; perhaps do this by comparing absolute scores with other assessments. if results are much lower it is to be suspected that the native gold standard is not very good (i.e., that the measure we use to judge annif performance is inadequte => motivation for foreign standard)
 
+construct all metrics:
+_Analysis.super_make_metrics(file_path=DIR + "/indexed/indexed_master_mesh_enriched.json")
+
+construcht all stats for metrics:
+_Analysis.super_make_stats()
+
 #### YSO
 
 #### Wikidata
