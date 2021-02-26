@@ -5,6 +5,7 @@ import csv
 from datetime import datetime
 from annif_client import AnnifClient
 import os.path
+from os import listdir
 import urllib3
 import xmltodict
 import ast
@@ -477,9 +478,9 @@ class _Keywords:
             return None
 
     @classmethod
-    def count_all(cls,
-                  file_path: str,
-                  save_path: str) -> None:
+    def make_count(cls,
+                   file_path: str,
+                   save_path: str) -> None:
         """ Count all keywords and their respective IDs per item in file.
 
         :param file_path: complete path to file including filename and extension
@@ -561,6 +562,29 @@ class _Analysis:
         _Utility.save_json(sample, save_path)
 
     @classmethod
+    def super_make_metrics(cls,
+                           file_path: str):
+        """ Make metrics for all combinations of Annif projects and parameters in enriched Edoc file.
+
+        Output files are saved in /metrics.
+
+        :param file_path: complete path to file including filename and extension
+        """
+
+        project_ids = ["yso-en", "yso-maui-en", "yso-bonsai-en", "yso-fasttext-en", "wikidata-en"]
+
+        # only title:
+        for project_id in project_ids:
+            cls.make_metrics(file_path=file_path,
+                             project_id=project_id)
+
+        # title + abstract:
+        for project_id in project_ids:
+            cls.make_metrics(file_path=file_path,
+                             project_id=project_id,
+                             abstract=True)
+
+    @classmethod
     def make_metrics(cls,
                      file_path: str,
                      project_id: str,
@@ -572,7 +596,7 @@ class _Analysis:
 
         """ Get metrics for items in file.
 
-        The output is saved as /assessment/metrics_{marker}.
+        The output is saved as /metrics/metrics_{marker}.json.
 
         Available Annif-client project IDs are yso-en, yso-maui-en, yso-bonsai-en, yso-fasttext-en, wikidata-en.
 
@@ -600,7 +624,7 @@ class _Analysis:
         # construct the correct annif marker:
         marker = f"{project_id}-{abstract}-{fulltext}-{limit}-{threshold}"
 
-        _Utility.save_json(metrics, DIR + f"/assessment/metrics_{marker}")
+        _Utility.save_json(metrics, DIR + f"/metrics/metrics_{marker}.json")
 
     @classmethod
     def get_item_metrics(cls,
@@ -675,6 +699,8 @@ class _Analysis:
             uri = suggestion.get("uri")
             if cls.get_id_type(marker) == "qid":
                 suggestions_ids.append(uri.split("http://www.wikidata.org/entity/")[1])
+            elif cls.get_id_type(marker) == "yso id":
+                suggestions_ids.append(int(uri.split("http://www.yso.fi/onto/yso/p")[1]))
 
         return suggestions_ids
 
@@ -726,7 +752,10 @@ class _Analysis:
             else:
                 false_positive = false_positive + 1
 
-        return true_positive / (true_positive + false_positive)
+        try:
+            return true_positive / (true_positive + false_positive)
+        except ZeroDivisionError:
+            return 0
 
     @classmethod
     def get_recall(cls,
@@ -768,8 +797,24 @@ class _Analysis:
             return 0
 
     @classmethod
+    def super_make_stats(cls) -> None:
+        """ Make metrics for files in /metrics.
+
+        Output is saved as /analysis/metrics_stats.json.
+        """
+
+        stats = []
+
+        files = os.listdir(DIR + "/metrics")
+        for file in files:
+            stats.append(cls.get_stats(DIR + f"/metrics/{file}"))
+
+        _Utility.save_json(stats, DIR + "/analysis/metrics_stats.json")
+
+
+    @classmethod
     def get_stats(cls,
-                  file_path: str) -> list:
+                  file_path: str) -> dict:
         """ Get quantiles, IQR, mean for F1, precision, recall in file.
 
         :param file_path: complete path to file including filename and extension
@@ -788,9 +833,11 @@ class _Analysis:
             except AttributeError:
                 continue
 
-        return [{"f1-stat": cls.get_quantiles(f1_scores)},
-                {"precision-stat": cls.get_quantiles(precision_scores)},
-                {"recall-stat": cls.get_quantiles(recall_scores)}]
+        return {"stat":
+                    [{"file": file_path.split("/")[len(file_path.split("/"))-1],
+                      "f1-stat": cls.get_quantiles(f1_scores),
+                      "precision-stat": cls.get_quantiles(precision_scores),
+                      "recall-stat": cls.get_quantiles(recall_scores)}]}
 
     @classmethod
     def get_quantiles(cls,
@@ -810,13 +857,17 @@ class _Analysis:
 
 
 
+_Analysis.super_make_stats()
+exit()
 
+_Analysis.super_make_metrics(file_path=DIR + "/indexed/indexed_master_mesh_enriched.json")
 
+exit()
 _Analysis.make_metrics(file_path=DIR + "/indexed/indexed_master_mesh_enriched.json",
                        project_id="wikidata-en",
                        abstract=True,
                        n=10)
-print(_Analysis.get_stats(DIR + "/assessment/test.json"))
+#print(_Analysis.get_stats(DIR + "/metrics/test.json"))
 
 exit()
 """

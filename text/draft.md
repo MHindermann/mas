@@ -243,11 +243,11 @@ An analysis of `/keywords/keywords_clean_histogram.json` shows that the lion's s
 
 ![In `keywords/keywords_clean_histogram.json`, the distribution of keywords is strongly skewed right (min = Q1 = M = Q3 = 1, max = 910). However, even though keywords with only one occurrence constitute over 75% of the total keywords, their occurrences constitute less than 35% of the total occurrences. The most common keywords with 50 or more occurrences are extreme outliers but make up almost 20% of the total occurrences.](images/keywords_clean_histogram_abc.pdf)
 
-To analyse the spread of keywords in the sample data set, the keywords per item are counted. To do so, we call `_Keywords.count_all` on `/indexed/indexed_master_mesh_enriched.json` and save the output as `/analysis/keywords_counted.json`:
+To analyse the spread of keywords in the sample data set, the keywords per item are counted. To do so, we call `_Keywords.make_count` on `/indexed/indexed_master_mesh_enriched.json` and save the output as `/analysis/keywords_counted.json`:
 
 ~~~~{.Python caption="count_keywords"}
 sample_data_set = _Utility.load_json(DIR + "/indexed/indexed_master_mesh_enriched.json")
-keywords_counted = _Keywords.count_all(sample_data_set)
+keywords_counted = _Keywords.make_count(sample_data_set)
 _Utility.save_json(keywords_counted, DIR + "/analysis/keywords_counted.json")
 ~~~~
 
@@ -277,7 +277,7 @@ _Utility.save_json(keywords_histogram, DIR + "keywords/keywords_reference_master
 
 ![The coverage of `/keywords/keywords_reference_master.json` by the controlled vocabularies of Wikidata (QID), Medical Subject Headings (MeSH), and YSO (General Finnish Ontology). Both MeSH and YSO are dependent on QID but independent of each other. YSO enriched is the superset of YSO created by reconciling keywords that lack a YSO identifier directly with the YSO database provided by the Finto API; it is hence independent of Wikidata.](images/native_gold_standard.pdf)
 
-Finally, consider the distribution of the cleaned and reconciled keywords per item in the Edoc sample data set. The corresponding data is generated with `_Keywords.count_all` as described in [subsection Analysis](#analysis) above and available as `/analysis/keywords_counted.json`. Figure 5 shows that the median number of keywords from MeSH or YSO might be too low to be adequate. This problem can be amended by imposing further constraints on the sample data set and such a solution is discussed in section [!! section].
+Finally, consider the distribution of the cleaned and reconciled keywords per item in the Edoc sample data set. The corresponding data is generated with `_Keywords.make_count` as described in [subsection Analysis](#analysis) above and available as `/analysis/keywords_counted.json`. Figure 5 shows that the median number of keywords from MeSH or YSO might be too low to be adequate. This problem can be amended by imposing further constraints on the sample data set and such a solution is discussed in section [!! section].
 
 ![The distribution of keywords per item in the Edoc sample data set. The leftmost boxplot shows the distribution of cleaned keywords (min = 0, Q1 = 4, M = 6, Q3 = 8, max = 87); the other boxplots show the distribution of cleaned keywords with reconciled QID (min = 0, Q1 = 2, M = 4, Q3 = 6, max = 80), MeSH ID (min = Q1 = 0, M = 2, Q3 = 4, max = 63), and YSO ID respectively (min = Q1 = 0, M = 1, Q3 = 2, max = 46). All four distributions are similarly consistent, but there is a linear shrinkage of the center leaving MeSH and YSO with potentially too few descriptors to represent an adequate indexing.](images/keywords_counted.pdf)
 
@@ -344,6 +344,7 @@ There are different axes of comparision that need to be distinguished (all relat
 
 1. Title versus title + abstract (versus title + abstract + fulltext)
 2. yso-en versus yso-maui-en versus yso-bonsai-en versus yso-fasttext-en versus wikidata-en
+3. number of suggestions
 
 we can then discuss whether the best performance is actually useful; perhaps do this by comparing absolute scores with other assessments. if results are much lower it is to be suspected that the native gold standard is not very good (i.e., that the measure we use to judge annif performance is inadequte => motivation for foreign standard)
 
