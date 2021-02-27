@@ -241,7 +241,7 @@ the raw Edoc data per department. Data field \texttt{abstract}:
 field \texttt{keywords}: \(\chi^2 (df=9) =\) 2'314.533, \(p < 0.001\).
 The data foundation is available at
 \texttt{/edoc/analysis/chi\_square...} and the \(\chi^2\)-statistic can
-be calculated by calling \texttt{\_Analysis.get\_chi\_square\_fit} on
+be calculated by calling \texttt{\_Analysis.print\_chi\_square\_fit} on
 the data foundation files.}
 \end{figure}
 
@@ -269,7 +269,8 @@ sciences, medicine and economics (data field \texttt{department}:
 \(p < 0.001\)) as compared to the raw Edoc data. The data foundation is
 available at \texttt{/edoc/analysis/chi\_square...} and the
 \(\chi^2\)-statistic can be calculated by calling
-\texttt{\_Analysis.get\_chi\_square\_fit} on the data foundation files.}
+\texttt{\_Analysis.print\_chi\_square\_fit} on the data foundation
+files.}
 \end{figure}
 
 \hypertarget{machine-indexing}{%
@@ -472,14 +473,14 @@ the total occurrences.}
 \end{figure}
 
 To analyse the spread of keywords in the sample data set, the keywords
-per item are counted. To do so, we call \texttt{\_Keywords.count\_all}
+per item are counted. To do so, we call \texttt{\_Keywords.make\_count}
 on \texttt{/indexed/indexed\_master\_mesh\_enriched.json} and save the
 output as \texttt{/analysis/keywords\_counted.json}:
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{sample\_data\_set }\OperatorTok{=}\NormalTok{ \_Utility.load\_json(DIR }\OperatorTok{+} \StringTok{"/indexed/indexed\_master\_mesh\_enriched.json"}\NormalTok{)}
-\NormalTok{keywords\_counted }\OperatorTok{=}\NormalTok{ \_Keywords.count\_all(sample\_data\_set)}
+\NormalTok{keywords\_counted }\OperatorTok{=}\NormalTok{ \_Keywords.make\_count(sample\_data\_set)}
 \NormalTok{\_Utility.save\_json(keywords\_counted, DIR }\OperatorTok{+} \StringTok{"/analysis/keywords\_counted.json"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
@@ -614,7 +615,7 @@ Wikidata.}
 
 Finally, consider the distribution of the cleaned and reconciled
 keywords per item in the Edoc sample data set. The corresponding data is
-generated with \texttt{\_Keywords.count\_all} as described in
+generated with \texttt{\_Keywords.make\_count} as described in
 \protect\hyperlink{analysis}{subsection Analysis} above and available as
 \texttt{/analysis/keywords\_counted.json}. Figure 5 shows that the
 median number of keywords from MeSH or YSO might be too low to be
@@ -691,7 +692,7 @@ and Kempf 2016, 93f.). Of course, there is a host of alternative metrics
 neglected here.
 
 Let us briefly look at the definitions and motivations of the chosen
-metrics. Recall that a suggestion of a subject term is correct if and
+metrics. Remember that a suggestion of a subject term is correct if and
 only if the subject term is in the native gold standard. The possible
 outcomes are summarized in Table 1.
 
@@ -714,7 +715,9 @@ outcomes are summarized in Table 1.
 a suggestion is correct if and only if it is in the native gold
 standard:
 
-\(\text{Precision} = \displaystyle \frac{\text{True positive}}{\text{True positive} + \text{False positive}}\)
+\begin{center} 
+$\text{Precision} = \displaystyle \frac{\text{True positive}}{\text{True positive} + \text{False positive}}$
+\end{center}
 
 Or put as question: what fraction of the subject terms suggested by
 Annif are also in the native gold standard? The metric of precision is
@@ -726,7 +729,9 @@ implemented by \texttt{\_Analysis.get\_precision}.
 ``Recall'' is the fraction of correct subject terms out of all correct
 subject terms:
 
-\(\text{Precision} = \displaystyle \frac{\text{True positive}}{\text{True positive} + \text{False negative}}\)
+\begin{center} 
+$\text{Precision} = \displaystyle \frac{\text{True positive}}{\text{True positive} + \text{False negative}}$
+\end{center}
 
 Put as question: what fraction of the subject terms in the gold standard
 were suggested by Annif? The metric of recall is implemented by
@@ -737,26 +742,104 @@ were suggested by Annif? The metric of recall is implemented by
 
 The F1-score is the harmonic mean between precision and recall:
 
-\(\text{F1} = \displaystyle 2 * \frac{\text{Precision} * \text{Recall}}{\text{Precision} + \text{Recall}}\)
+\begin{center} 
+$\text{F1} = \displaystyle 2 * \frac{\text{Precision} * \text{Recall}}{\text{Precision} + \text{Recall}}$
+\end{center}
 
-The metric of F1-score is implemented by \texttt{\_Analysis\_get\_f1}
+The metric of F1-score is implemented by \texttt{\_Analysis\_get\_f1}.
 
 \hypertarget{annif-versus-native-gold-standard}{%
 \subsubsection{Annif versus native gold
 standard}\label{annif-versus-native-gold-standard}}
 
-!! how to deal with items that have more than 10 keywords in standard??
-just look at data in IQR?
+In this section, I will assess the perfomance of Annif versus the native
+gold standard.
 
-\hypertarget{yso}{%
-\paragraph{YSO}\label{yso}}
+\hypertarget{creating-the-data-foundation}{%
+\paragraph{Creating the data
+foundation}\label{creating-the-data-foundation}}
 
-\hypertarget{wikidata}{%
-\paragraph{Wikidata}\label{wikidata}}
+I will now describe how the data foundation for the assessment was
+created. There are three parameters that need to be distinguished(see
+\protect\hyperlink{annif}{section ``Annif''}):
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  The Annif project (algorithm plus vocabulary) responsible for the
+  indexing of the sample data set. As per the Annif REST API, these are
+  \texttt{yso-en}, \texttt{yso-maui-en}, \texttt{yso-bonsai-en},
+  \texttt{yso-fasttext-en}, and \texttt{wikidata-en}.
+\item
+  The text base per item, namely title versus title and abstract.
+\item
+  The maximum number of suggestions per item. Since we required 10
+  suggestions per item, we can choose between 1-10 suggestions.
+\end{enumerate}
+
+Combining these parameters, we really have 100 Annif configurations
+whose perfomance we want to compare and assess: Annif project \(*\) text
+base \(*\) maximum number of suggestions \(= 5 * 2 * 10 = 100\).
+
+For each configuration, the F1-score was computed for every item in the
+sample data set. To do so, we call
+\texttt{\_Analysis.super\_make\_metrics} on
+\texttt{/indexed/indexed\_master\_mesh\_enriched}. The 100 output files
+are saved as \texttt{/metrics/metrics\_\{marker\}} where \texttt{marker}
+specifies the Annif configuration:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\_Analysis.super\_make\_metrics(DIR }\OperatorTok{+} \StringTok{"/indexed/indexed\_master\_mesh\_enriched.json"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Note that if an item had an empty native gold standard, no score was
+computed; this is the case exactly if none of the cleaned keywords had
+been matched to Wikidata or YSO respectively. Configurations with a
+Wikidata vocabulary had a scoring coverage of 94.38\% of the items in
+the sample data set as compared to only 62.84\% for configurations with
+a YSO vocabulary.
+
+Next, in order to be able to compare the F1-scores of the 100
+configurations, a statistic (quartiles, IQR, mean) was computed for each
+configuration by calling \texttt{\_Analysis.super\_make\_stats}, saving
+the output as \texttt{/analysis/metrics\_stats.json}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\_Analysis.super\_make\_stats()}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{general-results}{%
+\paragraph{General results}\label{general-results}}
+
+we can then discuss whether the best performance is actually useful;
+perhaps do this by comparing absolute scores with other assessments. if
+results are much lower it is to be suspected that the native gold
+standard is not very good (i.e., that the measure we use to judge annif
+performance is inadequte =\textgreater{} motivation for foreign
+standard)
+
+construct all metrics: \_Analysis.super\_make\_metrics(file\_path=DIR +
+``/indexed/indexed\_master\_mesh\_enriched.json'')
+
+construcht all stats for metrics: \_Analysis.super\_make\_stats()
+
+\hypertarget{yso-configurations}{%
+\paragraph{YSO configurations}\label{yso-configurations}}
+
+\hypertarget{wikidata-configurations}{%
+\paragraph{Wikidata configurations}\label{wikidata-configurations}}
 
 \hypertarget{annif-versus-foreign-gold-standard}{%
 \subsubsection{Annif versus foreign gold
 standard}\label{annif-versus-foreign-gold-standard}}
+
+!! but to do this we would first have to map the annif suggested terms
+to mesh\ldots! yes.
 
 \hypertarget{digression-truth-conditions-for-indexing}{%
 \subsubsection{Digression: truth-conditions for
