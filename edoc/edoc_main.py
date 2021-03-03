@@ -5,12 +5,11 @@ import csv
 from datetime import datetime
 from annif_client import AnnifClient
 import os.path
-from os import listdir
 import urllib3
 import xmltodict
 import ast
 import scipy.stats
-import numpy
+from sklearn.metrics import f1_score, recall_score, precision_score
 
 
 DIR = os.path.dirname(__file__)
@@ -605,11 +604,15 @@ class _Analysis:
                      threshold: int = None,
                      n: int = 10) -> None:
 
-        """ Get metrics for items in file.
+        """ Make Sklearn metrics F1, recall, precision for file.
 
         The output is saved as /metrics/metrics_{marker}.json.
 
         Available Annif-client project IDs are yso-en, yso-maui-en, yso-bonsai-en, yso-fasttext-en, wikidata-en.
+
+        https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html
+        https://scikit-learn.org/stable/modules/generated/sklearn.metrics.recall_score.html
+        https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_score.html
 
         :param file_path: complete path to file including filename and extension
         :param project_id: Annif-client project ID
@@ -622,32 +625,53 @@ class _Analysis:
 
         data = _Utility.load_json(file_path)
 
-        metrics = []
+        # construct y_true (=standard) and y_pred (=suggestions) from data:
+        standard = []
+        suggestions = []
         for item in data:
-            metrics.append(cls.get_item_metrics(item=item,
-                                                project_id=project_id,
-                                                abstract=abstract,
-                                                fulltext=fulltext,
-                                                limit=limit,
-                                                threshold=threshold,
-                                                n=n))
+            sklearn_array = cls.get_sklearn_array(item=item,
+                                                  project_id=project_id,
+                                                  abstract=abstract,
+                                                  fulltext=fulltext,
+                                                  limit=limit,
+                                                  threshold=threshold,
+                                                  n=n)
+            if sklearn_array is None:
+                continue
+            standard = standard + sklearn_array.get("y_true")
+            suggestions = suggestions + sklearn_array.get("y_pred")
 
         # construct the correct annif marker:
         marker = f"{project_id}-{abstract}-{fulltext}-{n}-{threshold}"
 
+        # compute the metrics:
+        metrics = {
+            "F1-macro": f1_score(standard, suggestions, average='macro'),
+            "Precision-macro": precision_score(standard, suggestions, average='macro', zero_division=0),
+            "Recall-macro": recall_score(standard, suggestions, average='macro', zero_division=0),
+
+            "F1-micro": f1_score(standard, suggestions, average='micro'),
+            "Precision-micro": precision_score(standard, suggestions, average='micro', zero_division=0),
+            "Recall-micro": recall_score(standard, suggestions, average='micro', zero_division=0),
+
+            "F1-weighted": f1_score(standard, suggestions, average='weighted'),
+            "Precision-weighted": precision_score(standard, suggestions, average='weighted', zero_division=0),
+            "Recall-weighted": recall_score(standard, suggestions, average='weighted', zero_division=0)
+        }
+
         _Utility.save_json(metrics, DIR + f"/metrics/metrics_{marker}.json")
 
     @classmethod
-    def get_item_metrics(cls,
-                         item: dict,
-                         project_id: str,
-                         abstract: bool = False,
-                         fulltext: bool = False,
-                         limit: int = None,
-                         threshold: int = None,
-                         n: int = 10) -> Union[dict, None]:
+    def get_sklearn_array(cls,
+                          item: dict,
+                          project_id: str,
+                          abstract: bool = False,
+                          fulltext: bool = False,
+                          limit: int = None,
+                          threshold: int = None,
+                          n: int = 10) -> Union[dict, None]:
 
-        """ Get metrics for an item.
+        """ Get Sklearn y_true and y_pred for an item.
 
         Available Annif-client project IDs are yso-en, yso-maui-en, yso-bonsai-en, yso-fasttext-en, wikidata-en.
 
@@ -669,14 +693,36 @@ class _Analysis:
         # extract gold standard IDs:
         gold_standard_ids = cls.extract_standard(item=item, marker=marker)
 
-        # calculate metrics:
+        # make y_true, y_pred:
         if gold_standard_ids is None:
             return None
-        precision = cls.get_precision(standard=gold_standard_ids, suggestions=suggestions_ids)
-        recall = cls.get_recall(standard=gold_standard_ids, suggestions=suggestions_ids)
-        f1_score = cls.get_f1(standard=gold_standard_ids, suggestions=suggestions_ids)
 
-        return {"precision": precision, "recall": recall, "f1": f1_score}
+        # count the true positives:
+        true_positive = 0
+        for suggestion in suggestions_ids:
+            try:
+                if suggestion in gold_standard_ids:
+                    true_positive = true_positive + 1
+            except TypeError:
+                return None
+
+        # construct y_true:
+        y_true = []
+        for k in range(0, len(gold_standard_ids)):
+            y_true.append(1)
+        for k in range(0, len(suggestions_ids) - len(gold_standard_ids)):
+            y_true.append(0)
+
+        # construct y_pred:
+        y_pred = []
+        for k in range(0, true_positive):
+            y_pred.append(1)
+        for k in range(0, len(suggestions_ids) - true_positive):
+            y_pred.append(1)
+        for k in range(0, len(y_true) - len(y_pred)):
+            y_pred.append(0)
+
+        return {"y_true": y_true, "y_pred": y_pred}
 
     @classmethod
     def get_id_type(cls, marker: str) -> str:
@@ -744,70 +790,6 @@ class _Analysis:
             return gold_standard_ids
 
     @classmethod
-    def get_precision(cls,
-                      standard: list,
-                      suggestions: list) -> float:
-        """ Get precision for suggestion according to standard.
-
-        See https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_score.html#sklearn.metrics.precision_score.
-
-        :param standard: the gold standard
-        :param suggestions: the suggestions resp. predictions
-        """
-
-        true_positive = 0
-        false_positive = 0
-        for suggestion in suggestions:
-            if suggestion in standard:
-                true_positive = true_positive + 1
-            else:
-                false_positive = false_positive + 1
-
-        try:
-            return true_positive / (true_positive + false_positive)
-        except ZeroDivisionError:
-            return 0
-
-    @classmethod
-    def get_recall(cls,
-                   standard: list,
-                   suggestions: list) -> float:
-        """ Get recall for suggestion according to standard.
-
-        See https://scikit-learn.org/stable/modules/generated/sklearn.metrics.recall_score.html#sklearn.metrics.recall_score.
-
-        :param standard: the gold standard
-        :param suggestions: the suggestions resp. predictions
-        """
-
-        true_positive = 0
-        for suggestion in suggestions:
-            if suggestion in standard:
-                true_positive = true_positive + 1
-
-        return true_positive / len(standard)
-
-    @classmethod
-    def get_f1(cls,
-               standard: list,
-               suggestions: list) -> float:
-        """ Get F1-score for suggestion according to standard.
-
-        See https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html#sklearn.metrics.f1_score.
-
-        :param standard: the gold standard
-        :param suggestions: the suggestions resp. predictions
-        """
-
-        precision = cls.get_precision(standard, suggestions)
-        recall = cls.get_recall(standard, suggestions)
-
-        try:
-            return 2 * ((precision * recall) / (precision + recall))
-        except ZeroDivisionError:
-            return 0
-
-    @classmethod
     def super_make_stats(cls) -> None:
         """ Make metrics for files in /metrics.
 
@@ -818,108 +800,32 @@ class _Analysis:
 
         files = os.listdir(DIR + "/metrics")
         for file in files:
-            stats.append(cls.get_stats(DIR + f"/metrics/{file}"))
+
+            metrics = _Utility.load_json(DIR + f"/metrics/{file}")
+            metrics["file"] = file.split("/")[len(file.split("/"))-1]
+
+            stats.append({"stat": metrics})
 
         _Utility.save_json(stats, DIR + "/analysis/metrics_stats.json")
 
-    @classmethod
-    def get_stats(cls,
-                  file_path: str) -> dict:
-        """ Get quantiles, IQR, mean for F1, precision, recall in file.
-
-        :param file_path: complete path to file including filename and extension
-        """
-
-        scores = _Utility.load_json(file_path)
-
-        f1_scores = []
-        precision_scores = []
-        recall_scores = []
-        for item in scores:
-            try:
-                f1_scores.append(item.get("f1"))
-                precision_scores.append(item.get("precision"))
-                recall_scores.append(item.get("recall"))
-            except AttributeError:
-                continue
-
-        return {"stat":
-                    [{"file": file_path.split("/")[len(file_path.split("/"))-1],
-                      "f1-stat": cls.get_quantiles(f1_scores),
-                      "precision-stat": cls.get_quantiles(precision_scores),
-                      "recall-stat": cls.get_quantiles(recall_scores)}]}
-
-    @classmethod
-    def get_quantiles(cls,
-                      data: list) -> dict:
-        """ Get quantiles, IQR, mean for data.
-
-        :param data: the data
-        """
-
-        return {"minimum": numpy.quantile(data, 0),
-                "q1": numpy.quantile(data, 0.25),
-                "q2": numpy.quantile(data, 0.5),
-                "q3": numpy.quantile(data, 0.75),
-                "maximum": numpy.quantile(data, 1),
-                "iqr": numpy.quantile(data, 0.75) - numpy.quantile(data, 0.25),
-                "mean": numpy.mean(data)}
-
-    @classmethod
-    def get_sklearn_metrics(cls,
-                            standard: list,
-                            suggestions: list) -> dict:
-        """ Bla.
-
-        :param standard:
-        :param suggestions:
-        """
-        true_positive = 0
-        for suggestion in suggestions:
-            if suggestion in standard:
-                true_positive = true_positive + 1
-
-        y_true = []
-        for k in range(0, len(standard)):
-            y_true.append(1)
-
-        y_pred = []
-        for k in range(0, true_positive):
-            y_pred.append(1)
-        for k in range(0, len(standard) - true_positive):
-            y_pred.append(0)
-
-        from sklearn.metrics import f1_score
-
-        return {"F1-macro": f1_score(y_true, y_pred, average="macro"),
-                "F1-micro": f1_score(y_true, y_pred, average="micro"),
-                "F1-weighted": f1_score(y_true, y_pred, average="weighted")}
-
-exit()
-from sklearn.metrics import precision_score
-y_true = [1,1,1]
-y_pred = [1,0,0]
-print(precision_score(y_true, y_pred, average='macro'))
-print(precision_score(y_true, y_pred, average='micro'))
-print(precision_score(y_true, y_pred, average='weighted'))
-
-
-
-exit()
-
 _Analysis.super_make_stats()
+
 exit()
 
 _Analysis.super_make_metrics(file_path=DIR + "/indexed/indexed_master_mesh_enriched.json")
 
 exit()
-_Analysis.make_metrics(file_path=DIR + "/indexed/indexed_master_mesh_enriched.json",
-                       project_id="wikidata-en",
-                       abstract=True,
-                       n=10)
-#print(_Analysis.get_stats(DIR + "/metrics/test.json"))
 
-exit()
+_Analysis.make_metrics(file_path=DIR + "/indexed/indexed_master_mesh_enriched.json",
+                       project_id="yso-en",
+                       abstract=True,
+                       fulltext=False,
+                       limit=None,
+                       threshold=None,
+                       n=10)
+
+
+
 """
 Here I describe _Utility and _Data in relation to the files in the edoc folder. 
 
