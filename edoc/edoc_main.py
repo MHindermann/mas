@@ -865,6 +865,47 @@ class _Analysis:
                 "iqr": numpy.quantile(data, 0.75) - numpy.quantile(data, 0.25),
                 "mean": numpy.mean(data)}
 
+    @classmethod
+    def get_sklearn_metrics(cls,
+                            standard: list,
+                            suggestions: list) -> dict:
+        """ Bla.
+
+        :param standard:
+        :param suggestions:
+        """
+        true_positive = 0
+        for suggestion in suggestions:
+            if suggestion in standard:
+                true_positive = true_positive + 1
+
+        y_true = []
+        for k in range(0, len(standard)):
+            y_true.append(1)
+
+        y_pred = []
+        for k in range(0, true_positive):
+            y_pred.append(1)
+        for k in range(0, len(standard) - true_positive):
+            y_pred.append(0)
+
+        from sklearn.metrics import f1_score
+
+        return {"F1-macro": f1_score(y_true, y_pred, average="macro"),
+                "F1-micro": f1_score(y_true, y_pred, average="micro"),
+                "F1-weighted": f1_score(y_true, y_pred, average="weighted")}
+
+exit()
+from sklearn.metrics import precision_score
+y_true = [1,1,1]
+y_pred = [1,0,0]
+print(precision_score(y_true, y_pred, average='macro'))
+print(precision_score(y_true, y_pred, average='micro'))
+print(precision_score(y_true, y_pred, average='weighted'))
+
+
+
+exit()
 
 _Analysis.super_make_stats()
 exit()

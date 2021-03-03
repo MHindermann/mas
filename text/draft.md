@@ -329,7 +329,7 @@ Or put as question: what fraction of the subject terms suggested by Annif are al
 "Recall" is the fraction of correct subject terms out of all correct subject terms:
 
 \begin{center} 
-$\text{Precision} = \displaystyle \frac{\text{True positive}}{\text{True positive} + \text{False negative}}$
+$\text{Recall} = \displaystyle \frac{\text{True positive}}{\text{True positive} + \text{False negative}}$
 \end{center}
 
 Put as question: what fraction of the subject terms in the gold standard were suggested by Annif? The metric of recall is implemented by `_Analysis.get_recall`.
@@ -350,7 +350,7 @@ In this section, I will assess the perfomance of Annif versus the native gold st
 
 #### Creating the data foundation
 
-I will now describe how the data foundation for the assessment was created. There are three parameters that need to be distinguished(see [section "Annif"](#annif)):
+I will now describe how the data foundation for the assessment was created. There are three parameters that need to be distinguished (see [section "Annif"](#annif)):
 
 1. The Annif project (algorithm plus vocabulary) responsible for the indexing of the sample data set. As per the Annif REST API, these are `yso-en`, `yso-maui-en`, `yso-bonsai-en`, `yso-fasttext-en`, and `wikidata-en`. 
 2. The text base per item, namely title versus title and abstract.
