@@ -720,8 +720,7 @@ $\text{Precision} = \displaystyle \frac{\text{True positive}}{\text{True positiv
 \end{center}
 
 Or put as question: what fraction of the subject terms suggested by
-Annif are also in the native gold standard? The metric of precision is
-implemented by \texttt{\_Analysis.get\_precision}.
+Annif are also in the native gold standard?
 
 \hypertarget{recall}{%
 \paragraph{Recall}\label{recall}}
@@ -730,12 +729,11 @@ implemented by \texttt{\_Analysis.get\_precision}.
 subject terms:
 
 \begin{center} 
-$\text{Precision} = \displaystyle \frac{\text{True positive}}{\text{True positive} + \text{False negative}}$
+$\text{Recall} = \displaystyle \frac{\text{True positive}}{\text{True positive} + \text{False negative}}$
 \end{center}
 
 Put as question: what fraction of the subject terms in the gold standard
-were suggested by Annif? The metric of recall is implemented by
-\texttt{\_Analysis.get\_recall}.
+were suggested by Annif?
 
 \hypertarget{f1-score}{%
 \paragraph{F1-score}\label{f1-score}}
@@ -746,7 +744,18 @@ The F1-score is the harmonic mean between precision and recall:
 $\text{F1} = \displaystyle 2 * \frac{\text{Precision} * \text{Recall}}{\text{Precision} + \text{Recall}}$
 \end{center}
 
-The metric of F1-score is implemented by \texttt{\_Analysis\_get\_f1}.
+\hypertarget{implementation-1}{%
+\paragraph{Implementation}\label{implementation-1}}
+
+The above scoring metrics were implemented using the scikit-learn
+machine learning library (Pedregosa et al. 2011). It is important to
+note that each metric comes in three different flavors dubbed ``macro,''
+``micro,'' and ``weighted'' respectively. In the macro flavor, the
+metric represents simply the mean per class (i.e., correct or incorrect
+suggestion). The weighted metric is the macro metric but each class is
+weighted by its true positives. By contrast, a metric with the micro
+flavor is computed globally over all true positives and false positives
+respectively negatives.
 
 \hypertarget{annif-versus-native-gold-standard}{%
 \subsubsection{Annif versus native gold
@@ -782,12 +791,12 @@ Combining these parameters, we really have 100 Annif configurations
 whose perfomance we want to compare and assess: Annif project \(*\) text
 base \(*\) maximum number of suggestions \(= 5 * 2 * 10 = 100\).
 
-For each configuration, the F1-score was computed for every item in the
-sample data set. To do so, we call
-\texttt{\_Analysis.super\_make\_metrics} on
+For each configuration, the F1-score (macro, micro and weighted) was
+computed. To do so, we call \texttt{\_Analysis.super\_make\_metrics} on
 \texttt{/indexed/indexed\_master\_mesh\_enriched}. The 100 output files
 are saved as \texttt{/metrics/metrics\_\{marker\}} where \texttt{marker}
-specifies the Annif configuration:
+specifies the Annif configuration; a single file for analysis is saved
+as \texttt{/analysis/metrics.json}:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -801,17 +810,6 @@ been matched to Wikidata or YSO respectively. Configurations with a
 Wikidata vocabulary had a scoring coverage of 94.38\% of the items in
 the sample data set as compared to only 62.84\% for configurations with
 a YSO vocabulary.
-
-Next, in order to be able to compare the F1-scores of the 100
-configurations, a statistic (quartiles, IQR, mean) was computed for each
-configuration by calling \texttt{\_Analysis.super\_make\_stats}, saving
-the output as \texttt{/analysis/metrics\_stats.json}:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{\_Analysis.super\_make\_stats()}
-\end{Highlighting}
-\end{Shaded}
 
 \hypertarget{general-results}{%
 \paragraph{General results}\label{general-results}}
@@ -904,11 +902,18 @@ Parke, Carol. 2013. \emph{Essential First Steps to Data Analysis:
 Scenario-Based Examples Using SPSS}. Thousand Oaks: {SAGE Publications}.
 \url{https://doi.org/10.4135/9781506335148}.
 
+\leavevmode\hypertarget{ref-Pedregosa.2011}{}%
+Pedregosa, F., G. Varoquaux, A. Gramfort, V. Michel, B. Thirion, O.
+Grisel, M. Blondel, et al. 2011. {``Scikit-Learn: Machine Learning in
+Python.''} \emph{Journal of Machine Learning Research}, no. 12:
+2825--30.
+\url{https://www.jmlr.org/papers/volume12/pedregosa11a/pedregosa11a.pdf?source=post_page---------------------------}.
+
 \leavevmode\hypertarget{ref-Roth.1993}{}%
 Roth, Erwin, and Klaus Heidenreich. 1993. \emph{Sozialwissenschaftliche
 Methoden: Lehr- Und Handbuch f{ü}r Forschung Und Praxis}. 3., v{ö}llig
-{ü}berarbeitete und erweiterte Auflage. M{ü}nchen {[}etc.{]}: {R.
-Oldenbourg Verlag}.
+{ü}berarbeitete und erweiterte Auflage. M{ü}nchen: {R. Oldenbourg
+Verlag}.
 
 \leavevmode\hypertarget{ref-Stokhof.2011}{}%
 Stokhof, Martin, and Michiel van Lambalgen. 2011. {``Abstractions and

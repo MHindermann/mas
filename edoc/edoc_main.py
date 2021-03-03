@@ -565,7 +565,7 @@ class _Analysis:
                            file_path: str):
         """ Make metrics for all combinations of Annif projects and parameters in enriched Edoc file.
 
-        Output files are saved in /metrics.
+        Output files are saved in /metrics/. Joint results are saved in /analysis/metrics.json.
 
         :param file_path: complete path to file including filename and extension
         """
@@ -593,6 +593,8 @@ class _Analysis:
                                  abstract=True,
                                  n=n)
             n = n + 1
+
+        cls.super_make_stats()
 
     @classmethod
     def make_metrics(cls,
@@ -646,6 +648,10 @@ class _Analysis:
 
         # compute the metrics:
         metrics = {
+            "F1-binary": f1_score(standard, suggestions, average='binary'),
+            "Precision-binary": precision_score(standard, suggestions, average='binary', zero_division=0),
+            "Recall-binary": recall_score(standard, suggestions, average='binary', zero_division=0),
+
             "F1-macro": f1_score(standard, suggestions, average='macro'),
             "Precision-macro": precision_score(standard, suggestions, average='macro', zero_division=0),
             "Recall-macro": recall_score(standard, suggestions, average='macro', zero_division=0),
@@ -793,7 +799,7 @@ class _Analysis:
     def super_make_stats(cls) -> None:
         """ Make metrics for files in /metrics.
 
-        Output is saved as /analysis/metrics_stats.json.
+        Output is saved as /analysis/metrics.json.
         """
 
         stats = []
@@ -806,9 +812,10 @@ class _Analysis:
 
             stats.append({"stat": metrics})
 
-        _Utility.save_json(stats, DIR + "/analysis/metrics_stats.json")
+        _Utility.save_json(stats, DIR + "/analysis/metrics.json")
 
 _Analysis.super_make_stats()
+
 
 exit()
 

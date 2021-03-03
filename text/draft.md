@@ -322,7 +322,7 @@ Let us briefly look at the definitions and motivations of the chosen metrics. Re
 $\text{Precision} = \displaystyle \frac{\text{True positive}}{\text{True positive} + \text{False positive}}$
 \end{center}
 
-Or put as question: what fraction of the subject terms suggested by Annif are also in the native gold standard? The metric of precision is implemented by `_Analysis.get_precision`.
+Or put as question: what fraction of the subject terms suggested by Annif are also in the native gold standard?
 
 #### Recall
 
@@ -332,7 +332,7 @@ Or put as question: what fraction of the subject terms suggested by Annif are al
 $\text{Recall} = \displaystyle \frac{\text{True positive}}{\text{True positive} + \text{False negative}}$
 \end{center}
 
-Put as question: what fraction of the subject terms in the gold standard were suggested by Annif? The metric of recall is implemented by `_Analysis.get_recall`.
+Put as question: what fraction of the subject terms in the gold standard were suggested by Annif?
 
 #### F1-score
 
@@ -342,7 +342,9 @@ The F1-score is the harmonic mean between precision and recall:
 $\text{F1} = \displaystyle 2 * \frac{\text{Precision} * \text{Recall}}{\text{Precision} + \text{Recall}}$
 \end{center}
 
-The metric of F1-score is implemented by `_Analysis_get_f1`.
+#### Implementation
+
+The above scoring metrics were implemented using the scikit-learn machine learning library [@Pedregosa.2011]. It is important to note that each metric comes in three different flavors dubbed "macro", "micro", and "weighted" respectively. In the macro flavor, the metric represents simply the mean per class (i.e., correct or incorrect suggestion). The weighted metric is the macro metric but each class is weighted by its true positives. By contrast, a metric with the micro flavor is computed globally over all true positives and false positives respectively negatives.
 
 ### Annif versus native gold standard
 
@@ -358,19 +360,13 @@ I will now describe how the data foundation for the assessment was created. Ther
  
 Combining these parameters, we really have 100 Annif configurations whose perfomance we want to compare and assess: Annif project $*$ text base $*$ maximum number of suggestions $= 5 * 2 * 10 = 100$.
 
-For each configuration, the F1-score was computed for every item in the sample data set. To do so, we call `_Analysis.super_make_metrics` on `/indexed/indexed_master_mesh_enriched`. The 100 output files are saved as `/metrics/metrics_{marker}` where `marker` specifies the Annif configuration:
+For each configuration, the F1-score (macro, micro and weighted) was computed. To do so, we call `_Analysis.super_make_metrics` on `/indexed/indexed_master_mesh_enriched`. The 100 output files are saved as `/metrics/metrics_{marker}` where `marker` specifies the Annif configuration; a single file for analysis is saved as `/analysis/metrics.json`:
 
 ~~~~{.Python caption="make_metrics"}
 _Analysis.super_make_metrics(DIR + "/indexed/indexed_master_mesh_enriched.json")
 ~~~~
 
 Note that if an item had an empty native gold standard, no score was computed; this is the case exactly if none of the cleaned keywords had been matched to Wikidata or YSO respectively. Configurations with a Wikidata vocabulary had a scoring coverage of 94.38% of the items in the sample data set as compared to only 62.84% for configurations with a YSO vocabulary.
-
-Next, in order to be able to compare the F1-scores of the 100 configurations, a statistic (quartiles, IQR, mean) was computed for each configuration by calling `_Analysis.super_make_stats`, saving the output as `/analysis/metrics_stats.json`:
-
-~~~~{.Python caption="make_metrics"}
-_Analysis.super_make_stats()
-~~~~
 
 #### General results
 
