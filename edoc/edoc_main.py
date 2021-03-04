@@ -694,12 +694,48 @@ class _Analysis:
             "Sample size": len(standard)
         }
 
+        metrics.update(cls.count_confusion(standard, suggestions))
+
         if department is None:
             _Utility.save_json(metrics, DIR + f"/metrics/metrics_{marker}.json")
         else:
             _Utility.save_json(metrics, DIR + f"/metrics/metrics_{department}_{marker}.json")
 
         print("done.")
+
+    @classmethod
+    def count_confusion(cls,
+                        standard: list,
+                        suggestions: list):
+        """ Count the values in the confusion matrix for standard and suggestions.
+
+        :param standard: the standard
+        :param suggestions: the suggestions
+        """
+
+        true_positive = 0
+        true_negative = 0
+        false_positive = 0
+        false_negative = 0
+
+        c = 0
+        while c < len(standard):
+            if standard[c] == suggestions[c]:
+                true_positive += 1
+            elif standard[c] > suggestions[c]:
+                false_negative += 1
+            elif standard[c] < suggestions[c]:
+                false_positive += 1
+            else:
+                true_negative += 1
+            c += 1
+
+        return {
+            "TP": true_positive,
+            "TN": true_negative,
+            "FP": false_positive,
+            "FN": false_negative
+        }
 
     @classmethod
     def get_sklearn_array(cls,
@@ -848,9 +884,6 @@ class _Analysis:
 
         _Utility.save_json(stats, DIR + "/analysis/metrics.json")
 
-_Analysis.super_make_metrics()
-
-exit()
 
 for dept in _Data.get_departments():
     _Analysis.super_make_metrics(file_path=DIR + "/indexed/indexed_master_mesh_enriched.json", department=dept)
