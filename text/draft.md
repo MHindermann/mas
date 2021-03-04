@@ -298,7 +298,7 @@ In this chapter I will assess the quality of the sample data set's indexing with
 
 ### Precision, recall, F1-score
 
-The metrics used for the assessment are precision, recall and F1 score. Precision and recall are standard metrics for indexing quality [e.g., @Gantert.2016, p. 197] whereby the F1 score plays are more prominent role in the assessment of machine indexing [e.g., @Suominen.2018, pp. 11-14; @Toepfer.2016, p. 93f.]. Of course, there is a host of alternative metrics (such as indexing consistency, transparency, reproducability) that are neglected here.
+The metrics used for the assessment are precision, recall and F1-score. Precision and recall are standard metrics for indexing quality [e.g., @Gantert.2016, p. 197] whereby the F1 score plays are more prominent role in the assessment of machine indexing [e.g., @Suominen.2018, pp. 11-14; @Toepfer.2016, p. 93f.]. Of course, there is a host of alternative metrics (such as indexing consistency, transparency, reproducability) that are neglected here.
 
 Let us briefly look at the definitions and motivations of the chosen metrics. Remember that a suggestion of a subject term is correct if and only if the subject term is in the native gold standard. The possible outcomes are summarized in Table 1.
 
@@ -344,11 +344,11 @@ $\text{F1} = \displaystyle 2 * \frac{\text{Precision} * \text{Recall}}{\text{Pre
 
 #### Implementation
 
-The above scoring metrics were implemented using the scikit-learn machine learning library [@Pedregosa.2011]. It is important to note that each metric comes in three different flavors dubbed "macro", "micro", and "weighted" respectively. In the macro flavor, the metric represents simply the mean per class (i.e., correct or incorrect suggestion). The weighted metric is the macro metric but each class is weighted by its true positives. By contrast, a metric with the micro flavor is computed globally over all true positives and false positives respectively negatives.
+The above scoring metrics were implemented using the scikit-learn machine learning library [@Pedregosa.2011]. For a given Annif configuration ([section "Annif versus native gold standard"](#annif-versus-native-gold-standard))... [perhaps explain how it is done, important to mention transformation of multilabel to binary]. Note that while 
 
 ### Annif versus native gold standard
 
-In this section, I will assess the perfomance of Annif versus the native gold standard.
+In this section, I will assess the performance of Annif versus the native gold standard.
 
 #### Creating the data foundation
 
@@ -358,9 +358,11 @@ I will now describe how the data foundation for the assessment was created. Ther
 2. The text base per item, namely title versus title and abstract.
 3. The maximum number of suggestions per item. Since we required 10 suggestions per item, we can choose between 1-10 suggestions.
  
-Combining these parameters, we really have 100 Annif configurations whose perfomance we want to compare and assess: Annif project $*$ text base $*$ maximum number of suggestions $= 5 * 2 * 10 = 100$.
+Combining these parameters, we really have 100 Annif configurations whose performance we want to compare and assess: Annif project $*$ text base $*$ maximum number of suggestions $= 5 * 2 * 10 = 100$.
 
-For each configuration, the F1-score (macro, micro and weighted) was computed. To do so, we call `_Analysis.super_make_metrics` on `/indexed/indexed_master_mesh_enriched`. The 100 output files are saved as `/metrics/metrics_{marker}` where `marker` specifies the Annif configuration; a single file for analysis is saved as `/analysis/metrics.json`:
+For each configuration, the F1-score was then computed. It is important to note that each metric comes in three different flavors dubbed "macro", "micro", and "weighted" respectively [see @Sokolova.2009]. In the macro flavor, the metric represents simply the mean per class (i.e., correct or incorrect suggestion). The weighted metric is the macro metric but each class is weighted by its true positives. By contrast, a metric with the micro flavor is computed globally over all true positives and false positives respectively negatives. So the "macro" and "weighted" flavors are useful for assessing the performance of a configuration with respect to individual cases of assigning subject terms  whereas the "micro" flavor is most suitable to assess the overall performance of a configuration with respect to assigning subject terms.
+
+To compute the F1-score, we call `_Analysis.super_make_metrics` on `/indexed/indexed_master_mesh_enriched`. The 100 output files are saved as `/metrics/metrics_{marker}` where `marker` specifies the Annif configuration; a single file for analysis is saved as `/analysis/metrics.json`:
 
 ~~~~{.Python caption="make_metrics"}
 _Analysis.super_make_metrics(DIR + "/indexed/indexed_master_mesh_enriched.json")
@@ -377,6 +379,13 @@ _Analysis.super_make_metrics(file_path=DIR + "/indexed/indexed_master_mesh_enric
 
 construcht all stats for metrics:
 _Analysis.super_make_stats()
+
+#### Departments
+
+for dept in _Data.get_departments():
+    _Analysis.super_make_metrics(file_path=DIR + "/indexed/indexed_master_mesh_enriched.json", department=dept)
+
+wir brauchen noch zahlen zu wie viele items mit gold standard pro dept
 
 #### YSO configurations
 

@@ -328,6 +328,21 @@ class _Data:
 
         _Data.enrich_with_annif(file_path=file_path, save_path=save_path, project_ids=project_ids, abstract=abstract)
 
+    @classmethod
+    def get_departments(cls) -> List[str]:
+        """ Get all Edoc departments. """
+
+        return ["Associated_Institutions",
+                "Central_University_Services",
+                "Faculty_of_Business_and_Economics",
+                "Faculty_of_Humanities",
+                "Faculty_of_Law",
+                "Faculty_of_Medicine",
+                "Faculty_of_Psychology",
+                "Faculty_of_Science",
+                "Faculty_of_Theology",
+                "Interdisciplinary_Institutions"]
+
 
 class _Keywords:
     """ A collection of functions for manipulating edoc author keywords. """
@@ -562,12 +577,14 @@ class _Analysis:
 
     @classmethod
     def super_make_metrics(cls,
-                           file_path: str):
+                           file_path: str,
+                           department: str = None):
         """ Make metrics for all combinations of Annif projects and parameters in enriched Edoc file.
 
         Output files are saved in /metrics/. Joint results are saved in /analysis/metrics.json.
 
         :param file_path: complete path to file including filename and extension
+        :param department: restrict to items from department
         """
 
         project_ids = ["yso-en", "yso-maui-en", "yso-bonsai-en", "yso-fasttext-en", "wikidata-en"]
@@ -575,23 +592,26 @@ class _Analysis:
         n = 1
         while n < 11:
             for project_id in project_ids:
-                print(f"Working on {project_id}...")
                 # title:
                 cls.make_metrics(file_path=file_path,
-                                 project_id=project_id)
+                                 project_id=project_id,
+                                 department=department)
                 # title + abstract:
                 cls.make_metrics(file_path=file_path,
                                  project_id=project_id,
-                                 abstract=True)
+                                 abstract=True,
+                                 department=department)
                 # title + limit:
                 cls.make_metrics(file_path=file_path,
                                  project_id=project_id,
-                                 n=n)
+                                 n=n,
+                                 department=department)
                 # title + limit:
                 cls.make_metrics(file_path=file_path,
                                  project_id=project_id,
                                  abstract=True,
-                                 n=n)
+                                 n=n,
+                                 department=department)
             n = n + 1
 
         cls.super_make_stats()
@@ -604,7 +624,8 @@ class _Analysis:
                      fulltext: bool = False,
                      limit: int = None,
                      threshold: int = None,
-                     n: int = 10) -> None:
+                     n: int = 10,
+                     department: str = None) -> None:
 
         """ Make Sklearn metrics F1, recall, precision for file.
 
@@ -623,14 +644,23 @@ class _Analysis:
         :param limit: Annif-client limit, defaults to None
         :param threshold: Annif-client threshold, defaults to None
         :param n: number of top IDs (by score) to be extracted per item, defaults to 10
+        :param department: restrict to items from department
         """
 
         data = _Utility.load_json(file_path)
+
+        # construct the correct annif marker:
+        marker = f"{project_id}-{abstract}-{fulltext}-{n}-{threshold}"
+
+        print(f"Working on {department}_{marker}...", end="")
 
         # construct y_true (=standard) and y_pred (=suggestions) from data:
         standard = []
         suggestions = []
         for item in data:
+            if department is not None:
+                if item.get("department") != department:
+                    continue
             sklearn_array = cls.get_sklearn_array(item=item,
                                                   project_id=project_id,
                                                   abstract=abstract,
@@ -642,9 +672,6 @@ class _Analysis:
                 continue
             standard = standard + sklearn_array.get("y_true")
             suggestions = suggestions + sklearn_array.get("y_pred")
-
-        # construct the correct annif marker:
-        marker = f"{project_id}-{abstract}-{fulltext}-{n}-{threshold}"
 
         # compute the metrics:
         metrics = {
@@ -662,10 +689,17 @@ class _Analysis:
 
             "F1-weighted": f1_score(standard, suggestions, average='weighted'),
             "Precision-weighted": precision_score(standard, suggestions, average='weighted', zero_division=0),
-            "Recall-weighted": recall_score(standard, suggestions, average='weighted', zero_division=0)
+            "Recall-weighted": recall_score(standard, suggestions, average='weighted', zero_division=0),
+
+            "Sample size": len(standard)
         }
 
-        _Utility.save_json(metrics, DIR + f"/metrics/metrics_{marker}.json")
+        if department is None:
+            _Utility.save_json(metrics, DIR + f"/metrics/metrics_{marker}.json")
+        else:
+            _Utility.save_json(metrics, DIR + f"/metrics/metrics_{department}_{marker}.json")
+
+        print("done.")
 
     @classmethod
     def get_sklearn_array(cls,
@@ -814,12 +848,12 @@ class _Analysis:
 
         _Utility.save_json(stats, DIR + "/analysis/metrics.json")
 
-_Analysis.super_make_stats()
-
+_Analysis.super_make_metrics()
 
 exit()
 
-_Analysis.super_make_metrics(file_path=DIR + "/indexed/indexed_master_mesh_enriched.json")
+for dept in _Data.get_departments():
+    _Analysis.super_make_metrics(file_path=DIR + "/indexed/indexed_master_mesh_enriched.json", department=dept)
 
 exit()
 

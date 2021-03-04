@@ -683,7 +683,7 @@ indexing with Annif based on the native and foreign gold standards.
 \subsubsection{Precision, recall,
 F1-score}\label{precision-recall-f1-score}}
 
-The metrics used for the assessment are precision, recall and F1 score.
+The metrics used for the assessment are precision, recall and F1-score.
 Precision and recall are standard metrics for indexing quality (e.g.,
 Gantert 2016, 197) whereby the F1 score plays are more prominent role in
 the assessment of machine indexing (e.g., Suominen 2018, 11--14; Toepfer
@@ -748,21 +748,19 @@ $\text{F1} = \displaystyle 2 * \frac{\text{Precision} * \text{Recall}}{\text{Pre
 \paragraph{Implementation}\label{implementation-1}}
 
 The above scoring metrics were implemented using the scikit-learn
-machine learning library (Pedregosa et al. 2011). It is important to
-note that each metric comes in three different flavors dubbed ``macro,''
-``micro,'' and ``weighted'' respectively. In the macro flavor, the
-metric represents simply the mean per class (i.e., correct or incorrect
-suggestion). The weighted metric is the macro metric but each class is
-weighted by its true positives. By contrast, a metric with the micro
-flavor is computed globally over all true positives and false positives
-respectively negatives.
+machine learning library (Pedregosa et al. 2011). For a given Annif
+configuration
+(\protect\hyperlink{annif-versus-native-gold-standard}{section ``Annif
+versus native gold standard''})\ldots{} {[}perhaps explain how it is
+done, important to mention transformation of multilabel to binary{]}.
+Note that while
 
 \hypertarget{annif-versus-native-gold-standard}{%
 \subsubsection{Annif versus native gold
 standard}\label{annif-versus-native-gold-standard}}
 
-In this section, I will assess the perfomance of Annif versus the native
-gold standard.
+In this section, I will assess the performance of Annif versus the
+native gold standard.
 
 \hypertarget{creating-the-data-foundation}{%
 \paragraph{Creating the data
@@ -788,11 +786,25 @@ created. There are three parameters that need to be distinguished (see
 \end{enumerate}
 
 Combining these parameters, we really have 100 Annif configurations
-whose perfomance we want to compare and assess: Annif project \(*\) text
-base \(*\) maximum number of suggestions \(= 5 * 2 * 10 = 100\).
+whose performance we want to compare and assess: Annif project \(*\)
+text base \(*\) maximum number of suggestions \(= 5 * 2 * 10 = 100\).
 
-For each configuration, the F1-score (macro, micro and weighted) was
-computed. To do so, we call \texttt{\_Analysis.super\_make\_metrics} on
+For each configuration, the F1-score was then computed. It is important
+to note that each metric comes in three different flavors dubbed
+``macro,'' ``micro,'' and ``weighted'' respectively (see Sokolova and
+Lapalme 2009). In the macro flavor, the metric represents simply the
+mean per class (i.e., correct or incorrect suggestion). The weighted
+metric is the macro metric but each class is weighted by its true
+positives. By contrast, a metric with the micro flavor is computed
+globally over all true positives and false positives respectively
+negatives. So the ``macro'' and ``weighted'' flavors are useful for
+assessing the performance of a configuration with respect to individual
+cases of assigning subject terms whereas the ``micro'' flavor is most
+suitable to assess the overall performance of a configuration with
+respect to assigning subject terms.
+
+To compute the F1-score, we call
+\texttt{\_Analysis.super\_make\_metrics} on
 \texttt{/indexed/indexed\_master\_mesh\_enriched}. The 100 output files
 are saved as \texttt{/metrics/metrics\_\{marker\}} where \texttt{marker}
 specifies the Annif configuration; a single file for analysis is saved
@@ -907,13 +919,19 @@ Pedregosa, F., G. Varoquaux, A. Gramfort, V. Michel, B. Thirion, O.
 Grisel, M. Blondel, et al. 2011. {``Scikit-Learn: Machine Learning in
 Python.''} \emph{Journal of Machine Learning Research}, no. 12:
 2825--30.
-\url{https://www.jmlr.org/papers/volume12/pedregosa11a/pedregosa11a.pdf?source=post_page---------------------------}.
+\url{https://www.jmlr.org/papers/volume12/pedregosa11a/pedregosa11a.pdf}.
 
 \leavevmode\hypertarget{ref-Roth.1993}{}%
 Roth, Erwin, and Klaus Heidenreich. 1993. \emph{Sozialwissenschaftliche
 Methoden: Lehr- Und Handbuch f{ü}r Forschung Und Praxis}. 3., v{ö}llig
 {ü}berarbeitete und erweiterte Auflage. M{ü}nchen: {R. Oldenbourg
 Verlag}.
+
+\leavevmode\hypertarget{ref-Sokolova.2009}{}%
+Sokolova, Marina, and Guy Lapalme. 2009. {``A Systematic Analysis of
+Performance Measures for Classification Tasks.''} \emph{Information
+Processing {\&} Management} 45 (4): 427--37.
+\url{https://doi.org/10.1016/j.ipm.2009.03.002}.
 
 \leavevmode\hypertarget{ref-Stokhof.2011}{}%
 Stokhof, Martin, and Michiel van Lambalgen. 2011. {``Abstractions and
