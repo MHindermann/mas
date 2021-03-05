@@ -1,13 +1,19 @@
 # Veusz saved document (version 3.3.1)
-# Saved at 2021-03-05T13:48:25.408797
+# Saved at 2021-03-05T13:50:17.524425
 
 AddImportPath(u'C:\\Users\\Max\\PycharmProjects\\mas\\text\\images')
-ImportFileCSV(u'keywords_counted.csv', linked=True, numericlocale=u'de_CH')
+ImportFileCSV(u'metrics_dept_distribution.csv', linked=True, numericlocale=u'de_CH')
 SetDataText(u'new dataset', [
-    u'Cleaned',
-    u'QID \\subset Cleaned',
-    u'MeSH \\subset Cleaned',
-    u'YSO \\subset Cleaned',
+    u'Associated',
+    u'Central Services',
+    u'Economics',
+    u'Humanities',
+    u'Interdisciplinary',
+    u'Law',
+    u'Medicine',
+    u'Psychology',
+    u'Science',
+    u'Theology',
 ])
 Set('colorTheme', u'default-latest')
 Set('StyleSheet/axis-function/autoRange', u'next-tick')
@@ -25,6 +31,7 @@ Set('bottomMargin', u'3.344cm')
 Add('axis', name=u'x', autoadd=False)
 To(u'x')
 Set('label', u'')
+Set('max', 11.0)
 Set('log', False)
 Set('mode', u'labels')
 Set('Label/size', u'12pt')
@@ -40,7 +47,7 @@ Set('MinorTicks/hide', True)
 To('..')
 Add('axis', name=u'y', autoadd=False)
 To(u'y')
-Set('label', u'Number of keywords per item')
+Set('label', u'F1-weighted per configuration')
 Set('max', u'Auto')
 Set('log', False)
 Set('direction', u'vertical')
@@ -55,7 +62,7 @@ To('..')
 Add('boxplot', name=u'boxplot1', autoadd=False)
 To(u'boxplot1')
 Set('calculate', True)
-Set('values', ('gold standard', 'qid', 'mesh id', 'yso id'))
+Set('values', ('Associated', 'Central Services', 'Economics', 'Humanities', 'Interdisciplinary', 'Law', 'Medicine', 'Psychology', 'Science', 'Theology'))
 Set('posn', u'a')
 Set('labels', u'new dataset')
 Set('direction', u'vertical')

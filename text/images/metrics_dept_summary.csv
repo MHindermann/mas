@@ -1,0 +1,11 @@
+Department,F1-weighted,Configuration,Ex aequo,Sample size
+Associated,0.70929712,wikidata-en-F-F-4-N,metrics_Associated_Institutions_wikidata-en-T-F-4-N.json,1697
+Central Services,0.486106747,wikidata-en-F-F-4-N,metrics_Central_University_Services_wikidata-en-T-F-4-N.json,857
+Economics,0.79197995,yso-en-F-F-1-N,metrics_Faculty_of_Business_and_Economics_yso-en-T-F-1-N.json,241
+Humanities,0.706976744,yso-en-F-F-1-N,metrics_Faculty_of_Humanities_yso-en-T-F-1-N.json,417
+Law,0.649496081,yso-bonsai-en-F-F-2-N,,47
+Medicine,0.462444601,yso-en-F-F-4-N,metrics_Faculty_of_Medicine_yso-en-T-F-4-N.json,7840
+Psychology,0.629370629,yso-en-F-F-1-N,metrics_Faculty_of_Psychology_yso-en-T-F-1-N.json,196
+Science,0.65377176,yso-en-F-F-1-N,metrics_Faculty_of_Psychology_yso-en-T-F-1-N.json,1392
+Theology,0.666158537,yso-en-F-F-2-N,metrics_Faculty_of_Theology_yso-en-T-F-2-N.json,41
+Interdisciplinary,0.725107326,wikidata-en-F-F-2-N,metrics_Interdisciplinary_Institutions_wikidata-en-T-F-2-N.json,261

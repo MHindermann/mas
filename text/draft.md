@@ -358,7 +358,7 @@ I will now describe how the data foundation for the assessment was created. Ther
 2. The text base per item, namely title versus title and abstract.
 3. The maximum number of suggestions per item. Since we required 10 suggestions per item, we can choose between 1-10 suggestions.
  
-Combining these parameters, we really have 100 Annif configurations whose performance we want to compare and assess: Annif project $*$ text base $*$ maximum number of suggestions $= 5 * 2 * 10 = 100$.
+Combining these parameters, we really have 100 Annif configurations whose performance we want to compare and assess: Annif project $*$ text base $*$ maximum number of suggestions $= 5 * 2 * 10 = 100$. Each configuration has a unique ID (called "marker" in what follows) constructed by the convention: `{project_id}-{abstract}-{fulltext}-{n}-{threshold}` where `project_id` is the Annif project, `abstract` and `fulltext` are boolean variables, `n` is the maximum number of suggestions per item, and `threshold` is a variable for a threshold Annif score.
 
 For each configuration, the F1-score was then computed. It is important to note that each metric comes in three different flavors dubbed "macro", "micro", and "weighted" respectively [see @Sokolova.2009]. In the macro flavor, the metric represents simply the mean per class (i.e., correct or incorrect suggestion). The weighted metric is the macro metric but each class is weighted by its true positives. By contrast, a metric with the micro flavor is computed globally over all true positives and false positives respectively negatives. So the "macro" and "weighted" flavors are useful for assessing the performance of a configuration with respect to individual cases of assigning subject terms (call them "samples") whereas the "micro" flavor is most suitable to assess the overall performance of a configuration with respect to assigning subject terms.
 
@@ -371,6 +371,13 @@ _Analysis.super_make_metrics(DIR + "/indexed/indexed_master_mesh_enriched.json")
 Note that the data foundation includes additional information, namely the sample size and the raw values for the confusion matrix. The sample size is a histogram of each instance in which a value in the confusion matrix was computed, that is, each case in which either Annif or the native gold standard assigned a subject term. Finally, note that if an item in the Edoc sample data set had an empty native gold standard, no score was computed; this is the case exactly if none of the cleaned keywords had been matched to Wikidata or YSO respectively. Configurations with a Wikidata vocabulary had a scoring coverage of 94.38% of the items in the sample data set as compared to only 62.84% for configurations with a YSO vocabulary.
 
 #### General results
+
+![Top 20 Annif configurations by F1-score.](images/metrics_f1_top20.pdf)
+
+
+![Distribution of weighted F1-scores per maximum number of suggestions 0 < n <11.](images/metrics_all_n.pdf)
+
+![Distribution of weighted F1-scores per class of algorithm (left) and per class of text basis (right).](images/metrics_all_project+abstract.pdf)
 
 we can then discuss whether the best performance is actually useful; perhaps do this by comparing absolute scores with other assessments. if results are much lower it is to be suspected that the native gold standard is not very good (i.e., that the measure we use to judge annif performance is inadequte => motivation for foreign standard)
 
@@ -391,7 +398,12 @@ for dept in _Data.get_departments():
 
 This yields 1000 files in `/metrics/metrics_{department}_{marker}.json` (100 configurations $*$ 10 departments) where `department` specifies the department according to the Edoc convention. 
 
-Let us now look at the results. For each department, we are interested in the highest F1-score and the corresponding configuration. 
+Let us now look at the results. For each department, we are interested in the highest weighted F1-score and the corresponding configuration as summarized in Figure X.
+
+![Best performing Annif configuration by F1-score weighted per department.](images/metrics_dept_summary.pdf)
+
+
+![Distribution of F1-scores weighted for all Annif configurations per department.](images/metrics_dept_distribution.pdf)
 
 #### YSO configurations
 

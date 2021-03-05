@@ -788,6 +788,13 @@ created. There are three parameters that need to be distinguished (see
 Combining these parameters, we really have 100 Annif configurations
 whose performance we want to compare and assess: Annif project \(*\)
 text base \(*\) maximum number of suggestions \(= 5 * 2 * 10 = 100\).
+Each configuration has a unique ID (called ``marker'' in what follows)
+constructed by the convention:
+\texttt{\{project\_id\}-\{abstract\}-\{fulltext\}-\{n\}-\{threshold\}}
+where \texttt{project\_id} is the Annif project, \texttt{abstract} and
+\texttt{fulltext} are boolean variables, \texttt{n} is the maximum
+number of suggestions per item, and \texttt{threshold} is a variable for
+a threshold Annif score.
 
 For each configuration, the F1-score was then computed. It is important
 to note that each metric comes in three different flavors dubbed
@@ -831,6 +838,26 @@ for configurations with a YSO vocabulary.
 \hypertarget{general-results}{%
 \paragraph{General results}\label{general-results}}
 
+\begin{figure}
+\centering
+\includegraphics{images/metrics_f1_top20.pdf}
+\caption{Top 20 Annif configurations by F1-score.}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics{images/metrics_all_n.pdf}
+\caption{Distribution of weighted F1-scores per maximum number of
+suggestions 0 \textless{} n \textless11.}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics{images/metrics_all_project+abstract.pdf}
+\caption{Distribution of weighted F1-scores per class of algorithm
+(left) and per class of text basis (right).}
+\end{figure}
+
 we can then discuss whether the best performance is actually useful;
 perhaps do this by comparing absolute scores with other assessments. if
 results are much lower it is to be suspected that the native gold
@@ -867,11 +894,23 @@ This yields 1000 files in
 configurations \(*\) 10 departments) where \texttt{department} specifies
 the department according to the Edoc convention.
 
-\begin{itemize}
-\tightlist
-\item
-  best config for department
-\end{itemize}
+Let us now look at the results. For each department, we are interested
+in the highest weighted F1-score and the corresponding configuration as
+summarized in Figure X.
+
+\begin{figure}
+\centering
+\includegraphics{images/metrics_dept_summary.pdf}
+\caption{Best performing Annif configuration by F1-score weighted per
+department.}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics{images/metrics_dept_distribution.pdf}
+\caption{Distribution of F1-scores weighted for all Annif configurations
+per department.}
+\end{figure}
 
 \hypertarget{yso-configurations}{%
 \paragraph{YSO configurations}\label{yso-configurations}}
