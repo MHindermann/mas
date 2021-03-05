@@ -885,6 +885,8 @@ class _Analysis:
         _Utility.save_json(stats, DIR + "/analysis/metrics.json")
 
 
+exit()
+
 for dept in _Data.get_departments():
     _Analysis.super_make_metrics(file_path=DIR + "/indexed/indexed_master_mesh_enriched.json", department=dept)
 

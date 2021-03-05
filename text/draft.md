@@ -360,15 +360,15 @@ I will now describe how the data foundation for the assessment was created. Ther
  
 Combining these parameters, we really have 100 Annif configurations whose performance we want to compare and assess: Annif project $*$ text base $*$ maximum number of suggestions $= 5 * 2 * 10 = 100$.
 
-For each configuration, the F1-score was then computed. It is important to note that each metric comes in three different flavors dubbed "macro", "micro", and "weighted" respectively [see @Sokolova.2009]. In the macro flavor, the metric represents simply the mean per class (i.e., correct or incorrect suggestion). The weighted metric is the macro metric but each class is weighted by its true positives. By contrast, a metric with the micro flavor is computed globally over all true positives and false positives respectively negatives. So the "macro" and "weighted" flavors are useful for assessing the performance of a configuration with respect to individual cases of assigning subject terms  whereas the "micro" flavor is most suitable to assess the overall performance of a configuration with respect to assigning subject terms.
+For each configuration, the F1-score was then computed. It is important to note that each metric comes in three different flavors dubbed "macro", "micro", and "weighted" respectively [see @Sokolova.2009]. In the macro flavor, the metric represents simply the mean per class (i.e., correct or incorrect suggestion). The weighted metric is the macro metric but each class is weighted by its true positives. By contrast, a metric with the micro flavor is computed globally over all true positives and false positives respectively negatives. So the "macro" and "weighted" flavors are useful for assessing the performance of a configuration with respect to individual cases of assigning subject terms (call them "samples") whereas the "micro" flavor is most suitable to assess the overall performance of a configuration with respect to assigning subject terms.
 
-To compute the F1-score, we call `_Analysis.super_make_metrics` on `/indexed/indexed_master_mesh_enriched`. The 100 output files are saved as `/metrics/metrics_{marker}` where `marker` specifies the Annif configuration; a single file for analysis is saved as `/analysis/metrics.json`:
+To compute the F1-score, we call `_Analysis.super_make_metrics` on `/indexed/indexed_master_mesh_enriched`. The 100 output files are saved as `/metrics/metrics_{marker}.json` where `marker` specifies the Annif configuration; a single file for analysis is saved as `/analysis/metrics.json`:
 
 ~~~~{.Python caption="make_metrics"}
 _Analysis.super_make_metrics(DIR + "/indexed/indexed_master_mesh_enriched.json")
 ~~~~
 
-Note that if an item had an empty native gold standard, no score was computed; this is the case exactly if none of the cleaned keywords had been matched to Wikidata or YSO respectively. Configurations with a Wikidata vocabulary had a scoring coverage of 94.38% of the items in the sample data set as compared to only 62.84% for configurations with a YSO vocabulary.
+Note that the data foundation includes additional information, namely the sample size and the raw values for the confusion matrix. The sample size is a histogram of each instance in which a value in the confusion matrix was computed, that is, each case in which either Annif or the native gold standard assigned a subject term. Finally, note that if an item in the Edoc sample data set had an empty native gold standard, no score was computed; this is the case exactly if none of the cleaned keywords had been matched to Wikidata or YSO respectively. Configurations with a Wikidata vocabulary had a scoring coverage of 94.38% of the items in the sample data set as compared to only 62.84% for configurations with a YSO vocabulary.
 
 #### General results
 
@@ -382,10 +382,16 @@ _Analysis.super_make_stats()
 
 #### Departments
 
-for dept in _Data.get_departments():
-    _Analysis.super_make_metrics(file_path=DIR + "/indexed/indexed_master_mesh_enriched.json", department=dept)
+I had noted in section X as caveat that the performance of Annif might vary according to department due to systematic biases in constructing the Edoc sample data set. It might therefore be illuminating to assess the performance of the various Annif configurations per department. Since the Edoc `department` data field is mandatory, the sample data set is partioned into blocks of departments by default. We can thus create a data foundation for each such block by calling `_Analysis.super_make_metrics` with a departmental parameter:
 
-wir brauchen noch zahlen zu wie viele items mit gold standard pro dept
+~~~~{.Python caption="make_metrics_department"}
+for dept in _Data.get_departments():
+    _Analysis.super_make_metrics(DIR + "/indexed/indexed_master_mesh_enriched.json", deparment=dept)
+~~~~
+
+This yields 1000 files in `/metrics/metrics_{department}_{marker}.json` (100 configurations $*$ 10 departments) where `department` specifies the department according to the Edoc convention. 
+
+Let us now look at the results. For each department, we are interested in the highest F1-score and the corresponding configuration. 
 
 #### YSO configurations
 

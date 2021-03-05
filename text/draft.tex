@@ -799,16 +799,16 @@ positives. By contrast, a metric with the micro flavor is computed
 globally over all true positives and false positives respectively
 negatives. So the ``macro'' and ``weighted'' flavors are useful for
 assessing the performance of a configuration with respect to individual
-cases of assigning subject terms whereas the ``micro'' flavor is most
-suitable to assess the overall performance of a configuration with
-respect to assigning subject terms.
+cases of assigning subject terms (call them ``samples'') whereas the
+``micro'' flavor is most suitable to assess the overall performance of a
+configuration with respect to assigning subject terms.
 
 To compute the F1-score, we call
 \texttt{\_Analysis.super\_make\_metrics} on
 \texttt{/indexed/indexed\_master\_mesh\_enriched}. The 100 output files
-are saved as \texttt{/metrics/metrics\_\{marker\}} where \texttt{marker}
-specifies the Annif configuration; a single file for analysis is saved
-as \texttt{/analysis/metrics.json}:
+are saved as \texttt{/metrics/metrics\_\{marker\}.json} where
+\texttt{marker} specifies the Annif configuration; a single file for
+analysis is saved as \texttt{/analysis/metrics.json}:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -816,12 +816,17 @@ as \texttt{/analysis/metrics.json}:
 \end{Highlighting}
 \end{Shaded}
 
-Note that if an item had an empty native gold standard, no score was
-computed; this is the case exactly if none of the cleaned keywords had
-been matched to Wikidata or YSO respectively. Configurations with a
-Wikidata vocabulary had a scoring coverage of 94.38\% of the items in
-the sample data set as compared to only 62.84\% for configurations with
-a YSO vocabulary.
+Note that the data foundation includes additional information, namely
+the sample size and the raw values for the confusion matrix. The sample
+size is a histogram of each instance in which a value in the confusion
+matrix was computed, that is, each case in which either Annif or the
+native gold standard assigned a subject term. Finally, note that if an
+item in the Edoc sample data set had an empty native gold standard, no
+score was computed; this is the case exactly if none of the cleaned
+keywords had been matched to Wikidata or YSO respectively.
+Configurations with a Wikidata vocabulary had a scoring coverage of
+94.38\% of the items in the sample data set as compared to only 62.84\%
+for configurations with a YSO vocabulary.
 
 \hypertarget{general-results}{%
 \paragraph{General results}\label{general-results}}
@@ -837,6 +842,36 @@ construct all metrics: \_Analysis.super\_make\_metrics(file\_path=DIR +
 ``/indexed/indexed\_master\_mesh\_enriched.json'')
 
 construcht all stats for metrics: \_Analysis.super\_make\_stats()
+
+\hypertarget{departments}{%
+\paragraph{Departments}\label{departments}}
+
+I had noted in section X as caveat that the performance of Annif might
+vary according to department due to systematic biases in constructing
+the Edoc sample data set. It might therefore be illuminating to assess
+the performance of the various Annif configurations per department.
+Since the Edoc \texttt{department} data field is mandatory, the sample
+data set is partioned into blocks of departments by default. We can thus
+create a data foundation for each such block by calling
+\texttt{\_Analysis.super\_make\_metrics} with a departmental parameter:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{for}\NormalTok{ dept }\KeywordTok{in}\NormalTok{ \_Data.get\_departments():}
+\NormalTok{    \_Analysis.super\_make\_metrics(DIR }\OperatorTok{+} \StringTok{"/indexed/indexed\_master\_mesh\_enriched.json"}\NormalTok{, deparment}\OperatorTok{=}\NormalTok{dept)}
+\end{Highlighting}
+\end{Shaded}
+
+This yields 1000 files in
+\texttt{/metrics/metrics\_\{department\}\_\{marker\}.json} (100
+configurations \(*\) 10 departments) where \texttt{department} specifies
+the department according to the Edoc convention.
+
+\begin{itemize}
+\tightlist
+\item
+  best config for department
+\end{itemize}
 
 \hypertarget{yso-configurations}{%
 \paragraph{YSO configurations}\label{yso-configurations}}
