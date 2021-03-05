@@ -382,7 +382,7 @@ Let us first consider overall performance. Here the most remarkable result is th
 
 Furthermore, the four YSO configurations are more or less on par: the `yso-bonsai-en`, `yso-en`, and `yso-fasttext-en` configurations perform very similarily and are slightly outperformed by `yso-maui-en`. 
 
-![The top 20 Annif configurations by F1-score.](images/metrics_f1_top20.pdf)
+![The top 20 Annif configurations (according to F1-score).](images/metrics_f1_top20.pdf)
 
 
 
@@ -411,10 +411,10 @@ This yields 1000 files in `/metrics/metrics_{department}_{marker}.json` (100 con
 
 Let us now look at the results. For each department, we are interested in the highest weighted F1-score and the corresponding configuration as summarized in Figure X.
 
-![Best performing Annif configuration by F1-score weighted per department.](images/metrics_dept_summary.pdf)
+![Best performing Annif configuration (according to weighted F1-score) per department.](images/metrics_dept_summary.pdf)
 
 
-![Distribution of F1-scores weighted for all Annif configurations per department.](images/metrics_dept_distribution.pdf)
+![Distribution of weighted F1-scores for all Annif configurations per department.](images/metrics_dept_distribution.pdf)
 
 #### YSO configurations
 
