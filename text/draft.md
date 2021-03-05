@@ -372,12 +372,23 @@ Note that the data foundation includes additional information, namely the sample
 
 #### General results
 
-![Top 20 Annif configurations by F1-score.](images/metrics_f1_top20.pdf)
+In this section I will discuss the general results of assessing the performance of the 100 Annif configurations versus the native gold standard with respect to the Edoc sample data set.
+
+Let us first consider overall performance. Here the most remarkable result is that Wikidata configurations outperformed YSO configurations (see Figure X). However, the explanation of this effect is not evident. The two main explanatory hypotheses are 1. that the suggestions by the Wikidata configurations are more salient, or 2. that the native gold standard is biased towards Wikidata due to its higher coverage of QIDs as compared to YSO IDs. By contrast, the Wikidata configurations are more productive than the YSO configurations, and the reason for this effect is the higher coverage of QIDs as compared to YSO IDs (see Figure Y). By "productivity" I mean that the absolute number of assigned subject terms. So Wikidata configurations are not only qualitatively but also quantitatively superior to YSO configurations. 
+
+![Distribution of weighted F1-scores per class of algorithm (left) and per class of text basis (right). Figure X.](images/metrics_all_project+abstract.pdf)
+
+![The distribution of cumulative sample size per class of Annif configuration. Figure Y](images/metrics_all_productivity.pdf)
+
+Furthermore, the four YSO configurations are more or less on par: the `yso-bonsai-en`, `yso-en`, and `yso-fasttext-en` configurations perform very similarily and are slightly outperformed by `yso-maui-en`. 
+
+![The top 20 Annif configurations by F1-score.](images/metrics_f1_top20.pdf)
+
 
 
 ![Distribution of weighted F1-scores per maximum number of suggestions 0 < n <11.](images/metrics_all_n.pdf)
 
-![Distribution of weighted F1-scores per class of algorithm (left) and per class of text basis (right).](images/metrics_all_project+abstract.pdf)
+
 
 we can then discuss whether the best performance is actually useful; perhaps do this by comparing absolute scores with other assessments. if results are much lower it is to be suspected that the native gold standard is not very good (i.e., that the measure we use to judge annif performance is inadequte => motivation for foreign standard)
 

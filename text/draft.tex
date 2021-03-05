@@ -838,10 +838,46 @@ for configurations with a YSO vocabulary.
 \hypertarget{general-results}{%
 \paragraph{General results}\label{general-results}}
 
+In this section I will discuss the general results of assessing the
+performance of the 100 Annif configurations versus the native gold
+standard with respect to the Edoc sample data set.
+
+Let us first consider overall performance. Here the most remarkable
+result is that Wikidata configurations outperformed YSO configurations
+(see Figure X). However, the explanation of this effect is not evident.
+The two main explanatory hypotheses are 1. that the suggestions by the
+Wikidata configurations are more salient, or 2. that the native gold
+standard is biased towards Wikidata due to its higher coverage of QIDs
+as compared to YSO IDs. By contrast, the Wikidata configurations are
+more productive than the YSO configurations, and the reason for this
+effect is the higher coverage of QIDs as compared to YSO IDs (see Figure
+Y). By ``productivity'' I mean that the absolute number of assigned
+subject terms. So Wikidata configurations are not only qualitatively but
+also quantitatively superior to YSO configurations.
+
+\begin{figure}
+\centering
+\includegraphics{images/metrics_all_project+abstract.pdf}
+\caption{Distribution of weighted F1-scores per class of algorithm
+(left) and per class of text basis (right). Figure X.}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics{images/metrics_all_productivity.pdf}
+\caption{The distribution of cumulative sample size per class of Annif
+configuration. Figure Y}
+\end{figure}
+
+Furthermore, the four YSO configurations are more or less on par: the
+\texttt{yso-bonsai-en}, \texttt{yso-en}, and \texttt{yso-fasttext-en}
+configurations perform very similarily and are slightly outperformed by
+\texttt{yso-maui-en}.
+
 \begin{figure}
 \centering
 \includegraphics{images/metrics_f1_top20.pdf}
-\caption{Top 20 Annif configurations by F1-score.}
+\caption{The top 20 Annif configurations by F1-score.}
 \end{figure}
 
 \begin{figure}
@@ -849,13 +885,6 @@ for configurations with a YSO vocabulary.
 \includegraphics{images/metrics_all_n.pdf}
 \caption{Distribution of weighted F1-scores per maximum number of
 suggestions 0 \textless{} n \textless11.}
-\end{figure}
-
-\begin{figure}
-\centering
-\includegraphics{images/metrics_all_project+abstract.pdf}
-\caption{Distribution of weighted F1-scores per class of algorithm
-(left) and per class of text basis (right).}
 \end{figure}
 
 we can then discuss whether the best performance is actually useful;
