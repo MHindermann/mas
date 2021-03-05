@@ -27,7 +27,7 @@ the manipulation history of some data can be exported as JSON file and then repr
 In this chapter, the prototype for a machine indexing of Edoc is presented. The focus is primarily on practical 
 implementation although care is taken to spell out design decisions in as much detail as is needed.
 
-## Aim
+# Aim
 
 Let us start by stating the aim of the prototype.  From a functional 
 perspective, the prototype takes a subset of the data from Edoc as input and provides index terms for each item in this 
@@ -41,9 +41,9 @@ subset as output. In order to fulfill this aim we can distinguish a number of st
 
 In the sections below, these steps will be discussed in detail.
 
-## Edoc data
+# Edoc data
 
-### Edoc
+## Edoc
 
 Edoc is the institutional repository of the University of Basel. It was conceived in 2009 as repository for 
 electronic dissertations and grew in scope when the University of Basel adapted its first open access policy in 2013.
@@ -53,7 +53,7 @@ Edoc runs on the EPrints 3 document management system (https://github.com/eprint
 !! Add technical description of Edoc.  
 !! Perhaps add description of how files are added to Edoc, see PDF in `/todo`.
 
-### Data extraction
+## Data extraction
 
 Even though Edoc is a public server, its database does not have a web-ready API. In addition, since Edoc is a production
 server, its underlying database cannot be used directly on pain of disturbing the provided services. The data hence
@@ -72,16 +72,16 @@ this
 files are called `raw_master_x-y.json` (where x and y indicate the entries as given by `1942-2020.json`) and saved under
 `/edoc/raw`.
 
-### Data description and analysis
+## Data description and analysis
 
 !! Explain the Edoc data fields. Say perhaps something about the granularity of the relevant fields. Say something about how the fields are filled in (and by whom).
 
-## Sample data set
+# Sample data set
 
 In this section, I will explain how the sample data set is selected and constructed. "Selection" means the task of 
 specifying a subset of the Edoc data and "construction" means the task of implementing this selection. 
 
-### Selection
+## Selection
 
 There are a number of constraints for selecting the sample data set pertaining to an items's text, evaluability and 
 the data set's
@@ -106,7 +106,7 @@ should be small enough to allow for easy handling and rapid iteration. On the ot
 not be trivial but reflect the quirks and inadequacies of the complete dataset. In other words, 
 we are looking for an abstraction rather than an idealization in the sense of  @Stokhof.2011. 
 
-### Construction
+## Construction
 
 The first constraint is that each item in the sample data set needs to have a text. Intuitively, this text could 
 consist of a title, an abstract, or even a full text, or any combination of the above. Similar to manual indexing, having 
@@ -144,7 +144,7 @@ construct the sample data set by choosing exactly those items from `/edoc/raw` w
 `title`, `abstract`, `id_number`, and `keywords`. We do so by calling `_Data.select_from_file` iteratively for all 
 files in `/edoc/raw`. The resulting file is saved in `/edoc/selected` as `selected_master.json`. 
 
-### Analysis
+## Analysis
 
 Of the 68'345 items in `/edoc/raw`, all have a title (non-empty `title` data field),  a little more than half of the items have an abstract (37'381 items with non-empty `abstract` data field), roughly half of the items have an ID (35'355 items with non-empty `id_number` data field),[^1] and less than 10% of the items have keywords (6'660 items with non-empty `keywords` data field). The sample data set as requires all the above data fields to be non-empty; `/edoc/sample/sample_master.json` has 4'111 items and hence constitutes 6% of the raw data. 
 
@@ -152,21 +152,21 @@ Of the 68'345 items in `/edoc/raw`, all have a title (non-empty `title` data fie
 
 In order to determine how well the sample data set represents the raw Edoc data, a one-sample $\chi^2$ goodnes of fit test was conducted on each selection data field [following @Parke.2013, chapter 1]. The results indicate that the sample data proportions of items are significantly different from the raw Edoc data per department (see Figure 1 for more details).
 
-![The sample data set ($n$ = 4'111) is not representative of the raw Edoc data per department. Data field `abstract`: $\chi^2 (df=9) =$ 3'160.556, $p < 0.001$; data field `id_number`: $\chi^2 (df=9) =$ 4'209.0285, $p < 0.001$; data field `keywords`: $\chi^2 (df=9) =$ 2'314.533, $p < 0.001$. The data foundation is available at `/edoc/analysis/chi_square...` and the $\chi^2$-statistic can be calculated by calling `_Analysis.print_chi_square_fit` on the data foundation files.](images/chi_square_selection_fields.pdf)
+![The sample data set ($n$ = 4'111) is not representative of the raw Edoc data per department. Data field `abstract`: $\chi^2 (df=9) =$ 3'160.556, $p < 0.001$; data field `id_number`: $\chi^2 (df=9) =$ 4'209.0285, $p < 0.001$; data field `keywords`: $\chi^2 (df=9) =$ 2'314.533, $p < 0.001$. The data foundation is available at `/edoc/analysis/chi_square_{data field}` and the $\chi^2$-statistic can be calculated by calling `_Analysis.print_chi_square_fit` on the data foundation files.](images/chi_square_selection_fields.pdf)
 
  The sample data set is hence not representative of the raw Edoc data. This is not surprising since its construction is strongly biased. This bias has the effect that the sample data set is significantly skewed towards English journal publications in the sciences, medicine and economics from the 21st century (again, this is shown by a one-sample $\chi^2$ goodness of fit test, see Figure 2 for more details). The upshot of this analysis is that the humanities are underrepresented in the sample data set. Therefore, any results with respect to the quality of machine indexing discussed below might not be applicable to the humanities.
 
-![The sample data set ($n$ = 4'111) is significantly skewed towards English (data field `language`: $\chi^2 (df=3) =$ 1'441.414, $p < 0.001$) journal publications (data field `type`: $\chi^2 (df=10) =$ 52'519.743, $p < 0.001$) in the sciences, medicine and economics (data field `department`: $\chi^2 (df=9) =$ 14'447.276, $p < 0.001$) from the 21st century (data field `date`: $\chi^2 (df=7) =$ 35'878.493, $p < 0.001$) as compared to the raw Edoc data. The data foundation is available at `/edoc/analysis/chi_square...` and the $\chi^2$-statistic can be calculated by calling `_Analysis.print_chi_square_fit` on the data foundation files.](images/raw_sample_analysis.pdf)
+![The sample data set ($n$ = 4'111) is significantly skewed towards English (data field `language`: $\chi^2 (df=3) =$ 1'441.414, $p < 0.001$) journal publications (data field `type`: $\chi^2 (df=10) =$ 52'519.743, $p < 0.001$) in the sciences, medicine and economics (data field `department`: $\chi^2 (df=9) =$ 14'447.276, $p < 0.001$) from the 21st century (data field `date`: $\chi^2 (df=7) =$ 35'878.493, $p < 0.001$) as compared to the raw Edoc data. The data foundation is available at `/edoc/analysis/chi_square_{data field}` and the $\chi^2$-statistic can be calculated by calling `_Analysis.print_chi_square_fit` on the data foundation files.](images/raw_sample_analysis.pdf)
 
-## Machine indexing
+# Machine indexing
 
-### General overview
+## General overview
 !! Give an overview over machine indexing.
 
-### Annif
+## Annif
 !! Given an intro to Annif. Explain that we are using the out of the box version
 
-### Implementation
+## Implementation
 
 As explained above, for the prototype we will use the out
 
@@ -180,12 +180,12 @@ In addition to the already used algorithms we should also try https://ai.finto.f
  ://edoc.unibas.ch/79633/` + `1/` + `2020_18_Informed by wet feet_How do floods affect property prices.pdf` to get
   `https://edoc.unibas.ch/79633/1/2020_18_Informed by wet feet_How do floods affect property prices.pdf`
 
-## Gold standard
+# Gold standard
 
 In this chapter I will construct two distinct gold standards in order to assess the quality of machine indexing the sample data set with Annif.  
 !! Say something about assessments of Annif that have already been carried out.
 
-### Definition
+## Definition
 
 The most common approach for assessing the output of machine indexing is by systematically comparing it with a gold standard (sometimes also referred to as model or reference). @Golub.2016 [p. 10]  define a gold standard as "a collection in which each document is assigned a set of [subject terms] that is assumed to be complete and correct" where "_complete_ means that all subjects that should be assigned to a document are in fact assigned, and _correct_ means
 that there are no subjects assigned that are irrelevant to the content". Put inversely, if an item in the gold standard lacks subject terms describing its content, the assignment is not complete; and if an item in the gold standard has been assigned subject terms that are not relevant to its content, the assignment is not correct. 
@@ -194,7 +194,7 @@ A gold standard is usually the product of manual indexing by "information expert
 
 There are other methods for assessing machine indexing quality besides comparison with a gold standard that are worth mentioning. These include an evaluation in the context of indexing workflows [@Golub.2016, p. 13ff.], the assessment of retrieval performance [@Golub.2016, p. 15-23.], and so-called model free assessments [@Louis.2013]. 
 
-### Native gold standard
+## Native gold standard
 
 The construction of the native gold standard takes x steps:
 
@@ -206,7 +206,7 @@ The intended output of this transformation process is...
 
 These steps are explained in more detail in what follows.
 
-#### Extract keywords
+### Extract keywords
 
 In a first step, the keywords must be extracted from the sample data set `/sample/sample_master.json`. Recall that we mandated a non-empty `keywords` data field for an item to be selected from the raw Edoc data (see [subsection "Selection"](#selection)). We can thus simply copy the information in the `keywords` data field on a per item basis. To do this, we call `_Keywords.extract_keywords` with the sample data set as argument and save the output as `keywords/keywords_extracted.json` like so:
 
@@ -215,7 +215,7 @@ keywords = _Keywords.extract_keywords(DIR + "/sample/sample_master.json")
 _Utility.save_json(keywords, DIR + "/keywords/keywords_extracted.json")
 ~~~~
 
-#### Clean keywords
+### Clean keywords
 
 In second step, a list of all single keywords must be created. In order to do so, let us consider now in more detail the exact information extracted from the `keywords` data fields as per `/keywords/keywords_extracted.json`. In Edoc, the `keywords` data field of an item is a non-mandatory free text field that is filled in by the user (usually one of the authors) who undertakes the data entry of an item to Edoc. Even though the Edoc user manual specifies that keywords must be separated by commas [@UniversitatBasel.2021, p. 8], this requirement is neither validated by the input mask nor by an administrator of Edoc. Furthermore, neither the manual nor the input mask provide a definition of the term "keyword". A vocabulary or a list of vocabularies from which to choose the keywords is also lacking. Taken together, these observations are indicative of very heterogeneous data in the `keywords` data field. To wit, the items of `/keywords/keywords_extracted.json` are strings where single keywords are individuated by any symbols the user saw fit. So, for each item in `/keywords/keywords_extracted.json`, the user input must be parsed into single keywords. 
 
@@ -229,7 +229,7 @@ keywords_clean = _Keywords.clean_keywords(keywords_extracted)
 _Utility.save_json(keywords_clean, DIR + "keywords/keywords_clean.json")
 ~~~~
 
-#### Analysis
+### Analysis
 
 `/keywords/keywords_clean.json` has 36'901 entries many of which are duplicates. We hence deduplicate and count the number of occurrences of each keyword. This is achieved by calling `_Keywords.make_histogram` on `/keywords/keywords_clean.json` and saving the output as `/keywords/keywords_clean_histogram.json`:
 
@@ -253,7 +253,7 @@ _Utility.save_json(keywords_counted, DIR + "/analysis/keywords_counted.json")
 
 The median number of keywords for an item in the sample data set is 6 with an IQR of 4 (min = 0, Q1 = 4, M = 6, Q3 = 8, max = 87).  Of course, items in the sample data set with a number of keywords below the first and above the third quartile are highly suspect from a qualitative point of view: when it comes to subject indexing, some terms are required, but more is usually worse [!! source]. Items with too few or too many keywords will be discussed in more detail in section [section Assessment](#assessment)
 
-#### Reconciliation
+### Reconciliation
 
 As explained in section X, Annif assigns index terms from a controlled vocabulary. If we want to assess the quality of the indexing via a gold standard, we must therefore ensure that the gold standard makes use of the vocabulary used by Annif. As seen in section Y, the relevant (English) vocabularies are Wikidata YSO. The next step in constructing the native gold standard is hence to match the extracted and cleaned keywords with keywords from YSO and Wikidata. This process is called "reconciliation" (see https://docs.openrefine.org/manual/reconciling) and the tool of choice for this task is OpenRefine (see [section OpenRefine](#openrefine)). 
 
@@ -281,22 +281,22 @@ Finally, consider the distribution of the cleaned and reconciled keywords per it
 
 ![The distribution of keywords per item in the Edoc sample data set. The leftmost boxplot shows the distribution of cleaned keywords (min = 0, Q1 = 4, M = 6, Q3 = 8, max = 87); the other boxplots show the distribution of cleaned keywords with reconciled QID (min = 0, Q1 = 2, M = 4, Q3 = 6, max = 80), MeSH ID (min = Q1 = 0, M = 2, Q3 = 4, max = 63), and YSO ID respectively (min = Q1 = 0, M = 1, Q3 = 2, max = 46). All four distributions are similarly consistent, but there is a linear shrinkage of the center leaving MeSH and YSO with potentially too few descriptors to represent an adequate indexing.](images/keywords_counted.pdf)
 
-#### Discussion
+### Discussion
 
 Let us now turn to the evaluation of the reconciliation: how many of the suggestions were correct? This question was answered via random sampling [following @Roth.1993, pp. 204-225]. The random sample ($n=500$) was created by calling `_Analysis.make_random_sample` on `/keywords/reference_keywords_master.json`; it is available at `/analysis/random_keywords.json`. The sample was then imported into OpenRefine and the judgement (1 for correct, 0 for incorrect) of the manual verification was recorded in the column `verification`. The data was then exported and is available at `/analysis/random_keywords_verified.csv`. 
 
 An analysis of this data shows that 53% of the suggestions in the random sample were correct with a 95% confidence interval of 48.8% to 57.3%. We can therefore conclude that 8'507 $\pm$ 692.1 of the 16'050 keywords in `/keywords/reference_keywords.json` have correct suggestions. Note that of the 235 incorrect suggestions in the random sample, 188 were incorrect by default because they were missing a QID; the share of non-empty yet incorrect suggestions is only 9.4% in the random sample meaning that the quality of the reconciliation is not as disappointing as it might seem at first glance.
 
-### Foreign gold standard
+## Foreign gold standard
 
 - !! Explain MeSH
 - !! Explain how to get MeSH for subset of sample data set
 
-## Assessment
+# Assessment
 
 In this chapter I will assess the quality of the sample data set's indexing with Annif based on the native and foreign gold standards. 
 
-### Precision, recall, F1-score
+## Precision, recall, F1-score
 
 The metrics used for the assessment are precision, recall and F1-score. Precision and recall are standard metrics for indexing quality [e.g., @Gantert.2016, p. 197] whereby the F1 score plays are more prominent role in the assessment of machine indexing [e.g., @Suominen.2018, pp. 11-14; @Toepfer.2016, p. 93f.]. Of course, there is a host of alternative metrics (such as indexing consistency, transparency, reproducability) that are neglected here.
 
@@ -314,7 +314,7 @@ Let us briefly look at the definitions and motivations of the chosen metrics. Re
 \label{tab:confusion-matrix}
 \end{table}
 
-#### Precision
+### Precision
 
 "Precision" is the fraction of the correctly suggested subject terms; a suggestion is correct if and only if it is in the native gold standard: 
 
@@ -324,7 +324,7 @@ $\text{Precision} = \displaystyle \frac{\text{True positive}}{\text{True positiv
 
 Or put as question: what fraction of the subject terms suggested by Annif are also in the native gold standard?
 
-#### Recall
+### Recall
 
 "Recall" is the fraction of correct subject terms out of all correct subject terms:
 
@@ -334,7 +334,7 @@ $\text{Recall} = \displaystyle \frac{\text{True positive}}{\text{True positive} 
 
 Put as question: what fraction of the subject terms in the gold standard were suggested by Annif?
 
-#### F1-score
+### F1-score
 
 The F1-score is the harmonic mean between precision and recall:
 
@@ -342,15 +342,15 @@ The F1-score is the harmonic mean between precision and recall:
 $\text{F1} = \displaystyle 2 * \frac{\text{Precision} * \text{Recall}}{\text{Precision} + \text{Recall}}$
 \end{center}
 
-#### Implementation
+### Implementation
 
 The above scoring metrics were implemented using the scikit-learn machine learning library [@Pedregosa.2011]. For a given Annif configuration ([section "Annif versus native gold standard"](#annif-versus-native-gold-standard))... [perhaps explain how it is done, important to mention transformation of multilabel to binary]. Note that while 
 
-### Annif versus native gold standard
+## Annif versus native gold standard
 
 In this section, I will assess the performance of Annif versus the native gold standard.
 
-#### Creating the data foundation
+### Creating the data foundation
 
 I will now describe how the data foundation for the assessment was created. There are three parameters that need to be distinguished (see [section "Annif"](#annif)):
 
@@ -370,7 +370,7 @@ _Analysis.super_make_metrics(DIR + "/indexed/indexed_master_mesh_enriched.json")
 
 Note that the data foundation includes additional information, namely the sample size and the raw values for the confusion matrix. The sample size is a histogram of each instance in which a value in the confusion matrix was computed, that is, each case in which either Annif or the native gold standard assigned a subject term. Finally, note that if an item in the Edoc sample data set had an empty native gold standard, no score was computed; this is the case exactly if none of the cleaned keywords had been matched to Wikidata or YSO respectively. Configurations with a Wikidata vocabulary had a scoring coverage of 94.38% of the items in the sample data set as compared to only 62.84% for configurations with a YSO vocabulary.
 
-#### General results
+### General results
 
 In this section I will discuss the general results of assessing the performance of the 100 Annif configurations versus the native gold standard with respect to the Edoc sample data set.
 
@@ -398,7 +398,7 @@ _Analysis.super_make_metrics(file_path=DIR + "/indexed/indexed_master_mesh_enric
 construcht all stats for metrics:
 _Analysis.super_make_stats()
 
-#### Departments
+### Departments
 
 I had noted in section X as caveat that the performance of Annif might vary according to department due to systematic biases in constructing the Edoc sample data set. It might therefore be illuminating to assess the performance of the various Annif configurations per department. Since the Edoc `department` data field is mandatory, the sample data set is partioned into blocks of departments by default. We can thus create a data foundation for each such block by calling `_Analysis.super_make_metrics` with a departmental parameter:
 
@@ -416,32 +416,30 @@ Let us now look at the results. For each department, we are interested in the hi
 
 ![Distribution of weighted F1-scores for all Annif configurations per department.](images/metrics_dept_distribution.pdf)
 
-#### YSO configurations
+### YSO configurations
 
-#### Wikidata configurations
+### Wikidata configurations
 
-### Annif versus foreign gold standard
+## Annif versus foreign gold standard
 
 !! but to do this we would first have to map the annif suggested terms to mesh...! yes.
 
-### Digression: truth-conditions for indexing
+## Digression: truth-conditions for indexing
 (Correspondence theory of indexing: subject term T fits text X iff text X is about T)
-### Targets
+## Targets
 !! Find out what I meant here.
 
-### Analysis
+## Analysis
 
 ## Discussion
 
-# Outlook
+# Outlook and conclusion
 
 ## Refinement
 
 ## Implementation strategy
 
 ## Other use cases
-
-# Conclusion
 
 !! Clean up: rename `/indexed/indexed_master_mesh_enriched.json` to `/indexed/master_final.json` or something short.
 
