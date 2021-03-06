@@ -374,19 +374,27 @@ Note that the data foundation includes additional information, namely the sample
 
 In this section I will discuss the general results of assessing the performance of the 100 Annif configurations versus the native gold standard with respect to the Edoc sample data set.
 
-Let us first consider overall performance. Here the most remarkable result is that Wikidata configurations outperformed YSO configurations (see Figure X). However, the explanation of this effect is not evident. The two main explanatory hypotheses are 1. that the suggestions by the Wikidata configurations are more salient, or 2. that the native gold standard is biased towards Wikidata due to its higher coverage of QIDs as compared to YSO IDs. By contrast, the Wikidata configurations are more productive than the YSO configurations, and the reason for this effect is the higher coverage of QIDs as compared to YSO IDs (see Figure Y). By "productivity" I mean that the absolute number of assigned subject terms. So Wikidata configurations are not only qualitatively but also quantitatively superior to YSO configurations. 
+![Distribution of weighted F1-scores per class of project of Annif configuration (left) and per class of text basis of Annif configuration (right). `wikidata` (min = 0.239, Q1 = 0.355, M = 0.415, Q3 = 0.492, max = 0.517) outperforms any YSO configuration. `yso-bonsai-en`, `yso-en` and `yso-fasttext-en` are on par (min = 0.169, Q1 = 0.218, M = 0.312, Q3 = 0.414, max = 0.496) and slightly outperformed by the more consistent `yso-maui-en` (min = 0.171, Q1 = 0.250, M = 0.327, Q3 = 0.407, max = 0.496). Surprisingly, the performance of configurations based on titles (min = 0.169, Q1 = 0.250, M = 0.345, Q3 = 0.424, max = 0.517) was marginally better than the performance of configurations based on titles and abstracts (min = 0.169, Q1 = 0.242, M = 0.337, Q3 = 0.424, max = 0.517).](images/metrics_all_project+abstract.pdf)
 
-![Distribution of weighted F1-scores per class of algorithm (left) and per class of text basis (right). Figure X.](images/metrics_all_project+abstract.pdf)
+Let us first consider overall performance. Here the most remarkable result is that Wikidata configurations outperformed YSO configurations (see Figure 6, left). However, the explanation of this effect is not evident. The two main explanatory hypotheses are 1. that the suggestions by the Wikidata configurations are more salient, or 2. that the native gold standard is biased towards Wikidata due to its higher coverage of QIDs as compared to YSO IDs. By contrast, the Wikidata configurations are more productive than the YSO configurations, and the reason for this effect is the higher coverage of QIDs as compared to YSO IDs (see Figure 7). By "productivity" I mean that the absolute number of assigned subject terms. So Wikidata configurations are not only qualitatively but also quantitatively superior to YSO configurations. 
 
-![The distribution of cumulative sample size per class of Annif configuration. Figure Y](images/metrics_all_productivity.pdf)
+![The distribution of cumulative sample size per project class of Annif configuration. Wikidata configurations (min = 28'618, Q1 = 29'912, M = 35'121, Q3 = 42'439, max = 48'776) are more productive than YSO configurations (min = 9'878, Q1 = 12'546, M = 16'710, Q3 = 22'694, max = 27'354).](images/metrics_all_productivity.pdf)
 
-Furthermore, the four YSO configurations are more or less on par: the `yso-bonsai-en`, `yso-en`, and `yso-fasttext-en` configurations perform very similarily and are slightly outperformed by `yso-maui-en`. 
+Furthermore, the four YSO configurations are more or less on par: the `yso-bonsai-en`, `yso-en`, and `yso-fasttext-en` configurations perform very similarily and are slightly outperformed by `yso-maui-en` (see Figure 6, left). 
+
+A surprising find is that there was no performance gain achieved by increasing the text basis from titles to titles and abstracts (see section X): if anything, the performance for the extended text basis was slightly worse (see Figure 6, right).
+
+Figure Z.
+
+![Distribution of weighted F1-scores per maximum number of suggestions 0 < n <11. Figure Z](images/metrics_all_n.pdf)
+
+Talk about top configurations.
 
 ![The top 20 Annif configurations (according to F1-score).](images/metrics_f1_top20.pdf)
 
 
 
-![Distribution of weighted F1-scores per maximum number of suggestions 0 < n <11.](images/metrics_all_n.pdf)
+
 
 
 

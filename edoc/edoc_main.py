@@ -884,7 +884,6 @@ class _Analysis:
 
         _Utility.save_json(stats, DIR + "/analysis/metrics.json")
 
-
 exit()
 
 for dept in _Data.get_departments():
