@@ -279,7 +279,7 @@ _Utility.save_json(keywords_histogram, DIR + "keywords/keywords_reference_master
 
 Finally, consider the distribution of the cleaned and reconciled keywords per item in the Edoc sample data set. The corresponding data is generated with `_Keywords.make_count` as described in [subsection Analysis](#analysis) above and available as `/analysis/keywords_counted.json`. Figure 5 shows that the median number of keywords from MeSH or YSO might be too low to be adequate. This problem can be amended by imposing further constraints on the sample data set and such a solution is discussed in section [!! section].
 
-![The distribution of keywords per item in the Edoc sample data set. The leftmost boxplot shows the distribution of cleaned keywords (min = 0, Q1 = 4, M = 6, Q3 = 8, max = 87); the other boxplots show the distribution of cleaned keywords with reconciled QID (min = 0, Q1 = 2, M = 4, Q3 = 6, max = 80), MeSH ID (min = Q1 = 0, M = 2, Q3 = 4, max = 63), and YSO ID respectively (min = Q1 = 0, M = 1, Q3 = 2, max = 46). All four distributions are similarly consistent, but there is a linear shrinkage of the center leaving MeSH and YSO with potentially too few descriptors to represent an adequate indexing.](images/keywords_counted.pdf)
+![The distribution of keywords per item in the Edoc sample data set. The leftmost boxplot shows the distribution of cleaned keywords (min = 0, Q1 = 4, M = 6, Q3 = 8, max = 87); the other boxplots show the distribution of cleaned keywords with reconciled QID (min = 0, Q1 = 2, M = 4, Q3 = 6, max = 80), MeSH ID (min = Q1 = 0, M = 2, Q3 = 4, max = 63), and YSO ID respectively (min = Q1 = 0, M = 1, Q3 = 2, max = 46). All four distributions are similarly consistent, but there is a linear decrease of the distribution's center leaving MeSH and YSO with potentially too few descriptors to represent an adequate indexing.](images/keywords_counted.pdf)
 
 ### Discussion
 
@@ -298,7 +298,7 @@ In this chapter I will assess the quality of the sample data set's indexing with
 
 ## Precision, recall, F1-score
 
-The metrics used for the assessment are precision, recall and F1-score. Precision and recall are standard metrics for indexing quality [e.g., @Gantert.2016, p. 197] whereby the F1 score plays are more prominent role in the assessment of machine indexing [e.g., @Suominen.2018, pp. 11-14; @Toepfer.2016, p. 93f.]. Of course, there is a host of alternative metrics (such as indexing consistency, transparency, reproducability) that are neglected here.
+The metrics used for the assessment are precision, recall and F1-score. Precision and recall are standard metrics for indexing quality [e.g., @Gantert.2016, p. 197] whereby the F1 score plays are more prominent role in the assessment of machine indexing [e.g., @Suominen.2019, pp. 11-14; @Toepfer.2016, p. 93f.]. Of course, there is a host of alternative metrics (such as indexing consistency, transparency, reproducability) that are neglected here.
 
 Let us briefly look at the definitions and motivations of the chosen metrics. Remember that a suggestion of a subject term is correct if and only if the subject term is in the native gold standard. The possible outcomes are summarized in Table 1.
 
@@ -372,78 +372,70 @@ Note that the data foundation includes additional information, namely the sample
 
 ### General results
 
-In this section I will discuss the general results of assessing the performance of the 100 Annif configurations versus the native gold standard with respect to the Edoc sample data set.
+In this section I will discuss the general results of assessing the performance of the 100 Annif configurations versus the native gold standard with respect to the Edoc sample data set. The data foundation is available at `/analysis/metrics.json`.
 
 ![Distribution of weighted F1-scores per class of project of Annif configuration (left) and per class of text basis of Annif configuration (right). `wikidata` (min = 0.239, Q1 = 0.355, M = 0.415, Q3 = 0.492, max = 0.517) outperforms any YSO configuration. `yso-bonsai-en`, `yso-en` and `yso-fasttext-en` are on par (min = 0.169, Q1 = 0.218, M = 0.312, Q3 = 0.414, max = 0.496) and slightly outperformed by the more consistent `yso-maui-en` (min = 0.171, Q1 = 0.250, M = 0.327, Q3 = 0.407, max = 0.496). Surprisingly, the performance of configurations based on titles (min = 0.169, Q1 = 0.250, M = 0.345, Q3 = 0.424, max = 0.517) was marginally better than the performance of configurations based on titles and abstracts (min = 0.169, Q1 = 0.242, M = 0.337, Q3 = 0.424, max = 0.517).](images/metrics_all_project+abstract.pdf)
 
-Let us first consider overall performance. Here the most remarkable result is that Wikidata configurations outperformed YSO configurations (see Figure 6, left). However, the explanation of this effect is not evident. The two main explanatory hypotheses are 1. that the suggestions by the Wikidata configurations are more salient, or 2. that the native gold standard is biased towards Wikidata due to its higher coverage of QIDs as compared to YSO IDs. By contrast, the Wikidata configurations are more productive than the YSO configurations, and the reason for this effect is the higher coverage of QIDs as compared to YSO IDs (see Figure 7). By "productivity" I mean that the absolute number of assigned subject terms. So Wikidata configurations are not only qualitatively but also quantitatively superior to YSO configurations. 
+Let us first consider overall performance. Here the most striking result is that Wikidata configurations outperformed YSO configurations (see Figure 6, left). However, the explanation of this effect is not evident. The two main explanatory hypotheses are 1. that the suggestions by the Wikidata configurations are more salient, or 2. that the native gold standard is biased towards Wikidata due to its higher coverage of QIDs as compared to YSO IDs. By contrast, the Wikidata configurations are more productive than the YSO configurations, and the reason for this effect is the higher coverage of QIDs as compared to YSO IDs (see Figure 7). By "productivity" I mean that the absolute number of assigned subject terms. So Wikidata configurations are not only qualitatively but also quantitatively superior to YSO configurations. 
 
 ![The distribution of cumulative sample size per project class of Annif configuration. Wikidata configurations (min = 28'618, Q1 = 29'912, M = 35'121, Q3 = 42'439, max = 48'776) are more productive than YSO configurations (min = 9'878, Q1 = 12'546, M = 16'710, Q3 = 22'694, max = 27'354).](images/metrics_all_productivity.pdf)
 
-Furthermore, the four YSO configurations are more or less on par: the `yso-bonsai-en`, `yso-en`, and `yso-fasttext-en` configurations perform very similarily and are slightly outperformed by `yso-maui-en` (see Figure 6, left). 
+Furthermore, the four YSO configurations are more or less on par: the `yso-bonsai-en`, `yso-en`, and `yso-fasttext-en` configurations perform very similarly and are slightly outperformed by `yso-maui-en` (see Figure 6, left). This result is consistent with other assessments reporting that "[o]f the individual algorithms, Maui performed best on all corpora" [@Suominen.2019, p. 13].
 
-A surprising find is that there was no performance gain achieved by increasing the text basis from titles to titles and abstracts (see section X): if anything, the performance for the extended text basis was slightly worse (see Figure 6, right).
+A surprising result is that there was no performance gain achieved by increasing the text basis from titles to titles and abstracts (see [section "Creating the data foundation"](#creating-the-data-foundation): if anything, the performance for the extended text basis was slightly worse (see Figure 6, right). There is again no easy explanation for this find since there are multiple plausible causes which cannot be distangled here. For example, the abstract of an item in the Edoc sample data set might be less representative of the item's content than its title. In that case, the observed worse perfomance of the Annif configurations based on title and abstracts would even be expected. Alternatively, it might be the case that the problem lies with Annif: a larger text basis introduces more confounding factors and might make it harder to extract the subject terms required. An experimentum crucis to decide between the two discussed explanations would be to further extend the text basis to include full texts in addition to titles and abstracts.
 
-Figure Z.
+![Distribution of weighted F1-scores per maximum number of suggestions 1 $\leq$ n $\leq$ 10. See Table 2 for numeric values. n = 2 is the best perfomring type of configuration. However, it is outperformed by n = 4 and n = 5 token configurations. The distribution of the distributions is skewed left. Types of configurations with a smaller maximum number of suggestions display a more consistent performance.](images/metrics_all_n.pdf)
 
-![Distribution of weighted F1-scores per maximum number of suggestions 0 < n <11. Figure Z](images/metrics_all_n.pdf)
+\begin{table}[]
+\begin{tabular}{lllllllllll}
+    & n=1   & n=2   & n=3   & n=4   & n=5   & n=6   & n=7   & n=8   & n=9   & n=10  \\ \hline
+min & 0.239 & 0.403 & 0.454 & 0.391 & 0.336 & 0.289 & 0.250 & 0.218 & 0.192 & 0.169 \\
+Q1  & 0.407 & 0.491 & 0.454 & 0.391 & 0.336 & 0.289 & 0.250 & 0.218 & 0.192 & 0.169 \\
+M   & 0.414 & 0.496 & 0.454 & 0.391 & 0.336 & 0.289 & 0.250 & 0.218 & 0.192 & 0.169 \\
+Q3  & 0.414 & 0.496 & 0.456 & 0.400 & 0.351 & 0.309 & 0.277 & 0.251 & 0.231 & 0.215 \\
+max & 0.414 & 0.496 & 0.492 & 0.517 & 0.503 & 0.467 & 0.427 & 0.389 & 0.355 & 0.324
+\end{tabular}
+\caption{Distribution of weighted F1-scores per maximum number of suggestions 1 $\leq$ n $\leq$ 10.}
+\label{tab:max-number}
+\end{table}
 
-Talk about top configurations.
+Let us turn to the parameter of the maximum number of suggestions per item in the Edoc sample data set (see Figure 8). Here the best performance was achieved by a token n = 4 configuration. However, the type n = 4 configuration performed on average significantly worse than the type n = 3 and type n = 2 configurations. So with respect to the maximum number of suggestions, there is a discrepancy between the best performing token configuration and the best performing type of configuration. This distinction is important: when choosing a configuration for the purpose of a production system, we are usually interested in the best token configuration. The top 20 token configurations are summarized in Figure 9. The best performing configuration with a weighted F1-score of 0.517 is `wikidata-en` with a maximum number of 4 suggestions per item; the text basis (title or abstract and title) does not matter.
 
 ![The top 20 Annif configurations (according to F1-score).](images/metrics_f1_top20.pdf)
 
+### Results by department
 
+In [section "General results"](#general-results) I have identified and discussed the overall best Annif configerations. However, in [section "Analysis"](#analysis)) I had also noted the caveat that the performance of Annif might vary according to department due to systematic biases in constructing the Edoc sample data set. In this section I will therefore assess the performance of the various Annif configurations per department. 
 
-
-
-
-
-we can then discuss whether the best performance is actually useful; perhaps do this by comparing absolute scores with other assessments. if results are much lower it is to be suspected that the native gold standard is not very good (i.e., that the measure we use to judge annif performance is inadequte => motivation for foreign standard)
-
-construct all metrics:
-_Analysis.super_make_metrics(file_path=DIR + "/indexed/indexed_master_mesh_enriched.json")
-
-construcht all stats for metrics:
-_Analysis.super_make_stats()
-
-### Departments
-
-I had noted in section X as caveat that the performance of Annif might vary according to department due to systematic biases in constructing the Edoc sample data set. It might therefore be illuminating to assess the performance of the various Annif configurations per department. Since the Edoc `department` data field is mandatory, the sample data set is partioned into blocks of departments by default. We can thus create a data foundation for each such block by calling `_Analysis.super_make_metrics` with a departmental parameter:
+We begin again by constructing the data foundation. Since the Edoc `department` data field is mandatory, the sample data set is partitioned into blocks of departments by default. We can thus create a data foundation for each such block by calling `_Analysis.super_make_metrics` with a departmental parameter:
 
 ~~~~{.Python caption="make_metrics_department"}
 for dept in _Data.get_departments():
     _Analysis.super_make_metrics(DIR + "/indexed/indexed_master_mesh_enriched.json", deparment=dept)
 ~~~~
 
-This yields 1000 files in `/metrics/metrics_{department}_{marker}.json` (100 configurations $*$ 10 departments) where `department` specifies the department according to the Edoc convention. 
-
-Let us now look at the results. For each department, we are interested in the highest weighted F1-score and the corresponding configuration as summarized in Figure X.
-
-![Best performing Annif configuration (according to weighted F1-score) per department.](images/metrics_dept_summary.pdf)
-
+This yields 1000 files in `/metrics/metrics_{department}_{marker}.json` (100 configurations $*$ 10 departments) where `department` specifies the department according to the Edoc convention. The data foundation is summarized in `/analysis/metrics.json`.
 
 ![Distribution of weighted F1-scores for all Annif configurations per department.](images/metrics_dept_distribution.pdf)
 
-### YSO configurations
+Let us now look at the results. First consider the distribution of the performance scores across departments as shown in Figure 11. We can see that there are striking differences in variability between departments. The departments with the most consistent weighted F1-scores are Medicine and Central Services. However, these two departments have also the lowest maximum F1-scores. It is noteworthy that all other departments have maximum F1-scores that are well above the F1-score of 0.517 of the best performing general Annif configuration. 
 
-### Wikidata configurations
+![Best performing Annif configuration (according to weighted F1-score) per department.](images/metrics_dept_summary.pdf)
+
+Let us now consider the best performing Annif configurations per department as summarized in Figure 12.
+
+
+For each department, we are interested in the highest weighted F1-score and the corresponding configuration as summarized in Figure X.
 
 ## Annif versus foreign gold standard
 
 !! but to do this we would first have to map the annif suggested terms to mesh...! yes.
 
-## Digression: truth-conditions for indexing
-(Correspondence theory of indexing: subject term T fits text X iff text X is about T)
-## Targets
-!! Find out what I meant here.
-
-## Analysis
-
-## Discussion
-
 # Outlook and conclusion
 
 ## Refinement
+
+- fulltext support
 
 ## Implementation strategy
 
