@@ -1,43 +1,19 @@
 \hypertarget{introduction}{%
 \section{Introduction}\label{introduction}}
 
-\hypertarget{outline}{%
-\subsection{Outline}\label{outline}}
-
 \hypertarget{method}{%
 \subsection{Method}\label{method}}
 
 !! Say something to the effect that all data and code are available on
 GitHub.
 
-\hypertarget{tools-and-configuration}{%
-\subsection{Tools and configuration}\label{tools-and-configuration}}
-
-\hypertarget{openrefine}{%
-\subsubsection{OpenRefine}\label{openrefine}}
-
-For data refinement I use OpenRefine version 3.4.1
-(https://openrefine.org/). Data manipulation in OpenRefine is tracked:
-the manipulation history of some data can be exported as JSON file and
-then reproduced (on the same data on a different machine or on different
-data) by loading said file. I will supply a corresponding manipulation
-history whenever appropriate. Note that when using OpenRefine with
-larger files (and there are many such files in this project), the memory
-allocation to OpenRefine must be manually increased (see
-https://docs.openrefine.org/manual/installing/\#increasing-memory-allocation
-for details). ALso note that OpenRefine always counts the number of
-records by the first column (a fact which caused me many headaches).
-
-\hypertarget{prototype}{%
-\section{Prototype}\label{prototype}}
-
-In this chapter, the prototype for a machine indexing of Edoc is
+!! In this chapter, the prototype for a machine indexing of Edoc is
 presented. The focus is primarily on practical implementation although
 care is taken to spell out design decisions in as much detail as is
 needed.
 
-\hypertarget{aim}{%
-\section{Aim}\label{aim}}
+\hypertarget{outline}{%
+\subsection{Outline}\label{outline}}
 
 Let us start by stating the aim of the prototype. From a functional
 perspective, the prototype takes a subset of the data from Edoc as input
@@ -61,6 +37,21 @@ to be taken:
 \end{enumerate}
 
 In the sections below, these steps will be discussed in detail.
+
+\hypertarget{tools}{%
+\subsection{Tools}\label{tools}}
+
+For data refinement I use OpenRefine version 3.4.1
+(https://openrefine.org/). Data manipulation in OpenRefine is tracked:
+the manipulation history of some data can be exported as JSON file and
+then reproduced (on the same data on a different machine or on different
+data) by loading said file. I will supply a corresponding manipulation
+history whenever appropriate. Note that when using OpenRefine with
+larger files (and there are many such files in this project), the memory
+allocation to OpenRefine must be manually increased (see
+https://docs.openrefine.org/manual/installing/\#increasing-memory-allocation
+for details). Also note that OpenRefine always counts the number of
+records by the first column (a fact which caused me many headaches).
 
 \hypertarget{edoc-data}{%
 \section{Edoc data}\label{edoc-data}}
@@ -103,8 +94,8 @@ second, \texttt{1942-2020.json} is too big to be handled by standard
 editors requiring special editors such as Oxygen. For these reasons
 \texttt{1942-2020.json} was split into smaller files that are easier
 handled and can be uploaded to GitHub. For this
-\texttt{\_Utility.split\_json} was used yielding 14 files of size 20 MB
-or less containing 5000 or fewer entries each. These files are called
+\texttt{Utility.split\_json} was used yielding 14 files of size 20 MB or
+less containing 5000 or fewer entries each. These files are called
 \texttt{raw\_master\_x-y.json} (where x and y indicate the entries as
 given by \texttt{1942-2020.json}) and saved under \texttt{/edoc/raw}.
 
@@ -203,7 +194,7 @@ employ any further restrictions. We can hence construct the sample data
 set by choosing exactly those items from \texttt{/edoc/raw} which have
 non-empty data fields \texttt{title}, \texttt{abstract},
 \texttt{id\_number}, and \texttt{keywords}. We do so by calling
-\texttt{\Data.select\_from\_file} iteratively for all files in
+\texttt{Data.select\_from\_file} iteratively for all files in
 \texttt{/edoc/raw}. The resulting file is saved in
 \texttt{/edoc/selected} as \texttt{selected\_master.json}.
 
@@ -242,8 +233,7 @@ field \texttt{keywords}: \(\chi^2 (df=9) =\) 2'314.533, \(p < 0.001\).
 The data foundation is available at
 \texttt{/edoc/analysis/chi\_square\_\{data\ field\}} and the
 \(\chi^2\)-statistic can be calculated by calling
-\texttt{\Analysis.print\_chi\_square\_fit} on the data foundation
-files.}
+\texttt{Analysis.print\_chi\_square\_fit} on the data foundation files.}
 \end{figure}
 
 The sample data set is hence not representative of the raw Edoc data.
@@ -270,8 +260,7 @@ sciences, medicine and economics (data field \texttt{department}:
 \(p < 0.001\)) as compared to the raw Edoc data. The data foundation is
 available at \texttt{/edoc/analysis/chi\_square\_\{data\ field\}} and
 the \(\chi^2\)-statistic can be calculated by calling
-\texttt{\Analysis.print\_chi\_square\_fit} on the data foundation
-files.}
+\texttt{Analysis.print\_chi\_square\_fit} on the data foundation files.}
 \end{figure}
 
 \hypertarget{machine-indexing}{%
@@ -310,10 +299,8 @@ to get
 \hypertarget{gold-standard}{%
 \section{Gold standard}\label{gold-standard}}
 
-In this chapter I will construct two distinct gold standards in order to
-assess the quality of machine indexing the sample data set with Annif.\\
-!! Say something about assessments of Annif that have already been
-carried out.
+In this section I will construct a derivative gold standard in order to
+assess the quality of machine indexing the sample data set with Annif.
 
 \hypertarget{definition}{%
 \subsection{Definition}\label{definition}}
@@ -337,14 +324,8 @@ A gold standard is usually the product of manual indexing by
 relating to objectivity and consistency of the assigned subject terms.
 Most importantly, however, the construction of a gold standard from
 scratch is very expensive. It is therefore not an option for the project
-at hand. Rather, I will construct what could be called derivative gold
-standards by reusing indexing data that is already available. Here we
-can distinguish two distinct kinds of derivative gold standards: first,
-I will construct a derivative gold standard based on the author keywords
-available in the sample data set; call this the ``native'' gold
-standard. Second, I will construct a derivative gold standard based on
-indexing metadata available in repositories distinct from Edoc; call
-this the ``foreign'' gold standard.
+at hand. Rather, I will construct what could be called a ``derivative''
+gold standard by reusing indexing data that is already available.
 
 There are other methods for assessing machine indexing quality besides
 comparison with a gold standard that are worth mentioning. These include
@@ -352,10 +333,7 @@ an evaluation in the context of indexing workflows (Golub et al. 2016,
 13ff.), the assessment of retrieval performance (Golub et al. 2016,
 15--23.), and so-called model free assessments (Louis and Nenkova 2013).
 
-\hypertarget{native-gold-standard}{%
-\subsection{Native gold standard}\label{native-gold-standard}}
-
-The construction of the native gold standard takes x steps:
+The construction of the derivative gold standard takes x steps:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -372,8 +350,9 @@ The intended output of this transformation process is\ldots{}
 
 These steps are explained in more detail in what follows.
 
-\hypertarget{extract-keywords}{%
-\subsubsection{Extract keywords}\label{extract-keywords}}
+\hypertarget{extract-and-clean-keywords}{%
+\subsection{Extract and clean
+keywords}\label{extract-and-clean-keywords}}
 
 In a first step, the keywords must be extracted from the sample data set
 \texttt{/sample/sample\_master.json}. Recall that we mandated a
@@ -381,19 +360,16 @@ non-empty \texttt{keywords} data field for an item to be selected from
 the raw Edoc data (see \protect\hyperlink{selection}{subsection
 ``Selection''}). We can thus simply copy the information in the
 \texttt{keywords} data field on a per item basis. To do this, we call
-\texttt{\Keywords.extract\_keywords} with the sample data set as
-argument and save the output as
-\texttt{keywords/keywords\_extracted.json} like so:
+\texttt{Keywords.extract\_keywords} with the sample data set as argument
+and save the output as \texttt{keywords/keywords\_extracted.json} like
+so:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{keywords }\OperatorTok{=}\NormalTok{ \Keywords.extract\_keywords(DIR }\OperatorTok{+} \StringTok{"/sample/sample\_master.json"}\NormalTok{)}
-\NormalTok{\_Utility.save\_json(keywords, DIR }\OperatorTok{+} \StringTok{"/keywords/keywords\_extracted.json"}\NormalTok{)}
+\NormalTok{keywords }\OperatorTok{=}\NormalTok{ Keywords.extract\_keywords(DIR }\OperatorTok{+} \StringTok{"/sample/sample\_master.json"}\NormalTok{)}
+\NormalTok{Utility.save\_json(keywords, DIR }\OperatorTok{+} \StringTok{"/keywords/keywords\_extracted.json"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
-
-\hypertarget{clean-keywords}{%
-\subsubsection{Clean keywords}\label{clean-keywords}}
 
 In second step, a list of all single keywords must be created. In order
 to do so, let us consider now in more detail the exact information
@@ -423,36 +399,36 @@ be broken into their component keywords and then parsed again. The
 reason for this is that Annif only assigns flat keywords and not keyword
 chains.
 
-\texttt{\Keywords.clean\_keywords} is the implementation the parser
-while the recursive cleaner is implemented by
-\texttt{\Keywords.clean\_keyword}. To create the desired list of clean
+\texttt{Keywords.clean\_keywords} is the implementation the parser while
+the recursive cleaner is implemented by
+\texttt{Keywords.clean\_keyword}. To create the desired list of clean
 keywords, saved as \texttt{/keywords/keywords\_clean.json}, we call
-\texttt{\Keywords.clean\_keywords} with the extracted keywords as
+\texttt{Keywords.clean\_keywords} with the extracted keywords as
 argument:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{keywords\_extracted }\OperatorTok{=}\NormalTok{ \_Utility.load\_json(DIR }\OperatorTok{+} \StringTok{"/keywords/keywords\_extracted.json"}\NormalTok{)}
-\NormalTok{keywords\_clean }\OperatorTok{=}\NormalTok{ \Keywords.clean\_keywords(keywords\_extracted)}
-\NormalTok{\_Utility.save\_json(keywords\_clean, DIR }\OperatorTok{+} \StringTok{"keywords/keywords\_clean.json"}\NormalTok{)}
+\NormalTok{keywords\_extracted }\OperatorTok{=}\NormalTok{ Utility.load\_json(DIR }\OperatorTok{+} \StringTok{"/keywords/keywords\_extracted.json"}\NormalTok{)}
+\NormalTok{keywords\_clean }\OperatorTok{=}\NormalTok{ Keywords.clean\_keywords(keywords\_extracted)}
+\NormalTok{Utility.save\_json(keywords\_clean, DIR }\OperatorTok{+} \StringTok{"keywords/keywords\_clean.json"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
 \hypertarget{analysis-1}{%
-\subsubsection{Analysis}\label{analysis-1}}
+\subsection{Analysis}\label{analysis-1}}
 
 \texttt{/keywords/keywords\_clean.json} has 36'901 entries many of which
 are duplicates. We hence deduplicate and count the number of occurrences
 of each keyword. This is achieved by calling
-\texttt{\Keywords.make\_histogram} on
+\texttt{Keywords.make\_histogram} on
 \texttt{/keywords/keywords\_clean.json} and saving the output as
 \texttt{/keywords/keywords\_clean\_histogram.json}:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{keywords\_clean }\OperatorTok{=}\NormalTok{ \_Utility.load\_json(DIR }\OperatorTok{+} \StringTok{"/keywords/keywords\_clean.json"}\NormalTok{)}
-\NormalTok{keywords\_histogram }\OperatorTok{=}\NormalTok{ \Keywords.make\_histogram(keywords\_clean)}
-\NormalTok{\_Utility.save\_json(keywords\_histogram, DIR }\OperatorTok{+} \StringTok{"keywords/keywords\_clean\_histogram.json"}\NormalTok{)}
+\NormalTok{keywords\_clean }\OperatorTok{=}\NormalTok{ Utility.load\_json(DIR }\OperatorTok{+} \StringTok{"/keywords/keywords\_clean.json"}\NormalTok{)}
+\NormalTok{keywords\_histogram }\OperatorTok{=}\NormalTok{ Keywords.make\_histogram(keywords\_clean)}
+\NormalTok{Utility.save\_json(keywords\_histogram, DIR }\OperatorTok{+} \StringTok{"keywords/keywords\_clean\_histogram.json"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -474,15 +450,15 @@ the total occurrences.}
 \end{figure}
 
 To analyse the spread of keywords in the sample data set, the keywords
-per item are counted. To do so, we call \texttt{\Keywords.make\_count}
-on \texttt{/indexed/indexed\_master\_mesh\_enriched.json} and save the
+per item are counted. To do so, we call \texttt{Keywords.make\_count} on
+\texttt{/indexed/indexed\_master\_mesh\_enriched.json} and save the
 output as \texttt{/analysis/keywords\_counted.json}:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{sample\_data\_set }\OperatorTok{=}\NormalTok{ \_Utility.load\_json(DIR }\OperatorTok{+} \StringTok{"/indexed/indexed\_master\_mesh\_enriched.json"}\NormalTok{)}
-\NormalTok{keywords\_counted }\OperatorTok{=}\NormalTok{ \Keywords.make\_count(sample\_data\_set)}
-\NormalTok{\_Utility.save\_json(keywords\_counted, DIR }\OperatorTok{+} \StringTok{"/analysis/keywords\_counted.json"}\NormalTok{)}
+\NormalTok{sample\_data\_set }\OperatorTok{=}\NormalTok{ Utility.load\_json(DIR }\OperatorTok{+} \StringTok{"/indexed/indexed\_master\_mesh\_enriched.json"}\NormalTok{)}
+\NormalTok{keywords\_counted }\OperatorTok{=}\NormalTok{ Keywords.make\_count(sample\_data\_set)}
+\NormalTok{Utility.save\_json(keywords\_counted, DIR }\OperatorTok{+} \StringTok{"/analysis/keywords\_counted.json"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -496,14 +472,14 @@ keywords will be discussed in more detail in section
 \protect\hyperlink{assessment}{section Assessment}
 
 \hypertarget{reconciliation}{%
-\subsubsection{Reconciliation}\label{reconciliation}}
+\subsection{Reconciliation}\label{reconciliation}}
 
 As explained in section X, Annif assigns index terms from a controlled
 vocabulary. If we want to assess the quality of the indexing via a gold
 standard, we must therefore ensure that the gold standard makes use of
 the vocabulary used by Annif. As seen in section Y, the relevant
 (English) vocabularies are Wikidata YSO. The next step in constructing
-the native gold standard is hence to match the extracted and cleaned
+the derivative gold standard is hence to match the extracted and cleaned
 keywords with keywords from YSO and Wikidata. This process is called
 ``reconciliation'' (see https://docs.openrefine.org/manual/reconciling)
 and the tool of choice for this task is OpenRefine (see
@@ -589,15 +565,15 @@ https://api.finto.fi/). For each keyword in the list of reference
 keywords that lacks a YSO identifier, the Finto API is queried; if a
 term turns up, it is added to the keyword. The effect of this second
 reconcilement is detailed in Figure 4. It is achieved by calling
-\texttt{\Keywords.enrich\_with\_yso} on
+\texttt{Keywords.enrich\_with\_yso} on
 \texttt{/keywords/keywords\_reference.json} and saving the output as
 \texttt{/keywords/keywords\_reference\_master.json}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{keywords\_reference }\OperatorTok{=}\NormalTok{ \_Utility.load\_json(DIR }\OperatorTok{+} \StringTok{"/keywords/keywords\_reference.json"}\NormalTok{)}
-\NormalTok{keywords\_reference\_new }\OperatorTok{=}\NormalTok{ \Keywords.enrich\_with\_yso(keywords\_reference)}
-\NormalTok{\_Utility.save\_json(keywords\_histogram, DIR }\OperatorTok{+} \StringTok{"keywords/keywords\_reference\_master.json"}\NormalTok{)}
+\NormalTok{keywords\_reference }\OperatorTok{=}\NormalTok{ Utility.load\_json(DIR }\OperatorTok{+} \StringTok{"/keywords/keywords\_reference.json"}\NormalTok{)}
+\NormalTok{keywords\_reference\_new }\OperatorTok{=}\NormalTok{ Keywords.enrich\_with\_yso(keywords\_reference)}
+\NormalTok{Utility.save\_json(keywords\_histogram, DIR }\OperatorTok{+} \StringTok{"keywords/keywords\_reference\_master.json"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -616,7 +592,7 @@ Wikidata.}
 
 Finally, consider the distribution of the cleaned and reconciled
 keywords per item in the Edoc sample data set. The corresponding data is
-generated with \texttt{\Keywords.make\_count} as described in
+generated with \texttt{Keywords.make\_count} as described in
 \protect\hyperlink{analysis}{subsection Analysis} above and available as
 \texttt{/analysis/keywords\_counted.json}. Figure 5 shows that the
 median number of keywords from MeSH or YSO might be too low to be
@@ -639,13 +615,13 @@ potentially too few descriptors to represent an adequate indexing.}
 \end{figure}
 
 \hypertarget{discussion}{%
-\subsubsection{Discussion}\label{discussion}}
+\subsection{Discussion}\label{discussion}}
 
 Let us now turn to the evaluation of the reconciliation: how many of the
 suggestions were correct? This question was answered via random sampling
 (following Roth and Heidenreich 1993, 204--25). The random sample
 (\(n=500\)) was created by calling
-\texttt{\Analysis.make\_random\_sample} on
+\texttt{Analysis.make\_random\_sample} on
 \texttt{/keywords/reference\_keywords\_master.json}; it is available at
 \texttt{/analysis/random\_keywords.json}. The sample was then imported
 into OpenRefine and the judgement (1 for correct, 0 for incorrect) of
@@ -663,22 +639,11 @@ the share of non-empty yet incorrect suggestions is only 9.4\% in the
 random sample meaning that the quality of the reconciliation is not as
 disappointing as it might seem at first glance.
 
-\hypertarget{foreign-gold-standard}{%
-\subsection{Foreign gold standard}\label{foreign-gold-standard}}
-
-\begin{itemize}
-\tightlist
-\item
-  !! Explain MeSH
-\item
-  !! Explain how to get MeSH for subset of sample data set
-\end{itemize}
-
 \hypertarget{assessment}{%
 \section{Assessment}\label{assessment}}
 
-In this chapter I will assess the quality of the sample data set's
-indexing with Annif based on the native and foreign gold standards.
+In this section I will assess the quality of the sample data set's
+indexing with Annif based on the gold standard.
 
 \hypertarget{precision-recall-f1-score}{%
 \subsection{Precision, recall,
@@ -694,8 +659,8 @@ neglected here.
 
 Let us briefly look at the definitions and motivations of the chosen
 metrics. Remember that a suggestion of a subject term is correct if and
-only if the subject term is in the native gold standard. The possible
-outcomes are summarized in Table 1.
+only if the subject term is in the derivative gold standard. The
+possible outcomes are summarized in Table 1.
 
 \begin{table}[h]
 \centering
@@ -709,11 +674,8 @@ outcomes are summarized in Table 1.
 \label{tab:confusion-matrix}
 \end{table}
 
-\hypertarget{precision}{%
-\subsubsection{Precision}\label{precision}}
-
 ``Precision'' is the fraction of the correctly suggested subject terms;
-a suggestion is correct if and only if it is in the native gold
+a suggestion is correct if and only if it is in the derivative gold
 standard:
 
 \begin{center} 
@@ -721,10 +683,7 @@ $\text{Precision} = \displaystyle \frac{\text{True positive}}{\text{True positiv
 \end{center}
 
 Or put as question: what fraction of the subject terms suggested by
-Annif are also in the native gold standard?
-
-\hypertarget{recall}{%
-\subsubsection{Recall}\label{recall}}
+Annif are also in the derivative gold standard?
 
 ``Recall'' is the fraction of correct subject terms out of all correct
 subject terms:
@@ -736,35 +695,22 @@ $\text{Recall} = \displaystyle \frac{\text{True positive}}{\text{True positive} 
 Put as question: what fraction of the subject terms in the gold standard
 were suggested by Annif?
 
-\hypertarget{f1-score}{%
-\subsubsection{F1-score}\label{f1-score}}
-
 The F1-score is the harmonic mean between precision and recall:
 
 \begin{center} 
 $\text{F1} = \displaystyle 2 * \frac{\text{Precision} * \text{Recall}}{\text{Precision} + \text{Recall}}$
 \end{center}
 
-\hypertarget{implementation-1}{%
-\subsubsection{Implementation}\label{implementation-1}}
-
 The above scoring metrics were implemented using the scikit-learn
 machine learning library (Pedregosa et al. 2011). For a given Annif
 configuration
-(\protect\hyperlink{annif-versus-native-gold-standard}{section ``Annif
-versus native gold standard''})\ldots{} {[}perhaps explain how it is
-done, important to mention transformation of multilabel to binary{]}.
-Note that while
-
-\hypertarget{annif-versus-native-gold-standard}{%
-\subsection{Annif versus native gold
-standard}\label{annif-versus-native-gold-standard}}
-
-In this section, I will assess the performance of Annif versus the
-native gold standard.
+(\protect\hyperlink{annif-versus-derivative-gold-standard}{section
+``Annif versus derivative gold standard''})\ldots{} {[}perhaps explain
+how it is done, important to mention transformation of multilabel to
+binary{]}.
 
 \hypertarget{creating-the-data-foundation}{%
-\subsubsection{Creating the data
+\subsection{Creating the data
 foundation}\label{creating-the-data-foundation}}
 
 I will now describe how the data foundation for the assessment was
@@ -811,16 +757,15 @@ cases of assigning subject terms (call them ``samples'') whereas the
 ``micro'' flavor is most suitable to assess the overall performance of a
 configuration with respect to assigning subject terms.
 
-To compute the F1-score, we call
-\texttt{\Analysis.super\_make\_metrics} on
-\texttt{/indexed/indexed\_master\_mesh\_enriched}. The 100 output files
-are saved as \texttt{/metrics/metrics\_\{marker\}.json} where
+To compute the F1-score, we call \texttt{Analysis.super\_make\_metrics}
+on \texttt{/indexed/indexed\_master\_mesh\_enriched}. The 100 output
+files are saved as \texttt{/metrics/metrics\_\{marker\}.json} where
 \texttt{marker} specifies the Annif configuration; a single file for
 analysis is saved as \texttt{/analysis/metrics.json}:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{\Analysis.super\_make\_metrics(DIR }\OperatorTok{+} \StringTok{"/indexed/indexed\_master\_mesh\_enriched.json"}\NormalTok{)}
+\NormalTok{Analysis.super\_make\_metrics(DIR }\OperatorTok{+} \StringTok{"/indexed/indexed\_master\_mesh\_enriched.json"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -828,19 +773,19 @@ Note that the data foundation includes additional information, namely
 the sample size and the raw values for the confusion matrix. The sample
 size is a histogram of each instance in which a value in the confusion
 matrix was computed, that is, each case in which either Annif or the
-native gold standard assigned a subject term. Finally, note that if an
-item in the Edoc sample data set had an empty native gold standard, no
-score was computed; this is the case exactly if none of the cleaned
-keywords had been matched to Wikidata or YSO respectively.
+derivative gold standard assigned a subject term. Finally, note that if
+an item in the Edoc sample data set had an empty derivative gold
+standard, no score was computed; this is the case exactly if none of the
+cleaned keywords had been matched to Wikidata or YSO respectively.
 Configurations with a Wikidata vocabulary had a scoring coverage of
 94.38\% of the items in the sample data set as compared to only 62.84\%
 for configurations with a YSO vocabulary.
 
 \hypertarget{general-results}{%
-\subsubsection{General results}\label{general-results}}
+\subsection{General results}\label{general-results}}
 
 In this section I will discuss the general results of assessing the
-performance of the 100 Annif configurations versus the native gold
+performance of the 100 Annif configurations versus the derivative gold
 standard with respect to the Edoc sample data set. The data foundation
 is available at \texttt{/analysis/metrics.json}.
 
@@ -865,7 +810,7 @@ Let us first consider overall performance. Here the most striking result
 is that Wikidata configurations outperformed YSO configurations (see
 Figure 6, left). However, the explanation of this effect is not evident.
 The two main explanatory hypotheses are 1. that the suggestions by the
-Wikidata configurations are more salient, or 2. that the native gold
+Wikidata configurations are more salient, or 2. that the derivative gold
 standard is biased towards Wikidata due to its higher coverage of QIDs
 as compared to YSO IDs. By contrast, the Wikidata configurations are
 more productive than the YSO configurations, and the reason for this
@@ -951,11 +896,12 @@ or abstract and title) does not matter.
 \begin{figure}
 \centering
 \includegraphics{images/metrics_f1_top20.pdf}
-\caption{The top 20 Annif configurations (according to F1-score).}
+\caption{20 best performing Annif configurations (according to
+F1-score).}
 \end{figure}
 
 \hypertarget{results-by-department}{%
-\subsubsection{Results by department}\label{results-by-department}}
+\subsection{Results by department}\label{results-by-department}}
 
 In \protect\hyperlink{general-results}{section ``General results''} I
 have identified and discussed the overall best Annif configerations.
@@ -969,12 +915,12 @@ We begin again by constructing the data foundation. Since the Edoc
 \texttt{department} data field is mandatory, the sample data set is
 partitioned into blocks of departments by default. We can thus create a
 data foundation for each such block by calling
-\texttt{\Analysis.super\_make\_metrics} with a departmental parameter:
+\texttt{Analysis.super\_make\_metrics} with a departmental parameter:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ControlFlowTok{for}\NormalTok{ dept }\KeywordTok{in}\NormalTok{ \Data.get\_departments():}
-\NormalTok{    \Analysis.super\_make\_metrics(DIR }\OperatorTok{+} \StringTok{"/indexed/indexed\_master\_mesh\_enriched.json"}\NormalTok{, deparment}\OperatorTok{=}\NormalTok{dept)}
+\ControlFlowTok{for}\NormalTok{ dept }\KeywordTok{in}\NormalTok{ Data.get\_departments():}
+\NormalTok{    Analysis.super\_make\_metrics(DIR }\OperatorTok{+} \StringTok{"/indexed/indexed\_master\_mesh\_enriched.json"}\NormalTok{, deparment}\OperatorTok{=}\NormalTok{dept)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -996,29 +942,31 @@ performance scores across departments as shown in Figure 11. We can see
 that there are striking differences in variability between departments.
 The departments with the most consistent weighted F1-scores are Medicine
 and Central Services. However, these two departments have also the
-lowest maximum F1-scores. It is noteworthy that all other departments
-have maximum F1-scores that are well above the F1-score of 0.517 of the
-best performing general Annif configuration.
+lowest maximum weighted F1-scores. It is noteworthy that all other
+departments have maximum weighted F1-scores that are well above the
+F1-score of 0.517 of the best performing general Annif configuration.
 
 \begin{figure}
 \centering
 \includegraphics{images/metrics_dept_summary.pdf}
 \caption{Best performing Annif configuration (according to weighted
-F1-score) per department.}
+F1-score) per department as compared to the overall best performing
+Annif configuration \texttt{wikidata-en-F-F-4-N}.}
 \end{figure}
 
 Let us now consider the best performing Annif configurations per
-department as summarized in Figure 12.
-
-For each department, we are interested in the highest weighted F1-score
-and the corresponding configuration as summarized in Figure X.
-
-\hypertarget{annif-versus-foreign-gold-standard}{%
-\subsection{Annif versus foreign gold
-standard}\label{annif-versus-foreign-gold-standard}}
-
-!! but to do this we would first have to map the annif suggested terms
-to mesh\ldots! yes.
+department as summarized in Figure 12. It is evident that only two of
+the ten departments (namely Associated and Central Services) have as
+best performing configuration the configuration that was declared the
+overall best performing configuration (namely
+\texttt{wikidata-en-F-F-4-N}). More surprisingly, YSO outperforms
+Wikidata in all other departments except Interdisciplinary. However, the
+margin is rather slim. The notable exception is the department
+Economics, where the YSO configuration outperforms the Wikidata
+configuration by a factor of 3. More importantly, the best performing
+YSO configurations are significantly less productive than the slightly
+worse performing Wikidata configuration, except for
+\texttt{yso-en-F-F-4-N} in the Medicine department.
 
 \hypertarget{outlook-and-conclusion}{%
 \section{Outlook and conclusion}\label{outlook-and-conclusion}}
@@ -1030,13 +978,26 @@ to mesh\ldots! yes.
 \tightlist
 \item
   fulltext support
+\item
+  mesh; A gold standard is usually the product of manual indexing by
+  ``information experts, subject experts, or potential or real end
+  users'' (Golub et al. 2016, 10). This entails its own host of
+  epistemic problems relating to objectivity and consistency of the
+  assigned subject terms. Most importantly, however, the construction of
+  a gold standard from scratch is very expensive. It is therefore not an
+  option for the project at hand. Rather, I will construct what could be
+  called derivative gold standards by reusing indexing data that is
+  already available. Here we can distinguish two distinct kinds of
+  derivative gold standards: first, I will construct a derivative gold
+  standard based on the author keywords available in the sample data
+  set; call this the ``derivative'' gold standard. Second, I will
+  construct a derivative gold standard based on indexing metadata
+  available in repositories distinct from Edoc; call this the
+  ``foreign'' gold standard.
 \end{itemize}
 
 \hypertarget{implementation-strategy}{%
 \subsection{Implementation strategy}\label{implementation-strategy}}
-
-\hypertarget{other-use-cases}{%
-\subsection{Other use cases}\label{other-use-cases}}
 
 !! Clean up: rename
 \texttt{/indexed/indexed\_master\_mesh\_enriched.json} to

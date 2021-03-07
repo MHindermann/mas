@@ -8,26 +8,14 @@ Write a research paper in Markdown: https://opensource.com/article/18/9/pandoc-r
 
 # Introduction
 
-## Outline
-
 ## Method
 
 !! Say something to the effect that all data and code are available on GitHub.
 
-## Tools and configuration 
-
-### OpenRefine 
-
-For data refinement I use OpenRefine version 3.4.1 (https://openrefine.org/). Data manipulation in OpenRefine is 
-tracked: 
-the manipulation history of some data can be exported as JSON file and then reproduced (on the same data on a different machine or on different data) by loading said file. I will supply a corresponding manipulation history whenever appropriate. Note that when using OpenRefine with larger files (and there are many such files in this project), the memory allocation to OpenRefine must be manually increased (see https://docs.openrefine.org/manual/installing/#increasing-memory-allocation for details). ALso note that OpenRefine always counts the number of records by the first column (a fact which caused me many headaches). 
-
-# Prototype
-
-In this chapter, the prototype for a machine indexing of Edoc is presented. The focus is primarily on practical 
+!! In this chapter, the prototype for a machine indexing of Edoc is presented. The focus is primarily on practical 
 implementation although care is taken to spell out design decisions in as much detail as is needed.
 
-# Aim
+## Outline
 
 Let us start by stating the aim of the prototype.  From a functional 
 perspective, the prototype takes a subset of the data from Edoc as input and provides index terms for each item in this 
@@ -40,6 +28,12 @@ subset as output. In order to fulfill this aim we can distinguish a number of st
 5. Assess the quality of the output based on the gold standard.
 
 In the sections below, these steps will be discussed in detail.
+
+## Tools
+
+For data refinement I use OpenRefine version 3.4.1 (https://openrefine.org/). Data manipulation in OpenRefine is 
+tracked: 
+the manipulation history of some data can be exported as JSON file and then reproduced (on the same data on a different machine or on different data) by loading said file. I will supply a corresponding manipulation history whenever appropriate. Note that when using OpenRefine with larger files (and there are many such files in this project), the memory allocation to OpenRefine must be manually increased (see https://docs.openrefine.org/manual/installing/#increasing-memory-allocation for details). Also note that OpenRefine always counts the number of records by the first column (a fact which caused me many headaches). 
 
 # Edoc data
 
@@ -182,21 +176,18 @@ In addition to the already used algorithms we should also try https://ai.finto.f
 
 # Gold standard
 
-In this chapter I will construct two distinct gold standards in order to assess the quality of machine indexing the sample data set with Annif.  
-!! Say something about assessments of Annif that have already been carried out.
+In this section I will construct a derivative gold standard in order to assess the quality of machine indexing the sample data set with Annif.  
 
 ## Definition
 
 The most common approach for assessing the output of machine indexing is by systematically comparing it with a gold standard (sometimes also referred to as model or reference). @Golub.2016 [p. 10]  define a gold standard as "a collection in which each document is assigned a set of [subject terms] that is assumed to be complete and correct" where "_complete_ means that all subjects that should be assigned to a document are in fact assigned, and _correct_ means
 that there are no subjects assigned that are irrelevant to the content". Put inversely, if an item in the gold standard lacks subject terms describing its content, the assignment is not complete; and if an item in the gold standard has been assigned subject terms that are not relevant to its content, the assignment is not correct. 
 
-A gold standard is usually the product of manual indexing by "information experts, subject experts, or potential or real end users" [@Golub.2016, p. 10]. This entails its own host of epistemic problems relating to objectivity and consistency of the assigned subject terms. Most importantly, however, the construction of a gold standard from scratch is very expensive. It is therefore not an option for the project at hand. Rather, I will construct what could be called derivative gold standards by reusing indexing data that is already available. Here we can distinguish two distinct kinds of derivative gold standards: first, I will construct a derivative gold standard based on the author keywords available in the sample data set; call this the "native" gold standard. Second, I will construct a derivative gold standard based on indexing metadata available in repositories distinct from Edoc; call this the "foreign" gold standard. 
+A gold standard is usually the product of manual indexing by "information experts, subject experts, or potential or real end users" [@Golub.2016, p. 10]. This entails its own host of epistemic problems relating to objectivity and consistency of the assigned subject terms. Most importantly, however, the construction of a gold standard from scratch is very expensive. It is therefore not an option for the project at hand. Rather, I will construct what could be called a "derivative" gold standard by reusing indexing data that is already available.
 
 There are other methods for assessing machine indexing quality besides comparison with a gold standard that are worth mentioning. These include an evaluation in the context of indexing workflows [@Golub.2016, p. 13ff.], the assessment of retrieval performance [@Golub.2016, p. 15-23.], and so-called model free assessments [@Louis.2013]. 
 
-## Native gold standard
-
-The construction of the native gold standard takes x steps:
+The construction of the derivative gold standard takes x steps:
 
 1. Extract the keywords from the sample data set.  
 2. Clean the extracted keywords.
@@ -206,7 +197,7 @@ The intended output of this transformation process is...
 
 These steps are explained in more detail in what follows.
 
-### Extract keywords
+## Extract and clean keywords
 
 In a first step, the keywords must be extracted from the sample data set `/sample/sample_master.json`. Recall that we mandated a non-empty `keywords` data field for an item to be selected from the raw Edoc data (see [subsection "Selection"](#selection)). We can thus simply copy the information in the `keywords` data field on a per item basis. To do this, we call `Keywords.extract_keywords` with the sample data set as argument and save the output as `keywords/keywords_extracted.json` like so:
 
@@ -214,8 +205,6 @@ In a first step, the keywords must be extracted from the sample data set `/sampl
 keywords = Keywords.extract_keywords(DIR + "/sample/sample_master.json")
 Utility.save_json(keywords, DIR + "/keywords/keywords_extracted.json")
 ~~~~
-
-### Clean keywords
 
 In second step, a list of all single keywords must be created. In order to do so, let us consider now in more detail the exact information extracted from the `keywords` data fields as per `/keywords/keywords_extracted.json`. In Edoc, the `keywords` data field of an item is a non-mandatory free text field that is filled in by the user (usually one of the authors) who undertakes the data entry of an item to Edoc. Even though the Edoc user manual specifies that keywords must be separated by commas [@UniversitatBasel.2021, p. 8], this requirement is neither validated by the input mask nor by an administrator of Edoc. Furthermore, neither the manual nor the input mask provide a definition of the term "keyword". A vocabulary or a list of vocabularies from which to choose the keywords is also lacking. Taken together, these observations are indicative of very heterogeneous data in the `keywords` data field. To wit, the items of `/keywords/keywords_extracted.json` are strings where single keywords are individuated by any symbols the user saw fit. So, for each item in `/keywords/keywords_extracted.json`, the user input must be parsed into single keywords. 
 
@@ -229,7 +218,7 @@ keywords_clean = Keywords.clean_keywords(keywords_extracted)
 Utility.save_json(keywords_clean, DIR + "keywords/keywords_clean.json")
 ~~~~
 
-### Analysis
+## Analysis
 
 `/keywords/keywords_clean.json` has 36'901 entries many of which are duplicates. We hence deduplicate and count the number of occurrences of each keyword. This is achieved by calling `Keywords.make_histogram` on `/keywords/keywords_clean.json` and saving the output as `/keywords/keywords_clean_histogram.json`:
 
@@ -253,9 +242,9 @@ Utility.save_json(keywords_counted, DIR + "/analysis/keywords_counted.json")
 
 The median number of keywords for an item in the sample data set is 6 with an IQR of 4 (min = 0, Q1 = 4, M = 6, Q3 = 8, max = 87).  Of course, items in the sample data set with a number of keywords below the first and above the third quartile are highly suspect from a qualitative point of view: when it comes to subject indexing, some terms are required, but more is usually worse [!! source]. Items with too few or too many keywords will be discussed in more detail in section [section Assessment](#assessment)
 
-### Reconciliation
+## Reconciliation
 
-As explained in section X, Annif assigns index terms from a controlled vocabulary. If we want to assess the quality of the indexing via a gold standard, we must therefore ensure that the gold standard makes use of the vocabulary used by Annif. As seen in section Y, the relevant (English) vocabularies are Wikidata YSO. The next step in constructing the native gold standard is hence to match the extracted and cleaned keywords with keywords from YSO and Wikidata. This process is called "reconciliation" (see https://docs.openrefine.org/manual/reconciling) and the tool of choice for this task is OpenRefine (see [section OpenRefine](#openrefine)). 
+As explained in section X, Annif assigns index terms from a controlled vocabulary. If we want to assess the quality of the indexing via a gold standard, we must therefore ensure that the gold standard makes use of the vocabulary used by Annif. As seen in section Y, the relevant (English) vocabularies are Wikidata YSO. The next step in constructing the derivative gold standard is hence to match the extracted and cleaned keywords with keywords from YSO and Wikidata. This process is called "reconciliation" (see https://docs.openrefine.org/manual/reconciling) and the tool of choice for this task is OpenRefine (see [section OpenRefine](#openrefine)). 
 
 In this section, I will describe how the cleaned keywords were reconciled with Wikidata and YSO, and which additional steps for refinement were undertaken. In total, 2'104 data transformation operations were performed; the complete operation history is available as `/keywords/operation_history.json`. 
 
@@ -281,26 +270,21 @@ Finally, consider the distribution of the cleaned and reconciled keywords per it
 
 ![The distribution of keywords per item in the Edoc sample data set. The leftmost boxplot shows the distribution of cleaned keywords (min = 0, Q1 = 4, M = 6, Q3 = 8, max = 87); the other boxplots show the distribution of cleaned keywords with reconciled QID (min = 0, Q1 = 2, M = 4, Q3 = 6, max = 80), MeSH ID (min = Q1 = 0, M = 2, Q3 = 4, max = 63), and YSO ID respectively (min = Q1 = 0, M = 1, Q3 = 2, max = 46). All four distributions are similarly consistent, but there is a linear decrease of the distribution's center leaving MeSH and YSO with potentially too few descriptors to represent an adequate indexing.](images/keywords_counted.pdf)
 
-### Discussion
+## Discussion
 
 Let us now turn to the evaluation of the reconciliation: how many of the suggestions were correct? This question was answered via random sampling [following @Roth.1993, pp. 204-225]. The random sample ($n=500$) was created by calling `Analysis.make_random_sample` on `/keywords/reference_keywords_master.json`; it is available at `/analysis/random_keywords.json`. The sample was then imported into OpenRefine and the judgement (1 for correct, 0 for incorrect) of the manual verification was recorded in the column `verification`. The data was then exported and is available at `/analysis/random_keywords_verified.csv`. 
 
 An analysis of this data shows that 53% of the suggestions in the random sample were correct with a 95% confidence interval of 48.8% to 57.3%. We can therefore conclude that 8'507 $\pm$ 692.1 of the 16'050 keywords in `/keywords/reference_keywords.json` have correct suggestions. Note that of the 235 incorrect suggestions in the random sample, 188 were incorrect by default because they were missing a QID; the share of non-empty yet incorrect suggestions is only 9.4% in the random sample meaning that the quality of the reconciliation is not as disappointing as it might seem at first glance.
 
-## Foreign gold standard
-
-- !! Explain MeSH
-- !! Explain how to get MeSH for subset of sample data set
-
 # Assessment
 
-In this chapter I will assess the quality of the sample data set's indexing with Annif based on the native and foreign gold standards. 
+In this section I will assess the quality of the sample data set's indexing with Annif based on the gold standard. 
 
 ## Precision, recall, F1-score
 
 The metrics used for the assessment are precision, recall and F1-score. Precision and recall are standard metrics for indexing quality [e.g., @Gantert.2016, p. 197] whereby the F1 score plays are more prominent role in the assessment of machine indexing [e.g., @Suominen.2019, pp. 11-14; @Toepfer.2016, p. 93f.]. Of course, there is a host of alternative metrics (such as indexing consistency, transparency, reproducability) that are neglected here.
 
-Let us briefly look at the definitions and motivations of the chosen metrics. Remember that a suggestion of a subject term is correct if and only if the subject term is in the native gold standard. The possible outcomes are summarized in Table 1.
+Let us briefly look at the definitions and motivations of the chosen metrics. Remember that a suggestion of a subject term is correct if and only if the subject term is in the derivative gold standard. The possible outcomes are summarized in Table 1.
 
 \begin{table}[h]
 \centering
@@ -314,17 +298,13 @@ Let us briefly look at the definitions and motivations of the chosen metrics. Re
 \label{tab:confusion-matrix}
 \end{table}
 
-### Precision
-
-"Precision" is the fraction of the correctly suggested subject terms; a suggestion is correct if and only if it is in the native gold standard: 
+"Precision" is the fraction of the correctly suggested subject terms; a suggestion is correct if and only if it is in the derivative gold standard: 
 
 \begin{center} 
 $\text{Precision} = \displaystyle \frac{\text{True positive}}{\text{True positive} + \text{False positive}}$
 \end{center}
 
-Or put as question: what fraction of the subject terms suggested by Annif are also in the native gold standard?
-
-### Recall
+Or put as question: what fraction of the subject terms suggested by Annif are also in the derivative gold standard?
 
 "Recall" is the fraction of correct subject terms out of all correct subject terms:
 
@@ -334,23 +314,15 @@ $\text{Recall} = \displaystyle \frac{\text{True positive}}{\text{True positive} 
 
 Put as question: what fraction of the subject terms in the gold standard were suggested by Annif?
 
-### F1-score
-
 The F1-score is the harmonic mean between precision and recall:
 
 \begin{center} 
 $\text{F1} = \displaystyle 2 * \frac{\text{Precision} * \text{Recall}}{\text{Precision} + \text{Recall}}$
 \end{center}
 
-### Implementation
+The above scoring metrics were implemented using the scikit-learn machine learning library [@Pedregosa.2011]. For a given Annif configuration ([section "Annif versus derivative gold standard"](#annif-versus-derivative-gold-standard))... [perhaps explain how it is done, important to mention transformation of multilabel to binary]. 
 
-The above scoring metrics were implemented using the scikit-learn machine learning library [@Pedregosa.2011]. For a given Annif configuration ([section "Annif versus native gold standard"](#annif-versus-native-gold-standard))... [perhaps explain how it is done, important to mention transformation of multilabel to binary]. Note that while 
-
-## Annif versus native gold standard
-
-In this section, I will assess the performance of Annif versus the native gold standard.
-
-### Creating the data foundation
+## Creating the data foundation
 
 I will now describe how the data foundation for the assessment was created. There are three parameters that need to be distinguished (see [section "Annif"](#annif)):
 
@@ -368,15 +340,15 @@ To compute the F1-score, we call `Analysis.super_make_metrics` on `/indexed/inde
 Analysis.super_make_metrics(DIR + "/indexed/indexed_master_mesh_enriched.json")
 ~~~~
 
-Note that the data foundation includes additional information, namely the sample size and the raw values for the confusion matrix. The sample size is a histogram of each instance in which a value in the confusion matrix was computed, that is, each case in which either Annif or the native gold standard assigned a subject term. Finally, note that if an item in the Edoc sample data set had an empty native gold standard, no score was computed; this is the case exactly if none of the cleaned keywords had been matched to Wikidata or YSO respectively. Configurations with a Wikidata vocabulary had a scoring coverage of 94.38% of the items in the sample data set as compared to only 62.84% for configurations with a YSO vocabulary.
+Note that the data foundation includes additional information, namely the sample size and the raw values for the confusion matrix. The sample size is a histogram of each instance in which a value in the confusion matrix was computed, that is, each case in which either Annif or the derivative gold standard assigned a subject term. Finally, note that if an item in the Edoc sample data set had an empty derivative gold standard, no score was computed; this is the case exactly if none of the cleaned keywords had been matched to Wikidata or YSO respectively. Configurations with a Wikidata vocabulary had a scoring coverage of 94.38% of the items in the sample data set as compared to only 62.84% for configurations with a YSO vocabulary.
 
-### General results
+## General results
 
-In this section I will discuss the general results of assessing the performance of the 100 Annif configurations versus the native gold standard with respect to the Edoc sample data set. The data foundation is available at `/analysis/metrics.json`.
+In this section I will discuss the general results of assessing the performance of the 100 Annif configurations versus the derivative gold standard with respect to the Edoc sample data set. The data foundation is available at `/analysis/metrics.json`.
 
 ![Distribution of weighted F1-scores per class of project of Annif configuration (left) and per class of text basis of Annif configuration (right). `wikidata` (min = 0.239, Q1 = 0.355, M = 0.415, Q3 = 0.492, max = 0.517) outperforms any YSO configuration. `yso-bonsai-en`, `yso-en` and `yso-fasttext-en` are on par (min = 0.169, Q1 = 0.218, M = 0.312, Q3 = 0.414, max = 0.496) and slightly outperformed by the more consistent `yso-maui-en` (min = 0.171, Q1 = 0.250, M = 0.327, Q3 = 0.407, max = 0.496). Surprisingly, the performance of configurations based on titles (min = 0.169, Q1 = 0.250, M = 0.345, Q3 = 0.424, max = 0.517) was marginally better than the performance of configurations based on titles and abstracts (min = 0.169, Q1 = 0.242, M = 0.337, Q3 = 0.424, max = 0.517).](images/metrics_all_project+abstract.pdf)
 
-Let us first consider overall performance. Here the most striking result is that Wikidata configurations outperformed YSO configurations (see Figure 6, left). However, the explanation of this effect is not evident. The two main explanatory hypotheses are 1. that the suggestions by the Wikidata configurations are more salient, or 2. that the native gold standard is biased towards Wikidata due to its higher coverage of QIDs as compared to YSO IDs. By contrast, the Wikidata configurations are more productive than the YSO configurations, and the reason for this effect is the higher coverage of QIDs as compared to YSO IDs (see Figure 7). By "productivity" I mean that the absolute number of assigned subject terms. So Wikidata configurations are not only qualitatively but also quantitatively superior to YSO configurations. 
+Let us first consider overall performance. Here the most striking result is that Wikidata configurations outperformed YSO configurations (see Figure 6, left). However, the explanation of this effect is not evident. The two main explanatory hypotheses are 1. that the suggestions by the Wikidata configurations are more salient, or 2. that the derivative gold standard is biased towards Wikidata due to its higher coverage of QIDs as compared to YSO IDs. By contrast, the Wikidata configurations are more productive than the YSO configurations, and the reason for this effect is the higher coverage of QIDs as compared to YSO IDs (see Figure 7). By "productivity" I mean that the absolute number of assigned subject terms. So Wikidata configurations are not only qualitatively but also quantitatively superior to YSO configurations. 
 
 ![The distribution of cumulative sample size per project class of Annif configuration. Wikidata configurations (min = 28'618, Q1 = 29'912, M = 35'121, Q3 = 42'439, max = 48'776) are more productive than YSO configurations (min = 9'878, Q1 = 12'546, M = 16'710, Q3 = 22'694, max = 27'354).](images/metrics_all_productivity.pdf)
 
@@ -401,9 +373,9 @@ max & 0.414 & 0.496 & 0.492 & 0.517 & 0.503 & 0.467 & 0.427 & 0.389 & 0.355 & 0.
 
 Let us turn to the parameter of the maximum number of suggestions per item in the Edoc sample data set (see Figure 8). Here the best performance was achieved by a token n = 4 configuration. However, the type n = 4 configuration performed on average significantly worse than the type n = 3 and type n = 2 configurations. So with respect to the maximum number of suggestions, there is a discrepancy between the best performing token configuration and the best performing type of configuration. This distinction is important: when choosing a configuration for the purpose of a production system, we are usually interested in the best token configuration. The top 20 token configurations are summarized in Figure 9. The best performing configuration with a weighted F1-score of 0.517 is `wikidata-en` with a maximum number of 4 suggestions per item; the text basis (title or abstract and title) does not matter.
 
-![The top 20 Annif configurations (according to F1-score).](images/metrics_f1_top20.pdf)
+![20 best performing Annif configurations (according to F1-score).](images/metrics_f1_top20.pdf)
 
-### Results by department
+## Results by department
 
 In [section "General results"](#general-results) I have identified and discussed the overall best Annif configerations. However, in [section "Analysis"](#analysis)) I had also noted the caveat that the performance of Annif might vary according to department due to systematic biases in constructing the Edoc sample data set. In this section I will therefore assess the performance of the various Annif configurations per department. 
 
@@ -418,28 +390,20 @@ This yields 1000 files in `/metrics/metrics_{department}_{marker}.json` (100 con
 
 ![Distribution of weighted F1-scores for all Annif configurations per department.](images/metrics_dept_distribution.pdf)
 
-Let us now look at the results. First consider the distribution of the performance scores across departments as shown in Figure 11. We can see that there are striking differences in variability between departments. The departments with the most consistent weighted F1-scores are Medicine and Central Services. However, these two departments have also the lowest maximum F1-scores. It is noteworthy that all other departments have maximum F1-scores that are well above the F1-score of 0.517 of the best performing general Annif configuration. 
+Let us now look at the results. First consider the distribution of the performance scores across departments as shown in Figure 11. We can see that there are striking differences in variability between departments. The departments with the most consistent weighted F1-scores are Medicine and Central Services. However, these two departments have also the lowest maximum weighted F1-scores. It is noteworthy that all other departments have maximum weighted F1-scores that are well above the F1-score of 0.517 of the best performing general Annif configuration. 
 
-![Best performing Annif configuration (according to weighted F1-score) per department.](images/metrics_dept_summary.pdf)
+![Best performing Annif configuration (according to weighted F1-score) per department as compared to the overall best performing Annif configuration `wikidata-en-F-F-4-N`.](images/metrics_dept_summary.pdf)
 
-Let us now consider the best performing Annif configurations per department as summarized in Figure 12.
-
-
-For each department, we are interested in the highest weighted F1-score and the corresponding configuration as summarized in Figure X.
-
-## Annif versus foreign gold standard
-
-!! but to do this we would first have to map the annif suggested terms to mesh...! yes.
+Let us now consider the best performing Annif configurations per department as summarized in Figure 12. It is evident that only two of the ten departments (namely Associated and Central Services) have as best performing configuration the configuration that was declared the overall best performing configuration (namely `wikidata-en-F-F-4-N`). More surprisingly, YSO outperforms Wikidata in all other departments except Interdisciplinary. However, the margin is rather slim. The notable exception is the department Economics, where the YSO configuration outperforms the Wikidata configuration by a factor of 3. More importantly, the best performing YSO configurations are significantly less productive than the slightly worse performing Wikidata configuration, except for `yso-en-F-F-4-N` in the Medicine department. 
 
 # Outlook and conclusion
 
 ## Refinement
 
 - fulltext support
+- mesh; A gold standard is usually the product of manual indexing by "information experts, subject experts, or potential or real end users" [@Golub.2016, p. 10]. This entails its own host of epistemic problems relating to objectivity and consistency of the assigned subject terms. Most importantly, however, the construction of a gold standard from scratch is very expensive. It is therefore not an option for the project at hand. Rather, I will construct what could be called derivative gold standards by reusing indexing data that is already available. Here we can distinguish two distinct kinds of derivative gold standards: first, I will construct a derivative gold standard based on the author keywords available in the sample data set; call this the "derivative" gold standard. Second, I will construct a derivative gold standard based on indexing metadata available in repositories distinct from Edoc; call this the "foreign" gold standard. 
 
 ## Implementation strategy
-
-## Other use cases
 
 !! Clean up: rename `/indexed/indexed_master_mesh_enriched.json` to `/indexed/master_final.json` or something short.
 
