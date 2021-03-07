@@ -37,17 +37,11 @@ the manipulation history of some data can be exported as JSON file and then repr
 
 # Edoc data
 
-## Edoc
+## Edoc and data extraction
 
 Edoc is the institutional repository of the University of Basel. It was conceived in 2009 as repository for 
 electronic dissertations and grew in scope when the University of Basel adapted its first open access policy in 2013.
-As per today Edoc contains roughly 68’000 items. 
-
-Edoc runs on the EPrints 3 document management system (https://github.com/eprints/eprints).  
-!! Add technical description of Edoc.  
-!! Perhaps add description of how files are added to Edoc, see PDF in `/todo`.
-
-## Data extraction
+As per today Edoc contains roughly 68’000 items. Edoc runs on the EPrints 3 document management system (https://github.com/eprints/eprints).  
 
 Even though Edoc is a public server, its database does not have a web-ready API. In addition, since Edoc is a production
 server, its underlying database cannot be used directly on pain of disturbing the provided services. The data hence
@@ -235,7 +229,7 @@ An analysis of `/keywords/keywords_clean_histogram.json` shows that the lion's s
 To analyse the spread of keywords in the sample data set, the keywords per item are counted. To do so, we call `Keywords.make_count` on `/indexed/indexed_master_mesh_enriched.json` and save the output as `/analysis/keywords_counted.json`:
 
 ~~~~{.Python caption="count_keywords"}
-sample_data_set = Utility.load_json(DIR + "/indexed/indexed_master_mesh_enriched.json")
+sample_data_set = Utility.load_json(DIR + "/indexed/indexed_master.json")
 keywords_counted = Keywords.make_count(sample_data_set)
 Utility.save_json(keywords_counted, DIR + "/analysis/keywords_counted.json")
 ~~~~
@@ -337,7 +331,7 @@ For each configuration, the F1-score was then computed. It is important to note 
 To compute the F1-score, we call `Analysis.super_make_metrics` on `/indexed/indexed_master_mesh_enriched`. The 100 output files are saved as `/metrics/metrics_{marker}.json` where `marker` specifies the Annif configuration; a single file for analysis is saved as `/analysis/metrics.json`:
 
 ~~~~{.Python caption="make_metrics"}
-Analysis.super_make_metrics(DIR + "/indexed/indexed_master_mesh_enriched.json")
+Analysis.super_make_metrics(DIR + "/indexed/indexed_master.json")
 ~~~~
 
 Note that the data foundation includes additional information, namely the sample size and the raw values for the confusion matrix. The sample size is a histogram of each instance in which a value in the confusion matrix was computed, that is, each case in which either Annif or the derivative gold standard assigned a subject term. Finally, note that if an item in the Edoc sample data set had an empty derivative gold standard, no score was computed; this is the case exactly if none of the cleaned keywords had been matched to Wikidata or YSO respectively. Configurations with a Wikidata vocabulary had a scoring coverage of 94.38% of the items in the sample data set as compared to only 62.84% for configurations with a YSO vocabulary.
@@ -375,7 +369,7 @@ Let us turn to the parameter of the maximum number of suggestions per item in th
 
 ![20 best performing Annif configurations (according to F1-score).](images/metrics_f1_top20.pdf)
 
-## Results by department
+## Departmental results
 
 In [section "General results"](#general-results) I have identified and discussed the overall best Annif configerations. However, in [section "Analysis"](#analysis)) I had also noted the caveat that the performance of Annif might vary according to department due to systematic biases in constructing the Edoc sample data set. In this section I will therefore assess the performance of the various Annif configurations per department. 
 
@@ -383,14 +377,14 @@ We begin again by constructing the data foundation. Since the Edoc `department` 
 
 ~~~~{.Python caption="make_metrics_department"}
 for dept in Data.get_departments():
-    Analysis.super_make_metrics(DIR + "/indexed/indexed_master_mesh_enriched.json", deparment=dept)
+    Analysis.super_make_metrics(DIR + "/indexed/indexed_master.json", dept)
 ~~~~
 
 This yields 1000 files in `/metrics/metrics_{department}_{marker}.json` (100 configurations $*$ 10 departments) where `department` specifies the department according to the Edoc convention. The data foundation is summarized in `/analysis/metrics.json`.
 
 ![Distribution of weighted F1-scores for all Annif configurations per department.](images/metrics_dept_distribution.pdf)
 
-Let us now look at the results. First consider the distribution of the performance scores across departments as shown in Figure 11. We can see that there are striking differences in variability between departments. The departments with the most consistent weighted F1-scores are Medicine and Central Services. However, these two departments have also the lowest maximum weighted F1-scores. It is noteworthy that all other departments have maximum weighted F1-scores that are well above the F1-score of 0.517 of the best performing general Annif configuration. 
+Let us now look at the results. First consider the distribution of the performance scores across departments as shown in Figure 11. We can see that there are striking differences in variability between departments. The departments with the most consistent weighted F1-scores are Medicine and Central Services. However, these two departments have also the lowest maximum weighted F1-scores. It is noteworthy that all other departments have maximum weighted F1-scores that are well above the weighted F1-score of 0.517 of the best performing general Annif configuration. 
 
 ![Best performing Annif configuration (according to weighted F1-score) per department as compared to the overall best performing Annif configuration `wikidata-en-F-F-4-N`.](images/metrics_dept_summary.pdf)
 
@@ -402,10 +396,12 @@ Let us now consider the best performing Annif configurations per department as s
 
 - fulltext support
 - mesh; A gold standard is usually the product of manual indexing by "information experts, subject experts, or potential or real end users" [@Golub.2016, p. 10]. This entails its own host of epistemic problems relating to objectivity and consistency of the assigned subject terms. Most importantly, however, the construction of a gold standard from scratch is very expensive. It is therefore not an option for the project at hand. Rather, I will construct what could be called derivative gold standards by reusing indexing data that is already available. Here we can distinguish two distinct kinds of derivative gold standards: first, I will construct a derivative gold standard based on the author keywords available in the sample data set; call this the "derivative" gold standard. Second, I will construct a derivative gold standard based on indexing metadata available in repositories distinct from Edoc; call this the "foreign" gold standard. 
+-We enrich the sample items with MeSH keywords from PubMed if available (item needs a PubMed ID and items needs to
+be indexed with MeSH on PubMed, 1653 items match this requirement); the resulting file is indexed_master_mesh.json. Like 
+so: 
+Data.enrich_with_mesh(DIR + "/indexed/indexed_master.json", DIR + "/indexed/indexed_master_mesh")
 
 ## Implementation strategy
-
-!! Clean up: rename `/indexed/indexed_master_mesh_enriched.json` to `/indexed/master_final.json` or something short.
 
 # Appendix
 

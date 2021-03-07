@@ -56,22 +56,15 @@ records by the first column (a fact which caused me many headaches).
 \hypertarget{edoc-data}{%
 \section{Edoc data}\label{edoc-data}}
 
-\hypertarget{edoc}{%
-\subsection{Edoc}\label{edoc}}
+\hypertarget{edoc-and-data-extraction}{%
+\subsection{Edoc and data extraction}\label{edoc-and-data-extraction}}
 
 Edoc is the institutional repository of the University of Basel. It was
 conceived in 2009 as repository for electronic dissertations and grew in
 scope when the University of Basel adapted its first open access policy
-in 2013. As per today Edoc contains roughly 68'000 items.
-
-Edoc runs on the EPrints 3 document management system
-(https://github.com/eprints/eprints).\\
-!! Add technical description of Edoc.\\
-!! Perhaps add description of how files are added to Edoc, see PDF in
-\texttt{/todo}.
-
-\hypertarget{data-extraction}{%
-\subsection{Data extraction}\label{data-extraction}}
+in 2013. As per today Edoc contains roughly 68'000 items. Edoc runs on
+the EPrints 3 document management system
+(https://github.com/eprints/eprints).
 
 Even though Edoc is a public server, its database does not have a
 web-ready API. In addition, since Edoc is a production server, its
@@ -456,7 +449,7 @@ output as \texttt{/analysis/keywords\_counted.json}:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{sample\_data\_set }\OperatorTok{=}\NormalTok{ Utility.load\_json(DIR }\OperatorTok{+} \StringTok{"/indexed/indexed\_master\_mesh\_enriched.json"}\NormalTok{)}
+\NormalTok{sample\_data\_set }\OperatorTok{=}\NormalTok{ Utility.load\_json(DIR }\OperatorTok{+} \StringTok{"/indexed/indexed\_master.json"}\NormalTok{)}
 \NormalTok{keywords\_counted }\OperatorTok{=}\NormalTok{ Keywords.make\_count(sample\_data\_set)}
 \NormalTok{Utility.save\_json(keywords\_counted, DIR }\OperatorTok{+} \StringTok{"/analysis/keywords\_counted.json"}\NormalTok{)}
 \end{Highlighting}
@@ -765,7 +758,7 @@ analysis is saved as \texttt{/analysis/metrics.json}:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{Analysis.super\_make\_metrics(DIR }\OperatorTok{+} \StringTok{"/indexed/indexed\_master\_mesh\_enriched.json"}\NormalTok{)}
+\NormalTok{Analysis.super\_make\_metrics(DIR }\OperatorTok{+} \StringTok{"/indexed/indexed\_master.json"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -900,8 +893,8 @@ or abstract and title) does not matter.
 F1-score).}
 \end{figure}
 
-\hypertarget{results-by-department}{%
-\subsection{Results by department}\label{results-by-department}}
+\hypertarget{departmental-results}{%
+\subsection{Departmental results}\label{departmental-results}}
 
 In \protect\hyperlink{general-results}{section ``General results''} I
 have identified and discussed the overall best Annif configerations.
@@ -920,7 +913,7 @@ data foundation for each such block by calling
 \begin{Shaded}
 \begin{Highlighting}[]
 \ControlFlowTok{for}\NormalTok{ dept }\KeywordTok{in}\NormalTok{ Data.get\_departments():}
-\NormalTok{    Analysis.super\_make\_metrics(DIR }\OperatorTok{+} \StringTok{"/indexed/indexed\_master\_mesh\_enriched.json"}\NormalTok{, deparment}\OperatorTok{=}\NormalTok{dept)}
+\NormalTok{    Analysis.super\_make\_metrics(DIR }\OperatorTok{+} \StringTok{"/indexed/indexed\_master.json"}\NormalTok{, dept)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -993,15 +986,16 @@ worse performing Wikidata configuration, except for
   set; call this the ``derivative'' gold standard. Second, I will
   construct a derivative gold standard based on indexing metadata
   available in repositories distinct from Edoc; call this the
-  ``foreign'' gold standard.
+  ``foreign'' gold standard. -We enrich the sample items with MeSH
+  keywords from PubMed if available (item needs a PubMed ID and items
+  needs to be indexed with MeSH on PubMed, 1653 items match this
+  requirement); the resulting file is indexed\_master\_mesh.json. Like
+  so: Data.enrich\_with\_mesh(DIR + ``/indexed/indexed\_master.json,''
+  DIR + ``/indexed/indexed\_master\_mesh'')
 \end{itemize}
 
 \hypertarget{implementation-strategy}{%
 \subsection{Implementation strategy}\label{implementation-strategy}}
-
-!! Clean up: rename
-\texttt{/indexed/indexed\_master\_mesh\_enriched.json} to
-\texttt{/indexed/master\_final.json} or something short.
 
 \hypertarget{appendix}{%
 \section{Appendix}\label{appendix}}
