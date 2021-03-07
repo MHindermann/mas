@@ -15,7 +15,7 @@ from sklearn.metrics import f1_score, recall_score, precision_score
 DIR = os.path.dirname(__file__)
 
 
-class _Utility:
+class Utility:
     """ A collection of utility functions. """
 
     @classmethod
@@ -67,7 +67,7 @@ class _Utility:
                 position = position + 5000
 
 
-class _Data:
+class Data:
     """ A collection of edoc data functions. """
 
     @classmethod
@@ -106,12 +106,12 @@ class _Data:
         :param fields: the required fields for an item to be sample
         """
 
-        data = _Utility.load_json(file_path)
+        data = Utility.load_json(file_path)
         print(f"{file_path} loaded")
-        selected = _Data.select_from_data(data, *fields)
+        selected = Data.select_from_data(data, *fields)
         print(f"Items sample")
         save_file_path = DIR + "/sample/" + str(datetime.now()).split(".")[0].replace(":", "-").replace(" ", "-")
-        _Utility.save_json(selected, save_file_path)
+        Utility.save_json(selected, save_file_path)
 
     @classmethod
     def inspect(cls,
@@ -147,7 +147,7 @@ class _Data:
         :param save_path: complete path to save folder including filename without extension
         """
 
-        data = _Utility.load_json(file_path)
+        data = Utility.load_json(file_path)
         modified_data = []
 
         for item in data:
@@ -157,7 +157,7 @@ class _Data:
 
             # clean keywords
             keywords = modified_item.get("keywords")
-            keywords_clean = _Keywords.clean_keywords([keywords])
+            keywords_clean = Keywords.clean_keywords([keywords])
 
             # enrich keywords
             enriched_keywords = []
@@ -169,7 +169,7 @@ class _Data:
             # add modified item to output:
             modified_data.append(modified_item)
 
-        _Utility.save_json(modified_data, save_path + ".json")
+        Utility.save_json(modified_data, save_path + ".json")
 
     @classmethod
     def map2reference(cls,
@@ -182,7 +182,7 @@ class _Data:
         """
 
         # load reference keywords:
-        keywords_reference = _Utility.load_json(DIR + "/keywords/keywords_reference_master.json")
+        keywords_reference = Utility.load_json(DIR + "/keywords/keywords_reference_master.json")
 
         # enrich keywords
         for entry in keywords_reference:
@@ -201,7 +201,7 @@ class _Data:
         :param save_path: complete path to save folder including filename without extension
         """
 
-        data = _Utility.load_json(file_path)
+        data = Utility.load_json(file_path)
         modified_data = []
 
         for item in data:
@@ -225,7 +225,7 @@ class _Data:
             # add modified item to output:
             modified_data.append(modified_item)
 
-        _Utility.save_json(modified_data, save_path + ".json")
+        Utility.save_json(modified_data, save_path + ".json")
 
     @classmethod
     def fetch_mesh(cls,
@@ -271,7 +271,7 @@ class _Data:
         :param threshold: Annif-client threshold, defaults to None
         """
 
-        data = _Utility.load_json(file_path)
+        data = Utility.load_json(file_path)
         client = AnnifClient()
         modified_data = []
 
@@ -312,7 +312,7 @@ class _Data:
             # add modified item to output:
             modified_data.append(modified_item)
 
-        _Utility.save_json(modified_data, save_path)
+        Utility.save_json(modified_data, save_path)
 
     @classmethod
     def super_enrich_with_annif(cls,
@@ -326,7 +326,7 @@ class _Data:
         save_path = f"{DIR}/indexed/indexed_working_{str(datetime.now()).split('.')[0].replace(':', '-').replace(' ', '-')}.json"
         project_ids = ["yso-en", "yso-maui-en", "yso-bonsai-en", "yso-fasttext-en", "wikidata-en"]
 
-        _Data.enrich_with_annif(file_path=file_path, save_path=save_path, project_ids=project_ids, abstract=abstract)
+        Data.enrich_with_annif(file_path=file_path, save_path=save_path, project_ids=project_ids, abstract=abstract)
 
     @classmethod
     def get_departments(cls) -> List[str]:
@@ -344,7 +344,7 @@ class _Data:
                 "Interdisciplinary_Institutions"]
 
 
-class _Keywords:
+class Keywords:
     """ A collection of functions for manipulating edoc author keywords. """
 
     @classmethod
@@ -354,7 +354,7 @@ class _Keywords:
 
         :param file_path: complete path to file including filename and extension
         """
-        data = _Utility.load_json(file_path)
+        data = Utility.load_json(file_path)
         keywords = []
         for item in data:
             keywords.append(item.get("keywords"))
@@ -453,7 +453,7 @@ class _Keywords:
         :param save_path: complete path to save folder including filename without extension
         """
 
-        data = _Utility.load_json(file_path)
+        data = Utility.load_json(file_path)
         modified_data = []
 
         for item in data:
@@ -471,7 +471,7 @@ class _Keywords:
 
             modified_data.append(modified_item)
 
-        _Utility.save_json(modified_data, save_path)
+        Utility.save_json(modified_data, save_path)
 
     @classmethod
     def fetch_yso(cls,
@@ -501,7 +501,7 @@ class _Keywords:
         :param save_path: complete path to save folder including filename and extension
         """
 
-        data = _Utility.load_json(file_path)
+        data = Utility.load_json(file_path)
         output = []
 
         for item in data:
@@ -521,10 +521,10 @@ class _Keywords:
             except AttributeError:
                 continue
 
-        _Utility.save_json(output, save_path)
+        Utility.save_json(output, save_path)
 
 
-class _Analysis:
+class Analysis:
     """ A collection of data analysis functions. """
 
     @classmethod
@@ -569,11 +569,11 @@ class _Analysis:
         :param size: the sample size
         """
 
-        population = _Utility.load_json(file_path)
+        population = Utility.load_json(file_path)
         import random
 
         sample = random.sample(population=population, k=size)
-        _Utility.save_json(sample, save_path)
+        Utility.save_json(sample, save_path)
 
     @classmethod
     def super_make_metrics(cls,
@@ -647,7 +647,7 @@ class _Analysis:
         :param department: restrict to items from department
         """
 
-        data = _Utility.load_json(file_path)
+        data = Utility.load_json(file_path)
 
         # construct the correct annif marker:
         marker = f"{project_id}-{abstract}-{fulltext}-{n}-{threshold}"
@@ -697,9 +697,9 @@ class _Analysis:
         metrics.update(cls.count_confusion(standard, suggestions))
 
         if department is None:
-            _Utility.save_json(metrics, DIR + f"/metrics/metrics_{marker}.json")
+            Utility.save_json(metrics, DIR + f"/metrics/metrics_{marker}.json")
         else:
-            _Utility.save_json(metrics, DIR + f"/metrics/metrics_{department}_{marker}.json")
+            Utility.save_json(metrics, DIR + f"/metrics/metrics_{department}_{marker}.json")
 
         print("done.")
 
@@ -877,32 +877,32 @@ class _Analysis:
         files = os.listdir(DIR + "/metrics")
         for file in files:
 
-            metrics = _Utility.load_json(DIR + f"/metrics/{file}")
+            metrics = Utility.load_json(DIR + f"/metrics/{file}")
             metrics["file"] = file.split("/")[len(file.split("/"))-1]
 
             stats.append({"stat": metrics})
 
-        _Utility.save_json(stats, DIR + "/analysis/metrics.json")
+        Utility.save_json(stats, DIR + "/analysis/metrics.json")
 
 exit()
 
-for dept in _Data.get_departments():
-    _Analysis.super_make_metrics(file_path=DIR + "/indexed/indexed_master_mesh_enriched.json", department=dept)
+for dept in Data.get_departments():
+    Analysis.super_make_metrics(file_path=DIR + "/indexed/indexed_master_mesh_enriched.json", department=dept)
 
 exit()
 
-_Analysis.make_metrics(file_path=DIR + "/indexed/indexed_master_mesh_enriched.json",
-                       project_id="yso-en",
-                       abstract=True,
-                       fulltext=False,
-                       limit=None,
-                       threshold=None,
-                       n=10)
+Analysis.make_metrics(file_path=DIR + "/indexed/indexed_master_mesh_enriched.json",
+                      project_id="yso-en",
+                      abstract=True,
+                      fulltext=False,
+                      limit=None,
+                      threshold=None,
+                      n=10)
 
 
 
 """
-Here I describe _Utility and _Data in relation to the files in the edoc folder. 
+Here I describe _Utility and Data in relation to the files in the edoc folder. 
 
 OK 1. We start by extracting all data from edoc. We do this by conducting an advanced search with the date-field set to
 1900-2020. On the results page, we export the results as JSON. We use the data extracted pm 20201210 We have 68345 
@@ -913,21 +913,21 @@ _Utility.split_json and we end up with files of size 20 MB or less containing 50
 called raw_master_x-y.json where x and y indicate the entries as given by 1900-2020.json. These files are saved under
 eodc/raw
 
-OK 3. We select a subset of the entries downloaded from edoc. We use _Data.select_from_file to do so (for convencience on 
+OK 3. We select a subset of the entries downloaded from edoc. We use Data.select_from_file to do so (for convencience on 
 1900-2020.json, but it could also be iteratively employed on the files in edoc/raw). The fields chosen are "title", 
 "abstract", "keywords" and "id_number". The rationale for choosing these fields is given elsewhere (in short: we need 
 items from which to construct a gold standard). The resulting 4111 items are saved as sample_master.json in 
 edoc/sample.
 
-ok 4. We extract the keywords (per entry) from the sample entries with _Keywords.extract_keywords like so:
-keywords = _Keywords.extract_keywords(DIR + "/sample/sample_master.json")
+ok 4. We extract the keywords (per entry) from the sample entries with Keywords.extract_keywords like so:
+keywords = Keywords.extract_keywords(DIR + "/sample/sample_master.json")
 We the save the resulting list under edoc/keywords as keywords_raw.json like so:
 _Utility.save_json(keywords, DIR + "/keywords/keywords_extracted.json")
 
-ok 5. We clean the extracted keywords with _Keywords.clean_keywords. How and why this is done is explained elsewhere. This 
+ok 5. We clean the extracted keywords with Keywords.clean_keywords. How and why this is done is explained elsewhere. This 
 is done as follows:
 keywords_extracted = _Utility.load_json(DIR + "/keywords/keywords_extracted.json")
-keywords_clean = _Keywords.clean_keywords(keywords_extracted)
+keywords_clean = Keywords.clean_keywords(keywords_extracted)
 We the save the resulting list under edoc/keywords as keywords_clean.json like so:
 _Utility.save_json(clean, DIR + "keywords/keywords_clean.json")
 
@@ -945,19 +945,19 @@ ids Q000208 and D005007 but the second is on different line and exported as stan
 
 ok 7b. We try to enrich the reference keywords with YSO ids wherever they are missing. Increases YSO coverage from 1759 to
 3185. To do this:
-_Keywords.enrich_with_yso(DIR + "/keywords/keywords_reference.json", DIR + "/keywords/keywords_reference-test.json")
+Keywords.enrich_with_yso(DIR + "/keywords/keywords_reference.json", DIR + "/keywords/keywords_reference-test.json")
 
-8. We index the sample items with _Data.super_enrich_with_annif. How this works exactly is explained elsewhere. The 
+8. We index the sample items with Data.super_enrich_with_annif. How this works exactly is explained elsewhere. The 
 resulting file is indexed_master.json saved in edoc/index. 
 
 9. We enrich the sample items with MeSH keywords from PubMed if available (item needs a PubMed ID and items needs to
 be indexed with MeSH on PubMed, 1653 items match this requirement); the resulting file is indexed_master_mesh.json. Like 
 so: 
-_Data.enrich_with_mesh(DIR + "/indexed/indexed_master.json", DIR + "/indexed/indexed_master_mesh")
+Data.enrich_with_mesh(DIR + "/indexed/indexed_master.json", DIR + "/indexed/indexed_master_mesh")
 
 OK 10. We enrich the sample items with cleaned author keywords (including, if available, Qid, MeSH ID, YSO ID) based on 
 the reference keywords; the resulting file is indexed_master_mesh_enriched.json. To do so:
-_Data.enrich_author_keywords(DIR + "/indexed/indexed_master_mesh.json", DIR + "/indexed/indexed_master_mesh_enriched")
+Data.enrich_author_keywords(DIR + "/indexed/indexed_master_mesh.json", DIR + "/indexed/indexed_master_mesh_enriched")
 NOTE: rerun this whenever we amend the reference keywords! WE MUST DO THIS NOW
 """
 

@@ -203,7 +203,7 @@ employ any further restrictions. We can hence construct the sample data
 set by choosing exactly those items from \texttt{/edoc/raw} which have
 non-empty data fields \texttt{title}, \texttt{abstract},
 \texttt{id\_number}, and \texttt{keywords}. We do so by calling
-\texttt{\_Data.select\_from\_file} iteratively for all files in
+\texttt{\Data.select\_from\_file} iteratively for all files in
 \texttt{/edoc/raw}. The resulting file is saved in
 \texttt{/edoc/selected} as \texttt{selected\_master.json}.
 
@@ -242,7 +242,7 @@ field \texttt{keywords}: \(\chi^2 (df=9) =\) 2'314.533, \(p < 0.001\).
 The data foundation is available at
 \texttt{/edoc/analysis/chi\_square\_\{data\ field\}} and the
 \(\chi^2\)-statistic can be calculated by calling
-\texttt{\_Analysis.print\_chi\_square\_fit} on the data foundation
+\texttt{\Analysis.print\_chi\_square\_fit} on the data foundation
 files.}
 \end{figure}
 
@@ -270,7 +270,7 @@ sciences, medicine and economics (data field \texttt{department}:
 \(p < 0.001\)) as compared to the raw Edoc data. The data foundation is
 available at \texttt{/edoc/analysis/chi\_square\_\{data\ field\}} and
 the \(\chi^2\)-statistic can be calculated by calling
-\texttt{\_Analysis.print\_chi\_square\_fit} on the data foundation
+\texttt{\Analysis.print\_chi\_square\_fit} on the data foundation
 files.}
 \end{figure}
 
@@ -381,13 +381,13 @@ non-empty \texttt{keywords} data field for an item to be selected from
 the raw Edoc data (see \protect\hyperlink{selection}{subsection
 ``Selection''}). We can thus simply copy the information in the
 \texttt{keywords} data field on a per item basis. To do this, we call
-\texttt{\_Keywords.extract\_keywords} with the sample data set as
+\texttt{\Keywords.extract\_keywords} with the sample data set as
 argument and save the output as
 \texttt{keywords/keywords\_extracted.json} like so:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{keywords }\OperatorTok{=}\NormalTok{ \_Keywords.extract\_keywords(DIR }\OperatorTok{+} \StringTok{"/sample/sample\_master.json"}\NormalTok{)}
+\NormalTok{keywords }\OperatorTok{=}\NormalTok{ \Keywords.extract\_keywords(DIR }\OperatorTok{+} \StringTok{"/sample/sample\_master.json"}\NormalTok{)}
 \NormalTok{\_Utility.save\_json(keywords, DIR }\OperatorTok{+} \StringTok{"/keywords/keywords\_extracted.json"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
@@ -423,17 +423,17 @@ be broken into their component keywords and then parsed again. The
 reason for this is that Annif only assigns flat keywords and not keyword
 chains.
 
-\texttt{\_Keywords.clean\_keywords} is the implementation the parser
+\texttt{\Keywords.clean\_keywords} is the implementation the parser
 while the recursive cleaner is implemented by
-\texttt{\_Keywords.clean\_keyword}. To create the desired list of clean
+\texttt{\Keywords.clean\_keyword}. To create the desired list of clean
 keywords, saved as \texttt{/keywords/keywords\_clean.json}, we call
-\texttt{\_Keywords.clean\_keywords} with the extracted keywords as
+\texttt{\Keywords.clean\_keywords} with the extracted keywords as
 argument:
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{keywords\_extracted }\OperatorTok{=}\NormalTok{ \_Utility.load\_json(DIR }\OperatorTok{+} \StringTok{"/keywords/keywords\_extracted.json"}\NormalTok{)}
-\NormalTok{keywords\_clean }\OperatorTok{=}\NormalTok{ \_Keywords.clean\_keywords(keywords\_extracted)}
+\NormalTok{keywords\_clean }\OperatorTok{=}\NormalTok{ \Keywords.clean\_keywords(keywords\_extracted)}
 \NormalTok{\_Utility.save\_json(keywords\_clean, DIR }\OperatorTok{+} \StringTok{"keywords/keywords\_clean.json"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
@@ -444,14 +444,14 @@ argument:
 \texttt{/keywords/keywords\_clean.json} has 36'901 entries many of which
 are duplicates. We hence deduplicate and count the number of occurrences
 of each keyword. This is achieved by calling
-\texttt{\_Keywords.make\_histogram} on
+\texttt{\Keywords.make\_histogram} on
 \texttt{/keywords/keywords\_clean.json} and saving the output as
 \texttt{/keywords/keywords\_clean\_histogram.json}:
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{keywords\_clean }\OperatorTok{=}\NormalTok{ \_Utility.load\_json(DIR }\OperatorTok{+} \StringTok{"/keywords/keywords\_clean.json"}\NormalTok{)}
-\NormalTok{keywords\_histogram }\OperatorTok{=}\NormalTok{ \_Keywords.make\_histogram(keywords\_clean)}
+\NormalTok{keywords\_histogram }\OperatorTok{=}\NormalTok{ \Keywords.make\_histogram(keywords\_clean)}
 \NormalTok{\_Utility.save\_json(keywords\_histogram, DIR }\OperatorTok{+} \StringTok{"keywords/keywords\_clean\_histogram.json"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
@@ -474,14 +474,14 @@ the total occurrences.}
 \end{figure}
 
 To analyse the spread of keywords in the sample data set, the keywords
-per item are counted. To do so, we call \texttt{\_Keywords.make\_count}
+per item are counted. To do so, we call \texttt{\Keywords.make\_count}
 on \texttt{/indexed/indexed\_master\_mesh\_enriched.json} and save the
 output as \texttt{/analysis/keywords\_counted.json}:
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{sample\_data\_set }\OperatorTok{=}\NormalTok{ \_Utility.load\_json(DIR }\OperatorTok{+} \StringTok{"/indexed/indexed\_master\_mesh\_enriched.json"}\NormalTok{)}
-\NormalTok{keywords\_counted }\OperatorTok{=}\NormalTok{ \_Keywords.make\_count(sample\_data\_set)}
+\NormalTok{keywords\_counted }\OperatorTok{=}\NormalTok{ \Keywords.make\_count(sample\_data\_set)}
 \NormalTok{\_Utility.save\_json(keywords\_counted, DIR }\OperatorTok{+} \StringTok{"/analysis/keywords\_counted.json"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
@@ -589,14 +589,14 @@ https://api.finto.fi/). For each keyword in the list of reference
 keywords that lacks a YSO identifier, the Finto API is queried; if a
 term turns up, it is added to the keyword. The effect of this second
 reconcilement is detailed in Figure 4. It is achieved by calling
-\texttt{\_Keywords.enrich\_with\_yso} on
+\texttt{\Keywords.enrich\_with\_yso} on
 \texttt{/keywords/keywords\_reference.json} and saving the output as
 \texttt{/keywords/keywords\_reference\_master.json}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{keywords\_reference }\OperatorTok{=}\NormalTok{ \_Utility.load\_json(DIR }\OperatorTok{+} \StringTok{"/keywords/keywords\_reference.json"}\NormalTok{)}
-\NormalTok{keywords\_reference\_new }\OperatorTok{=}\NormalTok{ \_Keywords.enrich\_with\_yso(keywords\_reference)}
+\NormalTok{keywords\_reference\_new }\OperatorTok{=}\NormalTok{ \Keywords.enrich\_with\_yso(keywords\_reference)}
 \NormalTok{\_Utility.save\_json(keywords\_histogram, DIR }\OperatorTok{+} \StringTok{"keywords/keywords\_reference\_master.json"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
@@ -616,7 +616,7 @@ Wikidata.}
 
 Finally, consider the distribution of the cleaned and reconciled
 keywords per item in the Edoc sample data set. The corresponding data is
-generated with \texttt{\_Keywords.make\_count} as described in
+generated with \texttt{\Keywords.make\_count} as described in
 \protect\hyperlink{analysis}{subsection Analysis} above and available as
 \texttt{/analysis/keywords\_counted.json}. Figure 5 shows that the
 median number of keywords from MeSH or YSO might be too low to be
@@ -645,7 +645,7 @@ Let us now turn to the evaluation of the reconciliation: how many of the
 suggestions were correct? This question was answered via random sampling
 (following Roth and Heidenreich 1993, 204--25). The random sample
 (\(n=500\)) was created by calling
-\texttt{\_Analysis.make\_random\_sample} on
+\texttt{\Analysis.make\_random\_sample} on
 \texttt{/keywords/reference\_keywords\_master.json}; it is available at
 \texttt{/analysis/random\_keywords.json}. The sample was then imported
 into OpenRefine and the judgement (1 for correct, 0 for incorrect) of
@@ -812,7 +812,7 @@ cases of assigning subject terms (call them ``samples'') whereas the
 configuration with respect to assigning subject terms.
 
 To compute the F1-score, we call
-\texttt{\_Analysis.super\_make\_metrics} on
+\texttt{\Analysis.super\_make\_metrics} on
 \texttt{/indexed/indexed\_master\_mesh\_enriched}. The 100 output files
 are saved as \texttt{/metrics/metrics\_\{marker\}.json} where
 \texttt{marker} specifies the Annif configuration; a single file for
@@ -820,7 +820,7 @@ analysis is saved as \texttt{/analysis/metrics.json}:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{\_Analysis.super\_make\_metrics(DIR }\OperatorTok{+} \StringTok{"/indexed/indexed\_master\_mesh\_enriched.json"}\NormalTok{)}
+\NormalTok{\Analysis.super\_make\_metrics(DIR }\OperatorTok{+} \StringTok{"/indexed/indexed\_master\_mesh\_enriched.json"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -969,12 +969,12 @@ We begin again by constructing the data foundation. Since the Edoc
 \texttt{department} data field is mandatory, the sample data set is
 partitioned into blocks of departments by default. We can thus create a
 data foundation for each such block by calling
-\texttt{\_Analysis.super\_make\_metrics} with a departmental parameter:
+\texttt{\Analysis.super\_make\_metrics} with a departmental parameter:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ControlFlowTok{for}\NormalTok{ dept }\KeywordTok{in}\NormalTok{ \_Data.get\_departments():}
-\NormalTok{    \_Analysis.super\_make\_metrics(DIR }\OperatorTok{+} \StringTok{"/indexed/indexed\_master\_mesh\_enriched.json"}\NormalTok{, deparment}\OperatorTok{=}\NormalTok{dept)}
+\ControlFlowTok{for}\NormalTok{ dept }\KeywordTok{in}\NormalTok{ \Data.get\_departments():}
+\NormalTok{    \Analysis.super\_make\_metrics(DIR }\OperatorTok{+} \StringTok{"/indexed/indexed\_master\_mesh\_enriched.json"}\NormalTok{, deparment}\OperatorTok{=}\NormalTok{dept)}
 \end{Highlighting}
 \end{Shaded}
 

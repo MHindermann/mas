@@ -68,7 +68,7 @@ called `1942-2020.json`. `1942-2020.json` has two drawbacks. First, the maximum 
 second, `1942-2020.json` is too big to be handled by standard editors requiring special editors such as Oxygen. For
 these reasons `1942-2020.json` was split into smaller files that are easier handled and can be uploaded to GitHub. For
 this
-`_Utility.split_json` was used yielding 14 files of size 20 MB or less containing 5000 or fewer entries each. These
+`Utility.split_json` was used yielding 14 files of size 20 MB or less containing 5000 or fewer entries each. These
 files are called `raw_master_x-y.json` (where x and y indicate the entries as given by `1942-2020.json`) and saved under
 `/edoc/raw`.
 
@@ -141,7 +141,7 @@ have non-empty `keywords` data field. The caveats of this approach are discussed
 
 Taking into account the third constraint simply means that we do not employ any further restrictions. We can hence 
 construct the sample data set by choosing exactly those items from `/edoc/raw` which have non-empty data fields 
-`title`, `abstract`, `id_number`, and `keywords`. We do so by calling `_Data.select_from_file` iteratively for all 
+`title`, `abstract`, `id_number`, and `keywords`. We do so by calling `Data.select_from_file` iteratively for all 
 files in `/edoc/raw`. The resulting file is saved in `/edoc/selected` as `selected_master.json`. 
 
 ## Analysis
@@ -152,11 +152,11 @@ Of the 68'345 items in `/edoc/raw`, all have a title (non-empty `title` data fie
 
 In order to determine how well the sample data set represents the raw Edoc data, a one-sample $\chi^2$ goodnes of fit test was conducted on each selection data field [following @Parke.2013, chapter 1]. The results indicate that the sample data proportions of items are significantly different from the raw Edoc data per department (see Figure 1 for more details).
 
-![The sample data set ($n$ = 4'111) is not representative of the raw Edoc data per department. Data field `abstract`: $\chi^2 (df=9) =$ 3'160.556, $p < 0.001$; data field `id_number`: $\chi^2 (df=9) =$ 4'209.0285, $p < 0.001$; data field `keywords`: $\chi^2 (df=9) =$ 2'314.533, $p < 0.001$. The data foundation is available at `/edoc/analysis/chi_square_{data field}` and the $\chi^2$-statistic can be calculated by calling `_Analysis.print_chi_square_fit` on the data foundation files.](images/chi_square_selection_fields.pdf)
+![The sample data set ($n$ = 4'111) is not representative of the raw Edoc data per department. Data field `abstract`: $\chi^2 (df=9) =$ 3'160.556, $p < 0.001$; data field `id_number`: $\chi^2 (df=9) =$ 4'209.0285, $p < 0.001$; data field `keywords`: $\chi^2 (df=9) =$ 2'314.533, $p < 0.001$. The data foundation is available at `/edoc/analysis/chi_square_{data field}` and the $\chi^2$-statistic can be calculated by calling `Analysis.print_chi_square_fit` on the data foundation files.](images/chi_square_selection_fields.pdf)
 
  The sample data set is hence not representative of the raw Edoc data. This is not surprising since its construction is strongly biased. This bias has the effect that the sample data set is significantly skewed towards English journal publications in the sciences, medicine and economics from the 21st century (again, this is shown by a one-sample $\chi^2$ goodness of fit test, see Figure 2 for more details). The upshot of this analysis is that the humanities are underrepresented in the sample data set. Therefore, any results with respect to the quality of machine indexing discussed below might not be applicable to the humanities.
 
-![The sample data set ($n$ = 4'111) is significantly skewed towards English (data field `language`: $\chi^2 (df=3) =$ 1'441.414, $p < 0.001$) journal publications (data field `type`: $\chi^2 (df=10) =$ 52'519.743, $p < 0.001$) in the sciences, medicine and economics (data field `department`: $\chi^2 (df=9) =$ 14'447.276, $p < 0.001$) from the 21st century (data field `date`: $\chi^2 (df=7) =$ 35'878.493, $p < 0.001$) as compared to the raw Edoc data. The data foundation is available at `/edoc/analysis/chi_square_{data field}` and the $\chi^2$-statistic can be calculated by calling `_Analysis.print_chi_square_fit` on the data foundation files.](images/raw_sample_analysis.pdf)
+![The sample data set ($n$ = 4'111) is significantly skewed towards English (data field `language`: $\chi^2 (df=3) =$ 1'441.414, $p < 0.001$) journal publications (data field `type`: $\chi^2 (df=10) =$ 52'519.743, $p < 0.001$) in the sciences, medicine and economics (data field `department`: $\chi^2 (df=9) =$ 14'447.276, $p < 0.001$) from the 21st century (data field `date`: $\chi^2 (df=7) =$ 35'878.493, $p < 0.001$) as compared to the raw Edoc data. The data foundation is available at `/edoc/analysis/chi_square_{data field}` and the $\chi^2$-statistic can be calculated by calling `Analysis.print_chi_square_fit` on the data foundation files.](images/raw_sample_analysis.pdf)
 
 # Machine indexing
 
@@ -208,11 +208,11 @@ These steps are explained in more detail in what follows.
 
 ### Extract keywords
 
-In a first step, the keywords must be extracted from the sample data set `/sample/sample_master.json`. Recall that we mandated a non-empty `keywords` data field for an item to be selected from the raw Edoc data (see [subsection "Selection"](#selection)). We can thus simply copy the information in the `keywords` data field on a per item basis. To do this, we call `_Keywords.extract_keywords` with the sample data set as argument and save the output as `keywords/keywords_extracted.json` like so:
+In a first step, the keywords must be extracted from the sample data set `/sample/sample_master.json`. Recall that we mandated a non-empty `keywords` data field for an item to be selected from the raw Edoc data (see [subsection "Selection"](#selection)). We can thus simply copy the information in the `keywords` data field on a per item basis. To do this, we call `Keywords.extract_keywords` with the sample data set as argument and save the output as `keywords/keywords_extracted.json` like so:
 
 ~~~~{.Python caption="extract_keywords"}
-keywords = _Keywords.extract_keywords(DIR + "/sample/sample_master.json")
-_Utility.save_json(keywords, DIR + "/keywords/keywords_extracted.json")
+keywords = Keywords.extract_keywords(DIR + "/sample/sample_master.json")
+Utility.save_json(keywords, DIR + "/keywords/keywords_extracted.json")
 ~~~~
 
 ### Clean keywords
@@ -221,34 +221,34 @@ In second step, a list of all single keywords must be created. In order to do so
 
 Next the so parsed single keywords must be cleaned or normalized: we want the keywords to follow a uniform format thereby joining morphological duplicates such as "Gene", "gene", "gene_", "gene/", and so on. Also, some keywords are in fact keyword chains, for example "Dendrites/metabolism/ultrastructure". Keyword chains must be broken into their component keywords and then parsed again. The reason for this is that Annif only assigns flat keywords and not keyword chains. 
 
-`_Keywords.clean_keywords` is the implementation the parser while the recursive cleaner is implemented by `_Keywords.clean_keyword`. To create the desired list of clean keywords, saved as `/keywords/keywords_clean.json`, we call `_Keywords.clean_keywords` with the extracted keywords as argument:
+`Keywords.clean_keywords` is the implementation the parser while the recursive cleaner is implemented by `Keywords.clean_keyword`. To create the desired list of clean keywords, saved as `/keywords/keywords_clean.json`, we call `Keywords.clean_keywords` with the extracted keywords as argument:
 
 ~~~~{.Python caption="extract_keywords"}
-keywords_extracted = _Utility.load_json(DIR + "/keywords/keywords_extracted.json")
-keywords_clean = _Keywords.clean_keywords(keywords_extracted)
-_Utility.save_json(keywords_clean, DIR + "keywords/keywords_clean.json")
+keywords_extracted = Utility.load_json(DIR + "/keywords/keywords_extracted.json")
+keywords_clean = Keywords.clean_keywords(keywords_extracted)
+Utility.save_json(keywords_clean, DIR + "keywords/keywords_clean.json")
 ~~~~
 
 ### Analysis
 
-`/keywords/keywords_clean.json` has 36'901 entries many of which are duplicates. We hence deduplicate and count the number of occurrences of each keyword. This is achieved by calling `_Keywords.make_histogram` on `/keywords/keywords_clean.json` and saving the output as `/keywords/keywords_clean_histogram.json`:
+`/keywords/keywords_clean.json` has 36'901 entries many of which are duplicates. We hence deduplicate and count the number of occurrences of each keyword. This is achieved by calling `Keywords.make_histogram` on `/keywords/keywords_clean.json` and saving the output as `/keywords/keywords_clean_histogram.json`:
 
 ~~~~{.Python caption="make_histogram"}
-keywords_clean = _Utility.load_json(DIR + "/keywords/keywords_clean.json")
-keywords_histogram = _Keywords.make_histogram(keywords_clean)
-_Utility.save_json(keywords_histogram, DIR + "keywords/keywords_clean_histogram.json")
+keywords_clean = Utility.load_json(DIR + "/keywords/keywords_clean.json")
+keywords_histogram = Keywords.make_histogram(keywords_clean)
+Utility.save_json(keywords_histogram, DIR + "keywords/keywords_clean_histogram.json")
 ~~~~
 
 An analysis of `/keywords/keywords_clean_histogram.json` shows that the lion's share of keywords has only one occurrence but that the total occurrences are predominantly made up of keywords with more than one occurrence (see Figure 3 for details).
 
 ![In `keywords/keywords_clean_histogram.json`, the distribution of keywords is strongly skewed right (min = Q1 = M = Q3 = 1, max = 910). However, even though keywords with only one occurrence constitute over 75% of the total keywords, their occurrences constitute less than 35% of the total occurrences. The most common keywords with 50 or more occurrences are extreme outliers but make up almost 20% of the total occurrences.](images/keywords_clean_histogram_abc.pdf)
 
-To analyse the spread of keywords in the sample data set, the keywords per item are counted. To do so, we call `_Keywords.make_count` on `/indexed/indexed_master_mesh_enriched.json` and save the output as `/analysis/keywords_counted.json`:
+To analyse the spread of keywords in the sample data set, the keywords per item are counted. To do so, we call `Keywords.make_count` on `/indexed/indexed_master_mesh_enriched.json` and save the output as `/analysis/keywords_counted.json`:
 
 ~~~~{.Python caption="count_keywords"}
-sample_data_set = _Utility.load_json(DIR + "/indexed/indexed_master_mesh_enriched.json")
-keywords_counted = _Keywords.make_count(sample_data_set)
-_Utility.save_json(keywords_counted, DIR + "/analysis/keywords_counted.json")
+sample_data_set = Utility.load_json(DIR + "/indexed/indexed_master_mesh_enriched.json")
+keywords_counted = Keywords.make_count(sample_data_set)
+Utility.save_json(keywords_counted, DIR + "/analysis/keywords_counted.json")
 ~~~~
 
 The median number of keywords for an item in the sample data set is 6 with an IQR of 4 (min = 0, Q1 = 4, M = 6, Q3 = 8, max = 87).  Of course, items in the sample data set with a number of keywords below the first and above the third quartile are highly suspect from a qualitative point of view: when it comes to subject indexing, some terms are required, but more is usually worse [!! source]. Items with too few or too many keywords will be discussed in more detail in section [section Assessment](#assessment)
@@ -267,23 +267,23 @@ First, the suggestions to the top 500 keywords were manually verified. These key
 
 Second, systematic biases were identified and removed. The most prevalent bias was an due to a suggestion's type. As stated above, the reconciliation service API was not constrained by type but had access to the complete Wikidata database. Since Wikidata is an ontology that encompasses everything, it also features types whose concepts cannot qualify as subject terms (at least in the present context). The most prominent example is the type Q13442814 "scholarly article". Wikidata contains the metadata of many scholarly articles. Now, for some of our keywords, there is a scholarly article with a title that exactly matches the keyword; and since there is no restriction concerning the type, the scholarly article is suggested with high confidence (see https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation-Service-API for details). For example, [keyword/article]. To generalize, suggestions with types whose concepts are proper names are usually incorrect. Based on this observation, suggestions with the following types were rejected: "scholarly article", "clinical trial", "scientific journal", "academic journal", "open access journal", "thesis", "doctoral thesis", "natural number". Suggestions with the following types were manually verified (i.e., checked for correctness): "human", "album", "film", "musical group", "business", "literary work", "television series", "organization", "family name", "written work", "video game", "single, television series episode", "painting", "commune of France", "city of the United States", "magazine", "studio album", "year", "nonprofit organization", "border town", "international organization", "political party", "software", "song", "website", "article comic strip", "collection", "commune of Italy", "fictional human", "film", "government agency", "village", "academic journal article", "female given name", "poem".
 
-With these improvements in place, each keyword with a suggestion was assigned a QID via the "Add cloumns from reconciled values"-function (and similar for YSO and MeSH identifiers). The data was then exported and saved as `/keywords/keywords_reference.json`. Keywords with a QID now constitute 69% of all keywords and 78% of their total occurrences in the sample data set, but these numbers are significantly lower for the MeSH identifier (53.6% of all keywords with only 28.8% of all occurrences) and especially low for the YSO identifier (26.9% of all keywords with 11% of all occurrences). In both cases, the problem is due to the fact that Wikidata's mapping of MeSH respectively YSO is only partial. There can be two reasons for this state of affairs for a given entry: either there is no match between Wikidata and YSO or MeSH (after all, Wikidata is much larger than MeSH and YSO taken together), or there is a match but it has not yet been added to the mapping. In the latter case, at least with respect to YSO, there is a solution: Finto provides a REST-sytle API to access the YSO vocabulary directly (see https://api.finto.fi/). For each keyword in the list of reference keywords that lacks a YSO identifier, the Finto API is queried; if a term turns up, it is added to the keyword. The effect of this second reconcilement is detailed in Figure 4. It is achieved by calling `_Keywords.enrich_with_yso` on `/keywords/keywords_reference.json` and saving the output as `/keywords/keywords_reference_master.json`
+With these improvements in place, each keyword with a suggestion was assigned a QID via the "Add cloumns from reconciled values"-function (and similar for YSO and MeSH identifiers). The data was then exported and saved as `/keywords/keywords_reference.json`. Keywords with a QID now constitute 69% of all keywords and 78% of their total occurrences in the sample data set, but these numbers are significantly lower for the MeSH identifier (53.6% of all keywords with only 28.8% of all occurrences) and especially low for the YSO identifier (26.9% of all keywords with 11% of all occurrences). In both cases, the problem is due to the fact that Wikidata's mapping of MeSH respectively YSO is only partial. There can be two reasons for this state of affairs for a given entry: either there is no match between Wikidata and YSO or MeSH (after all, Wikidata is much larger than MeSH and YSO taken together), or there is a match but it has not yet been added to the mapping. In the latter case, at least with respect to YSO, there is a solution: Finto provides a REST-sytle API to access the YSO vocabulary directly (see https://api.finto.fi/). For each keyword in the list of reference keywords that lacks a YSO identifier, the Finto API is queried; if a term turns up, it is added to the keyword. The effect of this second reconcilement is detailed in Figure 4. It is achieved by calling `Keywords.enrich_with_yso` on `/keywords/keywords_reference.json` and saving the output as `/keywords/keywords_reference_master.json`
 
 ~~~~{.Python caption="enrich_with_yso"}
-keywords_reference = _Utility.load_json(DIR + "/keywords/keywords_reference.json")
-keywords_reference_new = _Keywords.enrich_with_yso(keywords_reference)
-_Utility.save_json(keywords_histogram, DIR + "keywords/keywords_reference_master.json")
+keywords_reference = Utility.load_json(DIR + "/keywords/keywords_reference.json")
+keywords_reference_new = Keywords.enrich_with_yso(keywords_reference)
+Utility.save_json(keywords_histogram, DIR + "keywords/keywords_reference_master.json")
 ~~~~
 
 ![The coverage of `/keywords/keywords_reference_master.json` by the controlled vocabularies of Wikidata (QID), Medical Subject Headings (MeSH), and YSO (General Finnish Ontology). Both MeSH and YSO are dependent on QID but independent of each other. YSO enriched is the superset of YSO created by reconciling keywords that lack a YSO identifier directly with the YSO database provided by the Finto API; it is hence independent of Wikidata.](images/native_gold_standard.pdf)
 
-Finally, consider the distribution of the cleaned and reconciled keywords per item in the Edoc sample data set. The corresponding data is generated with `_Keywords.make_count` as described in [subsection Analysis](#analysis) above and available as `/analysis/keywords_counted.json`. Figure 5 shows that the median number of keywords from MeSH or YSO might be too low to be adequate. This problem can be amended by imposing further constraints on the sample data set and such a solution is discussed in section [!! section].
+Finally, consider the distribution of the cleaned and reconciled keywords per item in the Edoc sample data set. The corresponding data is generated with `Keywords.make_count` as described in [subsection Analysis](#analysis) above and available as `/analysis/keywords_counted.json`. Figure 5 shows that the median number of keywords from MeSH or YSO might be too low to be adequate. This problem can be amended by imposing further constraints on the sample data set and such a solution is discussed in section [!! section].
 
 ![The distribution of keywords per item in the Edoc sample data set. The leftmost boxplot shows the distribution of cleaned keywords (min = 0, Q1 = 4, M = 6, Q3 = 8, max = 87); the other boxplots show the distribution of cleaned keywords with reconciled QID (min = 0, Q1 = 2, M = 4, Q3 = 6, max = 80), MeSH ID (min = Q1 = 0, M = 2, Q3 = 4, max = 63), and YSO ID respectively (min = Q1 = 0, M = 1, Q3 = 2, max = 46). All four distributions are similarly consistent, but there is a linear decrease of the distribution's center leaving MeSH and YSO with potentially too few descriptors to represent an adequate indexing.](images/keywords_counted.pdf)
 
 ### Discussion
 
-Let us now turn to the evaluation of the reconciliation: how many of the suggestions were correct? This question was answered via random sampling [following @Roth.1993, pp. 204-225]. The random sample ($n=500$) was created by calling `_Analysis.make_random_sample` on `/keywords/reference_keywords_master.json`; it is available at `/analysis/random_keywords.json`. The sample was then imported into OpenRefine and the judgement (1 for correct, 0 for incorrect) of the manual verification was recorded in the column `verification`. The data was then exported and is available at `/analysis/random_keywords_verified.csv`. 
+Let us now turn to the evaluation of the reconciliation: how many of the suggestions were correct? This question was answered via random sampling [following @Roth.1993, pp. 204-225]. The random sample ($n=500$) was created by calling `Analysis.make_random_sample` on `/keywords/reference_keywords_master.json`; it is available at `/analysis/random_keywords.json`. The sample was then imported into OpenRefine and the judgement (1 for correct, 0 for incorrect) of the manual verification was recorded in the column `verification`. The data was then exported and is available at `/analysis/random_keywords_verified.csv`. 
 
 An analysis of this data shows that 53% of the suggestions in the random sample were correct with a 95% confidence interval of 48.8% to 57.3%. We can therefore conclude that 8'507 $\pm$ 692.1 of the 16'050 keywords in `/keywords/reference_keywords.json` have correct suggestions. Note that of the 235 incorrect suggestions in the random sample, 188 were incorrect by default because they were missing a QID; the share of non-empty yet incorrect suggestions is only 9.4% in the random sample meaning that the quality of the reconciliation is not as disappointing as it might seem at first glance.
 
@@ -362,10 +362,10 @@ Combining these parameters, we really have 100 Annif configurations whose perfor
 
 For each configuration, the F1-score was then computed. It is important to note that each metric comes in three different flavors dubbed "macro", "micro", and "weighted" respectively [see @Sokolova.2009]. In the macro flavor, the metric represents simply the mean per class (i.e., correct or incorrect suggestion). The weighted metric is the macro metric but each class is weighted by its true positives. By contrast, a metric with the micro flavor is computed globally over all true positives and false positives respectively negatives. So the "macro" and "weighted" flavors are useful for assessing the performance of a configuration with respect to individual cases of assigning subject terms (call them "samples") whereas the "micro" flavor is most suitable to assess the overall performance of a configuration with respect to assigning subject terms.
 
-To compute the F1-score, we call `_Analysis.super_make_metrics` on `/indexed/indexed_master_mesh_enriched`. The 100 output files are saved as `/metrics/metrics_{marker}.json` where `marker` specifies the Annif configuration; a single file for analysis is saved as `/analysis/metrics.json`:
+To compute the F1-score, we call `Analysis.super_make_metrics` on `/indexed/indexed_master_mesh_enriched`. The 100 output files are saved as `/metrics/metrics_{marker}.json` where `marker` specifies the Annif configuration; a single file for analysis is saved as `/analysis/metrics.json`:
 
 ~~~~{.Python caption="make_metrics"}
-_Analysis.super_make_metrics(DIR + "/indexed/indexed_master_mesh_enriched.json")
+Analysis.super_make_metrics(DIR + "/indexed/indexed_master_mesh_enriched.json")
 ~~~~
 
 Note that the data foundation includes additional information, namely the sample size and the raw values for the confusion matrix. The sample size is a histogram of each instance in which a value in the confusion matrix was computed, that is, each case in which either Annif or the native gold standard assigned a subject term. Finally, note that if an item in the Edoc sample data set had an empty native gold standard, no score was computed; this is the case exactly if none of the cleaned keywords had been matched to Wikidata or YSO respectively. Configurations with a Wikidata vocabulary had a scoring coverage of 94.38% of the items in the sample data set as compared to only 62.84% for configurations with a YSO vocabulary.
@@ -407,11 +407,11 @@ Let us turn to the parameter of the maximum number of suggestions per item in th
 
 In [section "General results"](#general-results) I have identified and discussed the overall best Annif configerations. However, in [section "Analysis"](#analysis)) I had also noted the caveat that the performance of Annif might vary according to department due to systematic biases in constructing the Edoc sample data set. In this section I will therefore assess the performance of the various Annif configurations per department. 
 
-We begin again by constructing the data foundation. Since the Edoc `department` data field is mandatory, the sample data set is partitioned into blocks of departments by default. We can thus create a data foundation for each such block by calling `_Analysis.super_make_metrics` with a departmental parameter:
+We begin again by constructing the data foundation. Since the Edoc `department` data field is mandatory, the sample data set is partitioned into blocks of departments by default. We can thus create a data foundation for each such block by calling `Analysis.super_make_metrics` with a departmental parameter:
 
 ~~~~{.Python caption="make_metrics_department"}
-for dept in _Data.get_departments():
-    _Analysis.super_make_metrics(DIR + "/indexed/indexed_master_mesh_enriched.json", deparment=dept)
+for dept in Data.get_departments():
+    Analysis.super_make_metrics(DIR + "/indexed/indexed_master_mesh_enriched.json", deparment=dept)
 ~~~~
 
 This yields 1000 files in `/metrics/metrics_{department}_{marker}.json` (100 configurations $*$ 10 departments) where `department` specifies the department according to the Edoc convention. The data foundation is summarized in `/analysis/metrics.json`.
