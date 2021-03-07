@@ -68,7 +68,7 @@ class Utility:
 
 
 class Data:
-    """ A collection of edoc data functions. """
+    """ A collection of Edoc data functions. """
 
     @classmethod
     def select_from_data(cls,
@@ -140,7 +140,7 @@ class Data:
                                save_path: str) -> None:
         """ Enrich author keywords.
 
-        For each edoc item: the string of author keywords is cut into single keywords and each keyword is cleaned. Each
+        For each Edoc item: the string of author keywords is cut into single keywords and each keyword is cleaned. Each
         keyword is then enriched with Qid, MeSH and YSO ID if available.
 
         :param file_path: complete path to file including filename and extension
@@ -195,7 +195,7 @@ class Data:
     def enrich_with_mesh(cls,
                          file_path: str,
                          save_path: str) -> None:
-        """ Enrich edoc data per item with MeSH keywords from PubMed if available.
+        """ Enrich Edoc data per item with MeSH keywords from PubMed if available.
 
         :param file_path: complete path to file including filename and extension
         :param save_path: complete path to save folder including filename without extension
@@ -345,7 +345,7 @@ class Data:
 
 
 class Keywords:
-    """ A collection of functions for manipulating edoc author keywords. """
+    """ A collection of functions for manipulating Edoc author keywords. """
 
     @classmethod
     def extract_keywords(cls,
