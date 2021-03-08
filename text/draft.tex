@@ -317,7 +317,29 @@ constructing a gold standard (see
 \protect\hyperlink{gold-standard}{section ``Gold standard''}) remains
 the same.
 
-Annif vocs that are available
+The vocabularies provided by the Annif API are the General Finnish
+Ontology or YSO in short (see https://finto.fi/yso/en/) and Wikidata
+(see https://www.wikidata.org/). Each vocabulary is combined with an
+algorithm or algorithm ensemble respectively and a specific language to
+create a so-called Annif ``project.'' The five projects used in what
+follows are summarized in Table 1. A high-level description of the
+algorithm(s) is given by Suominen (2019, 7--10). Information on
+implementation can be found at the Annif GitHub Wiki (see
+https://github.com/NatLibFi/Annif/wiki).
+
+\begin{table}[]
+\centering
+\begin{tabular}{llll}
+Annif project   & Vocabulary & Language & Algorithm(s)   \\ \hline
+\texttt{yso-en}  & YSO        & English  & NN ensemble \\
+\texttt{yso-maui-en}     & YSO        & English  & Maui        \\
+\texttt{yso-bonsai-en}   & YSO        & English  & Omikuji     \\
+\texttt{yso-fasttext-en} & YSO        & English  & fastText    \\
+\texttt{wikidata-en}     & Wikidata   & English  & TF-IDF     
+\end{tabular}
+\caption{Annif projects used to index the items of the Edoc sample data set.}
+\label{tab:my-table}
+\end{table}
 
 \hypertarget{implementation}{%
 \subsection{Implementation}\label{implementation}}
@@ -390,10 +412,8 @@ The construction of the derivative gold standard takes three steps:
 \item
   Clean the extracted keywords.
 \item
-  Reconcile the extracted keywords with.
+  Reconcile the extracted keywords with Wikidata and YSO.
 \end{enumerate}
-
-The intended output of this transformation process is\ldots{}
 
 These steps are explained in more detail in what follows.
 
@@ -413,8 +433,8 @@ so:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{keywords }\OperatorTok{=}\NormalTok{ Keywords.extract\_keywords(DIR }\OperatorTok{+} \StringTok{"/sample/sample\_master.json"}\NormalTok{)}
-\NormalTok{Utility.save\_json(keywords, DIR }\OperatorTok{+} \StringTok{"/keywords/keywords\_extracted.json"}\NormalTok{)}
+\NormalTok{keywords }\OperatorTok{=}\NormalTok{ Keywords.extract\_keywords(}\StringTok{"/sample/sample\_master.json"}\NormalTok{)}
+\NormalTok{Utility.save\_json(keywords, }\StringTok{"/keywords/keywords\_extracted.json"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -455,9 +475,9 @@ argument:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{keywords\_extracted }\OperatorTok{=}\NormalTok{ Utility.load\_json(DIR }\OperatorTok{+} \StringTok{"/keywords/keywords\_extracted.json"}\NormalTok{)}
+\NormalTok{keywords\_extracted }\OperatorTok{=}\NormalTok{ Utility.load\_json(}\StringTok{"/keywords/keywords\_extracted.json"}\NormalTok{)}
 \NormalTok{keywords\_clean }\OperatorTok{=}\NormalTok{ Keywords.clean\_keywords(keywords\_extracted)}
-\NormalTok{Utility.save\_json(keywords\_clean, DIR }\OperatorTok{+} \StringTok{"keywords/keywords\_clean.json"}\NormalTok{)}
+\NormalTok{Utility.save\_json(keywords\_clean, }\StringTok{"keywords/keywords\_clean.json"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -473,9 +493,9 @@ of each keyword. This is achieved by calling
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{keywords\_clean }\OperatorTok{=}\NormalTok{ Utility.load\_json(DIR }\OperatorTok{+} \StringTok{"/keywords/keywords\_clean.json"}\NormalTok{)}
+\NormalTok{keywords\_clean }\OperatorTok{=}\NormalTok{ Utility.load\_json(}\StringTok{"/keywords/keywords\_clean.json"}\NormalTok{)}
 \NormalTok{keywords\_histogram }\OperatorTok{=}\NormalTok{ Keywords.make\_histogram(keywords\_clean)}
-\NormalTok{Utility.save\_json(keywords\_histogram, DIR }\OperatorTok{+} \StringTok{"keywords/keywords\_clean\_histogram.json"}\NormalTok{)}
+\NormalTok{Utility.save\_json(keywords\_histogram, }\StringTok{"keywords/keywords\_clean\_histogram.json"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -503,9 +523,9 @@ output as \texttt{/analysis/keywords\_counted.json}:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{sample\_data\_set }\OperatorTok{=}\NormalTok{ Utility.load\_json(DIR }\OperatorTok{+} \StringTok{"/indexed/indexed\_master.json"}\NormalTok{)}
+\NormalTok{sample\_data\_set }\OperatorTok{=}\NormalTok{ Utility.load\_json(}\StringTok{"/indexed/indexed\_master.json"}\NormalTok{)}
 \NormalTok{keywords\_counted }\OperatorTok{=}\NormalTok{ Keywords.make\_count(sample\_data\_set)}
-\NormalTok{Utility.save\_json(keywords\_counted, DIR }\OperatorTok{+} \StringTok{"/analysis/keywords\_counted.json"}\NormalTok{)}
+\NormalTok{Utility.save\_json(keywords\_counted, }\StringTok{"/analysis/keywords\_counted.json"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -514,25 +534,26 @@ with an IQR of 4 (min = 0, Q1 = 4, M = 6, Q3 = 8, max = 87). Of course,
 items in the sample data set with a number of keywords below the first
 and above the third quartile are highly suspect from a qualitative point
 of view: when it comes to subject indexing, some terms are required, but
-more is usually worse {[}!! source{]}. Items with too few or too many
-keywords will be discussed in more detail in section
-\protect\hyperlink{assessment}{section Assessment}
+more is usually worse. Items with too few or too many keywords will be
+discussed in more detail in section
+\protect\hyperlink{assessment}{section ``Assessment''}
 
 \hypertarget{reconciliation}{%
 \subsection{Reconciliation}\label{reconciliation}}
 
-As explained in section X, Annif assigns index terms from a controlled
-vocabulary. If we want to assess the quality of the indexing via a gold
-standard, we must therefore ensure that the gold standard makes use of
-the vocabulary used by Annif. As seen in section Y, the relevant
-(English) vocabularies are Wikidata YSO. The next step in constructing
-the derivative gold standard is hence to match the extracted and cleaned
-keywords with keywords from YSO and Wikidata. This process is called
-``reconciliation'' (see https://docs.openrefine.org/manual/reconciling)
-and the tool of choice for this task is OpenRefine (see
-\protect\hyperlink{openrefine}{section OpenRefine}).
+As explained in \protect\hyperlink{machine-indexing}{section ``Machine
+indexing''}, Annif assigns index terms from a controlled vocabulary. If
+we want to assess the quality of the indexing via a gold standard, we
+must therefore ensure that the gold standard makes use of the vocabulary
+used by Annif. The relevant (English) vocabularies are Wikidata and YSO.
+The next step in constructing the derivative gold standard is hence to
+match the extracted and cleaned keywords with keywords from Wikidata and
+YSO. This process is called ``reconciliation'' (see
+https://docs.openrefine.org/manual/reconciling) and the tool of choice
+for this task is OpenRefine (see
+\protect\hyperlink{introduction}{section ``Introduction''}).
 
-In this section, I will describe how the cleaned keywords were
+In what follows, I will describe how the cleaned keywords were
 reconciled with Wikidata and YSO, and which additional steps for
 refinement were undertaken. In total, 2'104 data transformation
 operations were performed; the complete operation history is available
@@ -573,24 +594,24 @@ keywords, there is a scholarly article with a title that exactly matches
 the keyword; and since there is no restriction concerning the type, the
 scholarly article is suggested with high confidence (see
 https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation-Service-API
-for details). For example, {[}keyword/article{]}. To generalize,
-suggestions with types whose concepts are proper names are usually
-incorrect. Based on this observation, suggestions with the following
-types were rejected: ``scholarly article,'' ``clinical trial,''
-``scientific journal,'' ``academic journal,'' ``open access journal,''
-``thesis,'' ``doctoral thesis,'' ``natural number.'' Suggestions with
-the following types were manually verified (i.e., checked for
-correctness): ``human,'' ``album,'' ``film,'' ``musical group,''
-``business,'' ``literary work,'' ``television series,''
-``organization,'' ``family name,'' ``written work,'' ``video game,''
-``single, television series episode,'' ``painting,'' ``commune of
-France,'' ``city of the United States,'' ``magazine,'' ``studio album,''
-``year,'' ``nonprofit organization,'' ``border town,'' ``international
-organization,'' ``political party,'' ``software,'' ``song,''
-``website,'' ``article comic strip,'' ``collection,'' ``commune of
-Italy,'' ``fictional human,'' ``film,'' ``government agency,''
-``village,'' ``academic journal article,'' ``female given name,''
-``poem.''
+for details). To generalize, suggestions with types whose concepts are
+proper names are usually incorrect. Based on this observation,
+suggestions with types such as ``scholarly article,'' ``clinical
+trial,'' and ``scientific journal'' were rejected.\footnote{The complete
+  list includes ``academic journal,'' ``open access journal,''
+  ``thesis,'' ``doctoral thesis,'' and ``natural number.''} Suggestions
+types such as ``human,'' ``album,'' and ``commune of France'' were
+manually verified (i.e., checked for correctness).\footnote{The complete
+  list includes ``film,'' ``musical group,'' ``business,'' ``literary
+  work,'' ``television series,'' ``organization,'' ``family name,''
+  ``written work,'' ``video game,'' ``single, television series
+  episode,'' ``painting,'' , ``city of the United States,''
+  ``magazine,'' ``studio album,'' ``year,'' ``nonprofit organization,''
+  ``border town,'' ``international organization,'' ``political party,''
+  ``software,'' ``song,'' ``website,'' ``article comic strip,''
+  ``collection,'' ``commune of Italy,'' ``fictional human,'' ``film,''
+  ``government agency,'' ``village,'' ``academic journal article,''
+  ``female given name,'' and ``poem.''}
 
 With these improvements in place, each keyword with a suggestion was
 assigned a QID via the ``Add cloumns from reconciled values''-function
@@ -618,9 +639,9 @@ reconcilement is detailed in Figure 4. It is achieved by calling
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{keywords\_reference }\OperatorTok{=}\NormalTok{ Utility.load\_json(DIR }\OperatorTok{+} \StringTok{"/keywords/keywords\_reference.json"}\NormalTok{)}
+\NormalTok{keywords\_reference }\OperatorTok{=}\NormalTok{ Utility.load\_json(}\StringTok{"/keywords/keywords\_reference.json"}\NormalTok{)}
 \NormalTok{keywords\_reference\_new }\OperatorTok{=}\NormalTok{ Keywords.enrich\_with\_yso(keywords\_reference)}
-\NormalTok{Utility.save\_json(keywords\_histogram, DIR }\OperatorTok{+} \StringTok{"keywords/keywords\_reference\_master.json"}\NormalTok{)}
+\NormalTok{Utility.save\_json(keywords\_histogram, }\StringTok{"keywords/keywords\_reference\_master.json"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -690,7 +711,7 @@ disappointing as it might seem at first glance.
 \section{Assessment}\label{assessment}}
 
 In this section I will assess the quality of the sample data set's
-indexing with Annif based on the gold standard.
+indexing by Annif based on the gold standard.
 
 \hypertarget{precision-recall-f1-score}{%
 \subsection{Precision, recall,
@@ -707,7 +728,7 @@ neglected here.
 Let us briefly look at the definitions and motivations of the chosen
 metrics. Remember that a suggestion of a subject term is correct if and
 only if the subject term is in the derivative gold standard. The
-possible outcomes are summarized in Table 1.
+possible outcomes are summarized in Table 2.
 
 \begin{table}[h]
 \centering
@@ -749,12 +770,7 @@ $\text{F1} = \displaystyle 2 * \frac{\text{Precision} * \text{Recall}}{\text{Pre
 \end{center}
 
 The above scoring metrics were implemented using the scikit-learn
-machine learning library (Pedregosa et al. 2011). For a given Annif
-configuration
-(\protect\hyperlink{annif-versus-derivative-gold-standard}{section
-``Annif versus derivative gold standard''})\ldots{} {[}perhaps explain
-how it is done, important to mention transformation of multilabel to
-binary{]}.
+machine learning library (Pedregosa et al. 2011).
 
 \hypertarget{creating-the-data-foundation}{%
 \subsection{Creating the data
@@ -808,7 +824,7 @@ analysis is saved as \texttt{/analysis/metrics.json}:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{Analysis.super\_make\_metrics(DIR }\OperatorTok{+} \StringTok{"/indexed/indexed\_master.json"}\NormalTok{)}
+\NormalTok{Analysis.super\_make\_metrics(}\StringTok{"/indexed/indexed\_master.json"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -900,7 +916,7 @@ titles and abstracts.
 \centering
 \includegraphics{images/metrics_all_n.pdf}
 \caption{Distribution of weighted F1-scores per maximum number of
-suggestions 1 \(\leq\) n \(\leq\) 10. See Table 2 for numeric values. n
+suggestions 1 \(\leq\) n \(\leq\) 10. See Table 3 for numeric values. n
 = 2 is the best perfomring type of configuration. However, it is
 outperformed by n = 4 and n = 5 token configurations. The distribution
 of the distributions is skewed left. Types of configurations with a
@@ -963,7 +979,7 @@ data foundation for each such block by calling
 \begin{Shaded}
 \begin{Highlighting}[]
 \ControlFlowTok{for}\NormalTok{ dept }\KeywordTok{in}\NormalTok{ Data.get\_departments():}
-\NormalTok{    Analysis.super\_make\_metrics(DIR }\OperatorTok{+} \StringTok{"/indexed/indexed\_master.json"}\NormalTok{, dept)}
+\NormalTok{    Analysis.super\_make\_metrics(}\StringTok{"/indexed/indexed\_master.json"}\NormalTok{, dept)}
 \end{Highlighting}
 \end{Shaded}
 
