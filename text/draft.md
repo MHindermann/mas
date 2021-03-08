@@ -8,6 +8,18 @@ Write a research paper in Markdown: https://opensource.com/article/18/9/pandoc-r
 
 # Introduction
 
+In this section I will...
+
+## Problem statement and goal 
+
+Edoc is the institutional repository of the University of Basel. It runs on the EPrints 3 document management system (https://github.com/eprints/eprints). Edoc was conceived in 2009 as repository for 
+electronic dissertations and grew in scope when the University of Basel adapted its first open access policy in 2013. 
+Today Edoc contains roughly 68’000 items, most of them journal articles without full text support. Even though descriptive and administrative metadata are collected for each item, this does not include subject terms. The lack of subject indexing  hampers the repository’s usability and potential with respect to the topic-based monitoring of research output and, to a lesser extent, information retrieval. The goal of this project is to remedy this situation with the help of machine indexing.
+
+!! More precisely, this project aims to provide a roadmap for indexing the elements of Edoc with Annif (Suominen, 2018) – an open source tool for automated subject indexing and classification – and BARTOC FAST (Hindermann and Ledl, 2020), a federated asynchronous search tool that covers concepts of thousands of knowledge organization systems like thesauri, classifications etc.
+
+!! The goal of this thesis is to investigate to what extent machine indexing can be used to ameliorate institutional repositories. 
+
 ## Method
 
 !! Say something to the effect that all data and code are available on GitHub.
@@ -37,11 +49,9 @@ the manipulation history of some data can be exported as JSON file and then repr
 
 # Edoc data
 
-## Edoc and data extraction
+In this section, I will describe the Edoc data and how it was extracted.
 
-Edoc is the institutional repository of the University of Basel. It was conceived in 2009 as repository for 
-electronic dissertations and grew in scope when the University of Basel adapted its first open access policy in 2013.
-As per today Edoc contains roughly 68’000 items. Edoc runs on the EPrints 3 document management system (https://github.com/eprints/eprints).  
+## Edoc data extraction
 
 Even though Edoc is a public server, its database does not have a web-ready API. In addition, since Edoc is a production
 server, its underlying database cannot be used directly on pain of disturbing the provided services. The data hence
@@ -49,7 +59,7 @@ needs to be extracted from Edoc in order to work with it. This could for example
 the server and running it on a local machine. However, this route was not available due to the limited resources of the
 responsible co-workers. I thus employed a workaround: Edoc has a built-in advanced search tool where the results can be
 exported. Even though it is not possible to extract all database items by default, only one of the many available search
-fields has to be filled in. The complete database can hence be extracted by only filling in the `Date` field and using a
+fields has to be filled in. The complete database can hence be extracted by only filling in the `date` field and using a
 sufficiently permissive time period such as 1940 to 2020 since the oldest record in the database was published in 1942.
 On January 21 2021, this query yielded 68'345 results. These results were then exported as a 326 MB JSON file
 called `1942-2020.json`. `1942-2020.json` has two drawbacks. First, the maximum file size on GitHub is 100 MB. And
@@ -57,17 +67,17 @@ second, `1942-2020.json` is too big to be handled by standard editors requiring 
 these reasons `1942-2020.json` was split into smaller files that are easier handled and can be uploaded to GitHub. For
 this
 `Utility.split_json` was used yielding 14 files of size 20 MB or less containing 5000 or fewer entries each. These
-files are called `raw_master_x-y.json` (where x and y indicate the entries as given by `1942-2020.json`) and saved under
+files are called `raw_master_{year}.json` and saved under
 `/files/raw`.
 
-## Data description and analysis
+## Data description
 
-!! Explain the Edoc data fields. Say perhaps something about the granularity of the relevant fields. Say something about how the fields are filled in (and by whom).
+Each Edoc item has 43 main data fields. Most of these data fields belong to the class of descriptive metadata. The data entry for an item's descriptive metadata is undertaken by the person who uploads the item which is in most cases one of the item's authors. The Note that an item is first uploaded to the University of Basel's research database (https://www.forschdb2.unibas.ch) before being automatically fed into Edoc. There are explicit rules on how to enter the data as summarized in the user manual [@UniversitatBasel.2021]. However, there is no (or at least no systematic) manual or automatic validation of the entered data. This means that some data fields are very heterogenous and require further parsing (see [section "Gold standard"](#gold-standard)). The data fields that are of interest to the project at hand are discussed in more detail in (see [section "Sample data set"](#sample-data-set) below).
 
 # Sample data set
 
-In this section, I will explain how the sample data set is selected and constructed. "Selection" means the task of 
-specifying a subset of the Edoc data and "construction" means the task of implementing this selection. 
+In this section, I will explain how the sample data set is selected and constructed. "Selection" hereby means the task of 
+specifying a subset of the Edoc data; by "construction" I mean the task of implementing this selection. 
 
 ## Selection
 
@@ -113,7 +123,7 @@ sudden loss of electricity, or a measure taken in wartime. Knowing that the item
 researcher employed by the 
 Faculty of Business and Economics (and not, say, by the Faculty of Medicine) gives us reason to exclude the first 
 meaning. However, this idea cannot be implemented with the out 
-of the box instance of Annif employed in this chapter (see [subsection "Machine indexing"](#machine-indexing)). 
+of the box instance of Annif employed in this chapter (see [section "Machine indexing"](#machine-indexing)). 
 
 The second constraint is that the index terms assigned to each item in the sample data set must be assessable. How 
 the assessment is conducted in detail is discussed in [section "Assessment"](#assessment). For now, it is 
@@ -134,13 +144,13 @@ files in `/files/raw`. The resulting file is saved in `/files/selected` as `sele
 
 ## Analysis
 
+![The sample data set ($n$ = 4'111) is not representative of the raw Edoc data per department. Data field `abstract`: $\chi^2 (df=9) =$ 3'160.556, $p < 0.001$; data field `id_number`: $\chi^2 (df=9) =$ 4'209.0285, $p < 0.001$; data field `keywords`: $\chi^2 (df=9) =$ 2'314.533, $p < 0.001$. The data foundation is available at `/files/analysis/chi_square_{data field}` and the $\chi^2$-statistic can be calculated by calling `Analysis.print_chi_square_fit` on the data foundation files.](images/chi_square_selection_fields.pdf)
+
 Of the 68'345 items in `/files/raw`, all have a title (non-empty `title` data field),  a little more than half of the items have an abstract (37'381 items with non-empty `abstract` data field), roughly half of the items have an ID (35'355 items with non-empty `id_number` data field),[^1] and less than 10% of the items have keywords (6'660 items with non-empty `keywords` data field). The sample data set as requires all the above data fields to be non-empty; `/files/sample/sample_master.json` has 4'111 items and hence constitutes 6% of the raw data. 
 
 [^1]: Note that when using the facet by blank on `id_number` in OpenRefine, there are 57'153 matches; this is due to the fact that many items with an ID such as DOI have secondary or tertiary IDs such as ISI or PMID. 
 
 In order to determine how well the sample data set represents the raw Edoc data, a one-sample $\chi^2$ goodnes of fit test was conducted on each selection data field [following @Parke.2013, chapter 1]. The results indicate that the sample data proportions of items are significantly different from the raw Edoc data per department (see Figure 1 for more details).
-
-![The sample data set ($n$ = 4'111) is not representative of the raw Edoc data per department. Data field `abstract`: $\chi^2 (df=9) =$ 3'160.556, $p < 0.001$; data field `id_number`: $\chi^2 (df=9) =$ 4'209.0285, $p < 0.001$; data field `keywords`: $\chi^2 (df=9) =$ 2'314.533, $p < 0.001$. The data foundation is available at `/files/analysis/chi_square_{data field}` and the $\chi^2$-statistic can be calculated by calling `Analysis.print_chi_square_fit` on the data foundation files.](images/chi_square_selection_fields.pdf)
 
  The sample data set is hence not representative of the raw Edoc data. This is not surprising since its construction is strongly biased. This bias has the effect that the sample data set is significantly skewed towards English journal publications in the sciences, medicine and economics from the 21st century (again, this is shown by a one-sample $\chi^2$ goodness of fit test, see Figure 2 for more details). The upshot of this analysis is that the humanities are underrepresented in the sample data set. Therefore, any results with respect to the quality of machine indexing discussed below might not be applicable to the humanities.
 
@@ -148,11 +158,14 @@ In order to determine how well the sample data set represents the raw Edoc data,
 
 # Machine indexing
 
-## General overview
-!! Give an overview over machine indexing.
+In this section, I will briefly introduce Annif and how indexing with Annif was implemented. For a general overview concerning machine indexing, see @Golub.2019.
 
 ## Annif
-!! Given an intro to Annif. Explain that we are using the out of the box version
+
+Annif [@Suominen.2021] is an open source multi-algorithm automated
+indexing tool developed at the Finnish National Library [see @Suominen.2019 for an overview]. Training a local Annif instance for machine indexing is currently evaluated at different libraries, for example at the German National Library [@Nagelschmidt.12.11.2020]. As stated in section [section "Introduction"](#introduction), in this project I am interested in using Annif out of the box. This means that instead of training a local Annif instance, I will be relying on the Annif REST-style API (see https://api.annif.org/).[^2] The advantage of this approach is that it is quick and relatively easy to implement. The disadvantage is that no custom algorithms or vocabularies can be used. The task of constructing a gold standard (see [section "Gold standard"](#gold-standard)) remains the same.
+
+[^2]: This API is specifically intended for testing. For integration into a production system, the Finto AI API is available (see https://ai.finto.fi/v1/ui/).
 
 ## Implementation
 
@@ -250,7 +263,7 @@ First, the suggestions to the top 500 keywords were manually verified. These key
 
 Second, systematic biases were identified and removed. The most prevalent bias was an due to a suggestion's type. As stated above, the reconciliation service API was not constrained by type but had access to the complete Wikidata database. Since Wikidata is an ontology that encompasses everything, it also features types whose concepts cannot qualify as subject terms (at least in the present context). The most prominent example is the type Q13442814 "scholarly article". Wikidata contains the metadata of many scholarly articles. Now, for some of our keywords, there is a scholarly article with a title that exactly matches the keyword; and since there is no restriction concerning the type, the scholarly article is suggested with high confidence (see https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation-Service-API for details). For example, [keyword/article]. To generalize, suggestions with types whose concepts are proper names are usually incorrect. Based on this observation, suggestions with the following types were rejected: "scholarly article", "clinical trial", "scientific journal", "academic journal", "open access journal", "thesis", "doctoral thesis", "natural number". Suggestions with the following types were manually verified (i.e., checked for correctness): "human", "album", "film", "musical group", "business", "literary work", "television series", "organization", "family name", "written work", "video game", "single, television series episode", "painting", "commune of France", "city of the United States", "magazine", "studio album", "year", "nonprofit organization", "border town", "international organization", "political party", "software", "song", "website", "article comic strip", "collection", "commune of Italy", "fictional human", "film", "government agency", "village", "academic journal article", "female given name", "poem".
 
-With these improvements in place, each keyword with a suggestion was assigned a QID via the "Add cloumns from reconciled values"-function (and similar for YSO and MeSH identifiers). The data was then exported and saved as `/keywords/keywords_reference.json`. Keywords with a QID now constitute 69% of all keywords and 78% of their total occurrences in the sample data set, but these numbers are significantly lower for the MeSH identifier (53.6% of all keywords with only 28.8% of all occurrences) and especially low for the YSO identifier (26.9% of all keywords with 11% of all occurrences). In both cases, the problem is due to the fact that Wikidata's mapping of MeSH respectively YSO is only partial. There can be two reasons for this state of affairs for a given entry: either there is no match between Wikidata and YSO or MeSH (after all, Wikidata is much larger than MeSH and YSO taken together), or there is a match but it has not yet been added to the mapping. In the latter case, at least with respect to YSO, there is a solution: Finto provides a REST-sytle API to access the YSO vocabulary directly (see https://api.finto.fi/). For each keyword in the list of reference keywords that lacks a YSO identifier, the Finto API is queried; if a term turns up, it is added to the keyword. The effect of this second reconcilement is detailed in Figure 4. It is achieved by calling `Keywords.enrich_with_yso` on `/keywords/keywords_reference.json` and saving the output as `/keywords/keywords_reference_master.json`
+With these improvements in place, each keyword with a suggestion was assigned a QID via the "Add cloumns from reconciled values"-function (and similar for YSO and MeSH identifiers). The data was then exported and saved as `/keywords/keywords_reference.json`. Keywords with a QID now constitute 69% of all keywords and 78% of their total occurrences in the sample data set, but these numbers are significantly lower for the MeSH identifier (53.6% of all keywords with only 28.8% of all occurrences) and especially low for the YSO identifier (26.9% of all keywords with 11% of all occurrences). In both cases, the problem is due to the fact that Wikidata's mapping of MeSH respectively YSO is only partial. There can be two reasons for this state of affairs for a given entry: either there is no match between Wikidata and YSO or MeSH (after all, Wikidata is much larger than MeSH and YSO taken together), or there is a match but it has not yet been added to the mapping. In the latter case, at least with respect to YSO, there is a solution: Finto provides a REST-style API to access the YSO vocabulary directly (see https://api.finto.fi/). For each keyword in the list of reference keywords that lacks a YSO identifier, the Finto API is queried; if a term turns up, it is added to the keyword. The effect of this second reconcilement is detailed in Figure 4. It is achieved by calling `Keywords.enrich_with_yso` on `/keywords/keywords_reference.json` and saving the output as `/keywords/keywords_reference_master.json`
 
 ~~~~{.Python caption="enrich_with_yso"}
 keywords_reference = Utility.load_json(DIR + "/keywords/keywords_reference.json")

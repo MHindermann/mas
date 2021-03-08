@@ -1,6 +1,35 @@
 \hypertarget{introduction}{%
 \section{Introduction}\label{introduction}}
 
+In this section I will\ldots{}
+
+\hypertarget{problem-statement-and-goal}{%
+\subsection{Problem statement and
+goal}\label{problem-statement-and-goal}}
+
+Edoc is the institutional repository of the University of Basel. It runs
+on the EPrints 3 document management system
+(https://github.com/eprints/eprints). Edoc was conceived in 2009 as
+repository for electronic dissertations and grew in scope when the
+University of Basel adapted its first open access policy in 2013. Today
+Edoc contains roughly 68'000 items, most of them journal articles
+without full text support. Even though descriptive and administrative
+metadata are collected for each item, this does not include subject
+terms. The lack of subject indexing hampers the repository's usability
+and potential with respect to the topic-based monitoring of research
+output and, to a lesser extent, information retrieval. The goal of this
+project is to remedy this situation with the help of machine indexing.
+
+!! More precisely, this project aims to provide a roadmap for indexing
+the elements of Edoc with Annif (Suominen, 2018) -- an open source tool
+for automated subject indexing and classification -- and BARTOC FAST
+(Hindermann and Ledl, 2020), a federated asynchronous search tool that
+covers concepts of thousands of knowledge organization systems like
+thesauri, classifications etc.
+
+!! The goal of this thesis is to investigate to what extent machine
+indexing can be used to ameliorate institutional repositories.
+
 \hypertarget{method}{%
 \subsection{Method}\label{method}}
 
@@ -56,15 +85,10 @@ records by the first column (a fact which caused me many headaches).
 \hypertarget{edoc-data}{%
 \section{Edoc data}\label{edoc-data}}
 
-\hypertarget{edoc-and-data-extraction}{%
-\subsection{Edoc and data extraction}\label{edoc-and-data-extraction}}
+In this section, I will describe the Edoc data and how it was extracted.
 
-Edoc is the institutional repository of the University of Basel. It was
-conceived in 2009 as repository for electronic dissertations and grew in
-scope when the University of Basel adapted its first open access policy
-in 2013. As per today Edoc contains roughly 68'000 items. Edoc runs on
-the EPrints 3 document management system
-(https://github.com/eprints/eprints).
+\hypertarget{edoc-data-extraction}{%
+\subsection{Edoc data extraction}\label{edoc-data-extraction}}
 
 Even though Edoc is a public server, its database does not have a
 web-ready API. In addition, since Edoc is a production server, its
@@ -77,7 +101,7 @@ co-workers. I thus employed a workaround: Edoc has a built-in advanced
 search tool where the results can be exported. Even though it is not
 possible to extract all database items by default, only one of the many
 available search fields has to be filled in. The complete database can
-hence be extracted by only filling in the \texttt{Date} field and using
+hence be extracted by only filling in the \texttt{date} field and using
 a sufficiently permissive time period such as 1940 to 2020 since the
 oldest record in the database was published in 1942. On January 21 2021,
 this query yielded 68'345 results. These results were then exported as a
@@ -89,24 +113,33 @@ editors requiring special editors such as Oxygen. For these reasons
 handled and can be uploaded to GitHub. For this
 \texttt{Utility.split\_json} was used yielding 14 files of size 20 MB or
 less containing 5000 or fewer entries each. These files are called
-\texttt{raw\_master\_x-y.json} (where x and y indicate the entries as
-given by \texttt{1942-2020.json}) and saved under \texttt{/edoc/raw}.
+\texttt{raw\_master\_\{year\}.json} and saved under \texttt{/files/raw}.
 
-\hypertarget{data-description-and-analysis}{%
-\subsection{Data description and
-analysis}\label{data-description-and-analysis}}
+\hypertarget{data-description}{%
+\subsection{Data description}\label{data-description}}
 
-!! Explain the Edoc data fields. Say perhaps something about the
-granularity of the relevant fields. Say something about how the fields
-are filled in (and by whom).
+Each Edoc item has 43 main data fields. Most of these data fields belong
+to the class of descriptive metadata. The data entry for an item's
+descriptive metadata is undertaken by the person who uploads the item
+which is in most cases one of the item's authors. The Note that an item
+is first uploaded to the University of Basel's research database
+(https://www.forschdb2.unibas.ch) before being automatically fed into
+Edoc. There are explicit rules on how to enter the data as summarized in
+the user manual (Universität Basel, n.d.). However, there is no (or at
+least no systematic) manual or automatic validation of the entered data.
+This means that some data fields are very heterogenous and require
+further parsing (see \protect\hyperlink{gold-standard}{section ``Gold
+standard''}). The data fields that are of interest to the project at
+hand are discussed in more detail in (see
+\protect\hyperlink{sample-data-set}{section ``Sample data set''} below).
 
 \hypertarget{sample-data-set}{%
 \section{Sample data set}\label{sample-data-set}}
 
 In this section, I will explain how the sample data set is selected and
-constructed. ``Selection'' means the task of specifying a subset of the
-Edoc data and ``construction'' means the task of implementing this
-selection.
+constructed. ``Selection'' hereby means the task of specifying a subset
+of the Edoc data; by ``construction'' I mean the task of implementing
+this selection.
 
 \hypertarget{selection}{%
 \subsection{Selection}\label{selection}}
@@ -164,7 +197,7 @@ published by a researcher employed by the Faculty of Business and
 Economics (and not, say, by the Faculty of Medicine) gives us reason to
 exclude the first meaning. However, this idea cannot be implemented with
 the out of the box instance of Annif employed in this chapter (see
-\protect\hyperlink{machine-indexing}{subsection ``Machine indexing''}).
+\protect\hyperlink{machine-indexing}{section ``Machine indexing''}).
 
 The second constraint is that the index terms assigned to each item in
 the sample data set must be assessable. How the assessment is conducted
@@ -184,36 +217,15 @@ caveats of this approach are discussed in
 
 Taking into account the third constraint simply means that we do not
 employ any further restrictions. We can hence construct the sample data
-set by choosing exactly those items from \texttt{/edoc/raw} which have
+set by choosing exactly those items from \texttt{/files/raw} which have
 non-empty data fields \texttt{title}, \texttt{abstract},
 \texttt{id\_number}, and \texttt{keywords}. We do so by calling
 \texttt{Data.select\_from\_file} iteratively for all files in
-\texttt{/edoc/raw}. The resulting file is saved in
-\texttt{/edoc/selected} as \texttt{selected\_master.json}.
+\texttt{/files/raw}. The resulting file is saved in
+\texttt{/files/selected} as \texttt{selected\_master.json}.
 
 \hypertarget{analysis}{%
 \subsection{Analysis}\label{analysis}}
-
-Of the 68'345 items in \texttt{/edoc/raw}, all have a title (non-empty
-\texttt{title} data field), a little more than half of the items have an
-abstract (37'381 items with non-empty \texttt{abstract} data field),
-roughly half of the items have an ID (35'355 items with non-empty
-\texttt{id\_number} data field),\footnote{Note that when using the facet
-  by blank on \texttt{id\_number} in OpenRefine, there are 57'153
-  matches; this is due to the fact that many items with an ID such as
-  DOI have secondary or tertiary IDs such as ISI or PMID.} and less than
-10\% of the items have keywords (6'660 items with non-empty
-\texttt{keywords} data field). The sample data set as requires all the
-above data fields to be non-empty;
-\texttt{/edoc/sample/sample\_master.json} has 4'111 items and hence
-constitutes 6\% of the raw data.
-
-In order to determine how well the sample data set represents the raw
-Edoc data, a one-sample \(\chi^2\) goodnes of fit test was conducted on
-each selection data field (following Parke 2013, chap. 1). The results
-indicate that the sample data proportions of items are significantly
-different from the raw Edoc data per department (see Figure 1 for more
-details).
 
 \begin{figure}
 \centering
@@ -224,10 +236,31 @@ the raw Edoc data per department. Data field \texttt{abstract}:
 \texttt{id\_number}: \(\chi^2 (df=9) =\) 4'209.0285, \(p < 0.001\); data
 field \texttt{keywords}: \(\chi^2 (df=9) =\) 2'314.533, \(p < 0.001\).
 The data foundation is available at
-\texttt{/edoc/analysis/chi\_square\_\{data\ field\}} and the
+\texttt{/files/analysis/chi\_square\_\{data\ field\}} and the
 \(\chi^2\)-statistic can be calculated by calling
 \texttt{Analysis.print\_chi\_square\_fit} on the data foundation files.}
 \end{figure}
+
+Of the 68'345 items in \texttt{/files/raw}, all have a title (non-empty
+\texttt{title} data field), a little more than half of the items have an
+abstract (37'381 items with non-empty \texttt{abstract} data field),
+roughly half of the items have an ID (35'355 items with non-empty
+\texttt{id\_number} data field),\footnote{Note that when using the facet
+  by blank on \texttt{id\_number} in OpenRefine, there are 57'153
+  matches; this is due to the fact that many items with an ID such as
+  DOI have secondary or tertiary IDs such as ISI or PMID.} and less than
+10\% of the items have keywords (6'660 items with non-empty
+\texttt{keywords} data field). The sample data set as requires all the
+above data fields to be non-empty;
+\texttt{/files/sample/sample\_master.json} has 4'111 items and hence
+constitutes 6\% of the raw data.
+
+In order to determine how well the sample data set represents the raw
+Edoc data, a one-sample \(\chi^2\) goodnes of fit test was conducted on
+each selection data field (following Parke 2013, chap. 1). The results
+indicate that the sample data proportions of items are significantly
+different from the raw Edoc data per department (see Figure 1 for more
+details).
 
 The sample data set is hence not representative of the raw Edoc data.
 This is not surprising since its construction is strongly biased. This
@@ -251,7 +284,7 @@ sciences, medicine and economics (data field \texttt{department}:
 \(\chi^2 (df=9) =\) 14'447.276, \(p < 0.001\)) from the 21st century
 (data field \texttt{date}: \(\chi^2 (df=7) =\) 35'878.493,
 \(p < 0.001\)) as compared to the raw Edoc data. The data foundation is
-available at \texttt{/edoc/analysis/chi\_square\_\{data\ field\}} and
+available at \texttt{/files/analysis/chi\_square\_\{data\ field\}} and
 the \(\chi^2\)-statistic can be calculated by calling
 \texttt{Analysis.print\_chi\_square\_fit} on the data foundation files.}
 \end{figure}
@@ -259,16 +292,30 @@ the \(\chi^2\)-statistic can be calculated by calling
 \hypertarget{machine-indexing}{%
 \section{Machine indexing}\label{machine-indexing}}
 
-\hypertarget{general-overview}{%
-\subsection{General overview}\label{general-overview}}
-
-!! Give an overview over machine indexing.
+In this section, I will briefly introduce Annif and how indexing with
+Annif was implemented. For a general overview concerning machine
+indexing, see Golub (2019).
 
 \hypertarget{annif}{%
 \subsection{Annif}\label{annif}}
 
-!! Given an intro to Annif. Explain that we are using the out of the box
-version
+Annif (Suominen et al. 2021) is an open source multi-algorithm automated
+indexing tool developed at the Finnish National Library (see Suominen
+2019 for an overview). Training a local Annif instance for machine
+indexing is currently evaluated at different libraries, for example at
+the German National Library (Nagelschmidt 12.11.2020). As stated in
+section \protect\hyperlink{introduction}{section ``Introduction''}, in
+this project I am interested in using Annif out of the box. This means
+that instead of training a local Annif instance, I will be relying on
+the Annif REST-style API (see https://api.annif.org/).\footnote{This API
+  is specifically intended for testing. For integration into a
+  production system, the Finto AI API is available (see
+  https://ai.finto.fi/v1/ui/).} The advantage of this approach is that
+it is quick and relatively easy to implement. The disadvantage is that
+no custom algorithms or vocabularies can be used. The task of
+constructing a gold standard (see
+\protect\hyperlink{gold-standard}{section ``Gold standard''}) remains
+the same.
 
 \hypertarget{implementation}{%
 \subsection{Implementation}\label{implementation}}
@@ -553,7 +600,7 @@ given entry: either there is no match between Wikidata and YSO or MeSH
 (after all, Wikidata is much larger than MeSH and YSO taken together),
 or there is a match but it has not yet been added to the mapping. In the
 latter case, at least with respect to YSO, there is a solution: Finto
-provides a REST-sytle API to access the YSO vocabulary directly (see
+provides a REST-style API to access the YSO vocabulary directly (see
 https://api.finto.fi/). For each keyword in the list of reference
 keywords that lacks a YSO identifier, the Finto API is queried; if a
 term turns up, it is added to the keyword. The effect of this second
@@ -937,7 +984,8 @@ The departments with the most consistent weighted F1-scores are Medicine
 and Central Services. However, these two departments have also the
 lowest maximum weighted F1-scores. It is noteworthy that all other
 departments have maximum weighted F1-scores that are well above the
-F1-score of 0.517 of the best performing general Annif configuration.
+weighted F1-score of 0.517 of the best performing general Annif
+configuration.
 
 \begin{figure}
 \centering
@@ -1000,6 +1048,716 @@ worse performing Wikidata configuration, except for
 \hypertarget{appendix}{%
 \section{Appendix}\label{appendix}}
 
+Codebase available at: \url{https://github.com/MHindermann/mas}
+
+\hypertarget{class-files.utility}{%
+\subsection{class files.Utility()}\label{class-files.utility}}
+
+A collection of utility functions.
+
+\hypertarget{classmethod-load_jsonfile_path}{%
+\subsubsection{classmethod
+load\_json(file\_path)}\label{classmethod-load_jsonfile_path}}
+
+Load a JSON object from file.
+
+\begin{itemize}
+\item
+  \textbf{Parameters}
+
+  \textbf{file\_path} (\texttt{str}) -- complete path to file including
+  filename and extension
+\item
+  \textbf{Return type}
+
+  \texttt{list}
+\end{itemize}
+
+\hypertarget{classmethod-save_jsondata-file_path}{%
+\subsubsection{classmethod save\_json(data,
+file\_path)}\label{classmethod-save_jsondata-file_path}}
+
+Save data as JSON file.
+
+\begin{itemize}
+\item
+  \textbf{Parameters}
+
+  \begin{itemize}
+  \item
+    \textbf{data} (\texttt{Union}{[}\texttt{List}, \texttt{Dict}{]}) --
+    the data to be saved
+  \item
+    \textbf{file\_path} (\texttt{str}) -- complete path to file
+    including filename and extension
+  \end{itemize}
+\item
+  \textbf{Return type}
+
+  \texttt{None}
+\end{itemize}
+
+\hypertarget{classmethod-split_jsonfile_path-save_path}{%
+\subsubsection{classmethod split\_json(file\_path,
+save\_path)}\label{classmethod-split_jsonfile_path-save_path}}
+
+Split a JSON file into files not larger than 100MB.
+
+\begin{itemize}
+\item
+  \textbf{Parameters}
+
+  \begin{itemize}
+  \item
+    \textbf{file\_path} (\texttt{str}) -- complete path to file
+    including filename and extension
+  \item
+    \textbf{save\_path} (\texttt{str}) -- complete path to save folder
+    including filename without extension
+  \end{itemize}
+\item
+  \textbf{Return type}
+
+  \texttt{None}
+\end{itemize}
+
+\hypertarget{class-files.data}{%
+\subsection{class files.Data()}\label{class-files.data}}
+
+A collection of Edoc data functions.
+
+\hypertarget{classmethod-enrich_author_keywordsfile_path-save_path}{%
+\subsubsection{classmethod enrich\_author\_keywords(file\_path,
+save\_path)}\label{classmethod-enrich_author_keywordsfile_path-save_path}}
+
+Enrich author keywords.
+
+For each Edoc item: the string of author keywords is cut into single
+keywords and each keyword is cleaned. Each keyword is then enriched with
+Qid, MeSH and YSO ID if available.
+
+\begin{itemize}
+\item
+  \textbf{Parameters}
+
+  \begin{itemize}
+  \item
+    \textbf{file\_path} (\texttt{str}) -- complete path to file
+    including filename and extension
+  \item
+    \textbf{save\_path} (\texttt{str}) -- complete path to save folder
+    including filename without extension
+  \end{itemize}
+\item
+  \textbf{Return type}
+
+  \texttt{None}
+\end{itemize}
+
+\hypertarget{classmethod-enrich_with_anniffile_path-save_path-project_ids-abstractfalse-fulltextfalse-limitnone-thresholdnone}{%
+\subsubsection{classmethod enrich\_with\_annif(file\_path, save\_path,
+project\_ids, abstract=False, fulltext=False, limit=None,
+threshold=None)}\label{classmethod-enrich_with_anniffile_path-save_path-project_ids-abstractfalse-fulltextfalse-limitnone-thresholdnone}}
+
+Enrich items from file with automatic keywords using Annif-client.
+
+Available Annif-client project IDs are yso-en, yso-maui-en,
+yso-bonsai-en, yso-fasttext-en, wikidata-en.
+
+\begin{itemize}
+\item
+  \textbf{Parameters}
+
+  \begin{itemize}
+  \item
+    \textbf{file\_path} (\texttt{str}) -- complete path to file
+    including filename and extension
+  \item
+    \textbf{save\_path} (\texttt{str}) -- complete path to save folder
+    including filename without extension
+  \item
+    \textbf{project\_ids} (\texttt{List}{[}\texttt{str}{]}) --
+    Annif-client project IDs to be used
+  \item
+    \textbf{abstract} (\texttt{bool}) -- toggle use abstract for
+    indexing, defaults to False
+  \item
+    \textbf{fulltext} (\texttt{bool}) -- toggle use fulltext for
+    indexing, defaults to False
+  \item
+    \textbf{limit} (\texttt{Optional}{[}\texttt{int}{]}) -- Annif-client
+    limit, defaults to None
+  \item
+    \textbf{threshold} (\texttt{Optional}{[}\texttt{int}{]}) --
+    Annif-client threshold, defaults to None
+  \end{itemize}
+\item
+  \textbf{Return type}
+
+  \texttt{None}
+\end{itemize}
+
+\hypertarget{classmethod-enrich_with_meshfile_path-save_path}{%
+\subsubsection{classmethod enrich\_with\_mesh(file\_path,
+save\_path)}\label{classmethod-enrich_with_meshfile_path-save_path}}
+
+Enrich Edoc data per item with MeSH keywords from PubMed if available.
+
+\begin{itemize}
+\item
+  \textbf{Parameters}
+
+  \begin{itemize}
+  \item
+    \textbf{file\_path} (\texttt{str}) -- complete path to file
+    including filename and extension
+  \item
+    \textbf{save\_path} (\texttt{str}) -- complete path to save folder
+    including filename without extension
+  \end{itemize}
+\item
+  \textbf{Return type}
+
+  \texttt{None}
+\end{itemize}
+
+\hypertarget{classmethod-fetch_meshpubmed_id}{%
+\subsubsection{classmethod
+fetch\_mesh(pubmed\_id)}\label{classmethod-fetch_meshpubmed_id}}
+
+Fetch MeSH keywords for article based on PubMed ID.
+
+\begin{itemize}
+\item
+  \textbf{Parameters}
+
+  \textbf{pubmed\_id} (\texttt{str}) -- article PubMed ID
+\item
+  \textbf{Return type}
+
+  \texttt{List}{[}\texttt{Dict}{]}
+\end{itemize}
+
+\hypertarget{classmethod-get_departments}{%
+\subsubsection{classmethod
+get\_departments()}\label{classmethod-get_departments}}
+
+Get all Edoc departments.
+
+\begin{itemize}
+\item
+  \textbf{Return type}
+
+  \texttt{List}{[}\texttt{str}{]}
+\end{itemize}
+
+\hypertarget{classmethod-inspectdata-fields}{%
+\subsubsection{classmethod inspect(data,
+*fields)}\label{classmethod-inspectdata-fields}}
+
+Print fields of items in data.
+
+\begin{itemize}
+\item
+  \textbf{Parameters}
+
+  \begin{itemize}
+  \item
+    \textbf{data} (\texttt{List}{[}\texttt{Dict}{]}) -- data to be
+    inspected
+  \item
+    \textbf{fields} (\texttt{str}) -- fields to focus on
+  \end{itemize}
+\item
+  \textbf{Return type}
+
+  \texttt{None}
+\end{itemize}
+
+\hypertarget{classmethod-map2referencekeyword}{%
+\subsubsection{classmethod
+map2reference(keyword)}\label{classmethod-map2referencekeyword}}
+
+Map a keyword to its reference keyword.
+
+Keyword must first be cleaned by corresponding \_Keyword method.
+
+\begin{itemize}
+\item
+  \textbf{Parameters}
+
+  \textbf{keyword} (\texttt{str}) -- the keyword
+\item
+  \textbf{Return type}
+
+  \texttt{Dict}
+\end{itemize}
+
+\hypertarget{classmethod-select_from_datadata-fields}{%
+\subsubsection{classmethod select\_from\_data(data,
+*fields)}\label{classmethod-select_from_datadata-fields}}
+
+Select items from data based on non-empty fields.
+
+Only items where all required fields are non-empty are sample.
+
+\begin{itemize}
+\item
+  \textbf{Parameters}
+
+  \begin{itemize}
+  \item
+    \textbf{data} (\texttt{List}{[}\texttt{Dict}{]}) -- the input data
+  \item
+    \textbf{fields} (\texttt{str}) -- the required fields for an item to
+    be sample
+  \end{itemize}
+\item
+  \textbf{Return type}
+
+  \texttt{List}{[}\texttt{Dict}{]}
+\end{itemize}
+
+\hypertarget{classmethod-select_from_filefile_path-fields}{%
+\subsubsection{classmethod select\_from\_file(file\_path,
+*fields)}\label{classmethod-select_from_filefile_path-fields}}
+
+Select items from file according to fields.
+
+For example: select\_from\_file(DIR + ``/raw/2019.json,'' ``title,''
+``abstract,'' ``keywords,'' ``id\_number'')
+
+\begin{itemize}
+\item
+  \textbf{Parameters}
+
+  \begin{itemize}
+  \item
+    \textbf{file\_path} (\texttt{str}) -- complete path to file
+    including filename and extension
+  \item
+    \textbf{fields} (\texttt{str}) -- the required fields for an item to
+    be sample
+  \end{itemize}
+\item
+  \textbf{Return type}
+
+  \texttt{None}
+\end{itemize}
+
+\hypertarget{classmethod-super_enrich_with_annifabstract}{%
+\subsubsection{classmethod
+super\_enrich\_with\_annif(abstract)}\label{classmethod-super_enrich_with_annifabstract}}
+
+Enrich items with automatic keywords using all Annif-client projects.
+
+\begin{itemize}
+\item
+  \textbf{Parameters}
+
+  \textbf{abstract} (\texttt{bool}) -- toggle use abstract for indexing
+\item
+  \textbf{Return type}
+
+  \texttt{None}
+\end{itemize}
+
+\hypertarget{class-files.keywords}{%
+\subsection{class files.Keywords()}\label{class-files.keywords}}
+
+A collection of functions for manipulating Edoc author keywords.
+
+\hypertarget{classmethod-clean_keywordkeyword}{%
+\subsubsection{classmethod
+clean\_keyword(keyword)}\label{classmethod-clean_keywordkeyword}}
+
+Clean a keyword.
+
+\begin{itemize}
+\item
+  \textbf{Parameters}
+
+  \textbf{keyword} (\texttt{str}) -- the keyword
+\item
+  \textbf{Return type}
+
+  \texttt{List}{[}\texttt{str}{]}
+\end{itemize}
+
+\hypertarget{classmethod-clean_keywordskeywords_per_item}{%
+\subsubsection{classmethod
+clean\_keywords(keywords\_per\_item)}\label{classmethod-clean_keywordskeywords_per_item}}
+
+Turn a string of keywords per item into a list of cleaned (=normalized)
+keywords.
+
+\begin{itemize}
+\item
+  \textbf{Parameters}
+
+  \textbf{keywords\_per\_item} (\texttt{List}{[}\texttt{str}{]}) -- the
+  keywords
+\item
+  \textbf{Return type}
+
+  \texttt{List}{[}\texttt{str}{]}
+\end{itemize}
+
+\hypertarget{classmethod-enrich_with_ysofile_path-save_path}{%
+\subsubsection{classmethod enrich\_with\_yso(file\_path,
+save\_path)}\label{classmethod-enrich_with_ysofile_path-save_path}}
+
+Blah.
+
+\begin{itemize}
+\item
+  \textbf{Parameters}
+
+  \begin{itemize}
+  \item
+    \textbf{file\_path} (\texttt{str}) -- complete path to file
+    including filename and extension
+  \item
+    \textbf{save\_path} (\texttt{str}) -- complete path to save folder
+    including filename without extension
+  \end{itemize}
+\end{itemize}
+
+\hypertarget{classmethod-extract_keywordsfile_path}{%
+\subsubsection{classmethod
+extract\_keywords(file\_path)}\label{classmethod-extract_keywordsfile_path}}
+
+Extract keywords per item from file.
+
+\begin{itemize}
+\item
+  \textbf{Parameters}
+
+  \textbf{file\_path} (\texttt{str}) -- complete path to file including
+  filename and extension
+\item
+  \textbf{Return type}
+
+  \texttt{List}{[}\texttt{str}{]}
+\end{itemize}
+
+\hypertarget{classmethod-fetch_ysokeyword}{%
+\subsection{classmethod
+fetch\_yso(keyword)}\label{classmethod-fetch_ysokeyword}}
+
+Fetch the YSO ID for a keyword if any.
+
+\begin{itemize}
+\item
+  \textbf{Parameters}
+
+  \textbf{keyword} (\texttt{str}) -- the keyword
+\item
+  \textbf{Return type}
+
+  \texttt{Optional}{[}\texttt{str}{]}
+\end{itemize}
+
+\hypertarget{classmethod-make_countfile_path-save_path}{%
+\subsubsection{classmethod make\_count(file\_path,
+save\_path)}\label{classmethod-make_countfile_path-save_path}}
+
+Count all keywords and their respective IDs per item in file.
+
+\begin{itemize}
+\item
+  \textbf{Parameters}
+
+  \begin{itemize}
+  \item
+    \textbf{file\_path} (\texttt{str}) -- complete path to file
+    including filename and extension
+  \item
+    \textbf{save\_path} (\texttt{str}) -- complete path to save folder
+    including filename and extension
+  \end{itemize}
+\item
+  \textbf{Return type}
+
+  \texttt{None}
+\end{itemize}
+
+\hypertarget{classmethod-make_histogramkeywords}{%
+\subsubsection{classmethod
+make\_histogram(keywords)}\label{classmethod-make_histogramkeywords}}
+
+Make a histogram for keywords.
+
+\begin{itemize}
+\item
+  \textbf{Parameters}
+
+  \textbf{keywords} (\texttt{List}{[}\texttt{str}{]}) -- the keywords
+\item
+  \textbf{Return type}
+
+  \texttt{List}{[}\texttt{Dict}{]}
+\end{itemize}
+
+\hypertarget{class-files.analysis}{%
+\subsection{class files.Analysis()}\label{class-files.analysis}}
+
+A collection of data analysis functions.
+
+\hypertarget{classmethod-count_confusionstandard-suggestions}{%
+\subsubsection{classmethod count\_confusion(standard,
+suggestions)}\label{classmethod-count_confusionstandard-suggestions}}
+
+Count the values in the confusion matrix for standard and suggestions.
+
+\begin{itemize}
+\item
+  \textbf{Parameters}
+
+  \begin{itemize}
+  \item
+    \textbf{standard} (\texttt{list}) -- the standard
+  \item
+    \textbf{suggestions} (\texttt{list}) -- the suggestions
+  \end{itemize}
+\end{itemize}
+
+\hypertarget{classmethod-extract_standarditem-marker}{%
+\subsubsection{classmethod extract\_standard(item,
+marker)}\label{classmethod-extract_standarditem-marker}}
+
+Extract gold standard IDs from item.
+
+\begin{itemize}
+\item
+  \textbf{Parameters}
+
+  \begin{itemize}
+  \item
+    \textbf{item} (\texttt{dict}) -- the Edoc item
+  \item
+    \textbf{marker} (\texttt{str}) -- the type of ID
+  \end{itemize}
+\item
+  \textbf{Return type}
+
+  \texttt{Optional}{[}\texttt{list}{]}
+\end{itemize}
+
+\hypertarget{classmethod-extract_suggestionsitem-marker-n10}{%
+\subsubsection{classmethod extract\_suggestions(item, marker,
+n=10)}\label{classmethod-extract_suggestionsitem-marker-n10}}
+
+Extract top n Annif suggestion IDs from item.
+
+\begin{itemize}
+\item
+  \textbf{Parameters}
+
+  \begin{itemize}
+  \item
+    \textbf{item} (\texttt{dict}) -- the Edoc item
+  \item
+    \textbf{marker} (\texttt{str}) --
+    project\_id-abstract-fulltext-limit-threshold
+  \item
+    \textbf{n} (\texttt{int}) -- number of top IDs (by score) to be
+    extracted, defaults to 10
+  \end{itemize}
+\end{itemize}
+
+\hypertarget{classmethod-get_id_typemarker}{%
+\subsubsection{classmethod
+get\_id\_type(marker)}\label{classmethod-get_id_typemarker}}
+
+Get the ID type from the project ID.
+
+\begin{itemize}
+\item
+  \textbf{Parameters}
+
+  \textbf{marker} (\texttt{str}) --
+  project\_id-abstract-fulltext-limit-threshold
+\item
+  \textbf{Return type}
+
+  \texttt{str}
+\end{itemize}
+
+\hypertarget{classmethod-get_sklearn_arrayitem-project_id-abstractfalse-fulltextfalse-limitnone-thresholdnone-n10}{%
+\subsubsection{classmethod get\_sklearn\_array(item, project\_id,
+abstract=False, fulltext=False, limit=None, threshold=None,
+n=10)}\label{classmethod-get_sklearn_arrayitem-project_id-abstractfalse-fulltextfalse-limitnone-thresholdnone-n10}}
+
+Get Sklearn y\_true and y\_pred for an item.
+
+Available Annif-client project IDs are yso-en, yso-maui-en,
+yso-bonsai-en, yso-fasttext-en, wikidata-en.
+
+\begin{itemize}
+\item
+  \textbf{Parameters}
+
+  \begin{itemize}
+  \item
+    \textbf{item} (\texttt{dict}) -- sample data set item
+  \item
+    \textbf{project\_id} (\texttt{str}) -- Annif-client project ID
+  \item
+    \textbf{abstract} (\texttt{bool}) -- toggle use abstract for
+    indexing, defaults to False
+  \item
+    \textbf{fulltext} (\texttt{bool}) -- toggle use fulltext for
+    indexing, defaults to False
+  \item
+    \textbf{limit} (\texttt{Optional}{[}\texttt{int}{]}) -- Annif-client
+    limit, defaults to None
+  \item
+    \textbf{threshold} (\texttt{Optional}{[}\texttt{int}{]}) --
+    Annif-client threshold, defaults to None
+  \item
+    \textbf{n} (\texttt{int}) -- number of top IDs (by score) to be
+    extracted, defaults to 10
+  \end{itemize}
+\item
+  \textbf{Return type}
+
+  \texttt{Optional}{[}\texttt{dict}{]}
+\end{itemize}
+
+\hypertarget{classmethod-make_metricsfile_path-project_id-abstractfalse-fulltextfalse-limitnone-thresholdnone-n10-departmentnone}{%
+\subsubsection{classmethod make\_metrics(file\_path, project\_id,
+abstract=False, fulltext=False, limit=None, threshold=None, n=10,
+department=None)}\label{classmethod-make_metricsfile_path-project_id-abstractfalse-fulltextfalse-limitnone-thresholdnone-n10-departmentnone}}
+
+Make Sklearn metrics F1, recall, precision for file.
+
+The output is saved as /metrics/metrics\_\{marker\}.json.
+
+Available Annif-client project IDs are yso-en, yso-maui-en,
+yso-bonsai-en, yso-fasttext-en, wikidata-en.
+
+\begin{itemize}
+\item
+  \textbf{Parameters}
+
+  \begin{itemize}
+  \item
+    \textbf{file\_path} (\texttt{str}) -- complete path to file
+    including filename and extension
+  \item
+    \textbf{project\_id} (\texttt{str}) -- Annif-client project ID
+  \item
+    \textbf{abstract} (\texttt{bool}) -- toggle use abstract for
+    indexing, defaults to False
+  \item
+    \textbf{fulltext} (\texttt{bool}) -- toggle use fulltext for
+    indexing, defaults to False
+  \item
+    \textbf{limit} (\texttt{Optional}{[}\texttt{int}{]}) -- Annif-client
+    limit, defaults to None
+  \item
+    \textbf{threshold} (\texttt{Optional}{[}\texttt{int}{]}) --
+    Annif-client threshold, defaults to None
+  \item
+    \textbf{n} (\texttt{int}) -- number of top IDs (by score) to be
+    extracted per item, defaults to 10
+  \item
+    \textbf{department} (\texttt{Optional}{[}\texttt{str}{]}) --
+    restrict to items from department
+  \end{itemize}
+\item
+  \textbf{Return type}
+
+  \texttt{None}
+\end{itemize}
+
+\hypertarget{classmethod-make_random_samplefile_path-save_path-size}{%
+\subsubsection{classmethod make\_random\_sample(file\_path, save\_path,
+size)}\label{classmethod-make_random_samplefile_path-save_path-size}}
+
+Save a random sample from the population in the file.
+
+\begin{itemize}
+\item
+  \textbf{Parameters}
+
+  \begin{itemize}
+  \item
+    \textbf{file\_path} (\texttt{str}) -- complete path to file
+    including filename and extension
+  \item
+    \textbf{save\_path} (\texttt{str}) -- complete path to save folder
+    including filename and extension
+  \item
+    \textbf{size} (\texttt{int}) -- the sample size
+  \end{itemize}
+\item
+  \textbf{Return type}
+
+  \texttt{None}
+\end{itemize}
+
+\hypertarget{classmethod-print_chi_square_fitfile_path}{%
+\subsubsection{classmethod
+print\_chi\_square\_fit(file\_path)}\label{classmethod-print_chi_square_fitfile_path}}
+
+Print chi square goodness of fit.
+
+File must be CSV with first line title; three columns with first column
+categories, second column expected and third column observed values.
+
+\begin{itemize}
+\item
+  \textbf{Parameters}
+
+  \textbf{file\_path} (\texttt{str}) -- complete path to file including
+  filename and extension
+\item
+  \textbf{Return type}
+
+  \texttt{None}
+\end{itemize}
+
+\hypertarget{classmethod-super_make_metricsfile_path-departmentnone}{%
+\subsubsection{classmethod super\_make\_metrics(file\_path,
+department=None)}\label{classmethod-super_make_metricsfile_path-departmentnone}}
+
+Make metrics for all combinations of Annif projects and parameters in
+enriched Edoc file.
+
+Output files are saved in /metrics/. Joint results are saved in
+/analysis/metrics.json.
+
+\begin{itemize}
+\item
+  \textbf{Parameters}
+
+  \begin{itemize}
+  \item
+    \textbf{file\_path} (\texttt{str}) -- complete path to file
+    including filename and extension
+  \item
+    \textbf{department} (\texttt{Optional}{[}\texttt{str}{]}) --
+    restrict to items from department
+  \end{itemize}
+\end{itemize}
+
+\hypertarget{classmethod-super_make_stats}{%
+\subsubsection{classmethod
+super\_make\_stats()}\label{classmethod-super_make_stats}}
+
+Make metrics for files in /metrics.
+
+Output is saved as /analysis/metrics.json.
+
+\begin{itemize}
+\item
+  \textbf{Return type}
+
+  \texttt{None}
+\end{itemize}
+
 \hypertarget{bibliography}{%
 \section{Bibliography}\label{bibliography}}
 
@@ -1009,6 +1767,11 @@ worse performing Wikidata configuration, except for
 Gantert, Klaus. 2016. \emph{Bibliothekarisches Grundwissen}. 9.,
 vollst{ä}ndig neu bearbeitete und erweiterte Auflage. Berlin: {De
 Gruyter Saur}. \url{https://doi.org/10.1515/9783110321500}.
+
+\leavevmode\hypertarget{ref-Golub.2019}{}%
+Golub, Koraljka. 2019. {``Automatic Subject Indexing of Text.''}
+\emph{Knowledge Organization} 46 (2): 104--21.
+\url{https://doi.org/10.5771/0943-7444-2019-2-104}.
 
 \leavevmode\hypertarget{ref-Golub.2016}{}%
 Golub, Koraljka, Dagobert Soergel, George Buchanan, Douglas Tudhope,
@@ -1022,6 +1785,12 @@ Louis, Annie, and Ani Nenkova. 2013. {``Automatically Assessing Machine
 Summary Content Without a Gold Standard.''} \emph{Computational
 Linguistics} 39 (2): 267--300.
 \url{https://doi.org/10.1162/COLI\%7B/textunderscore\%20\%7Da\%7B/textunderscore\%20\%7D00123}.
+
+\leavevmode\hypertarget{ref-Nagelschmidt.12.11.2020}{}%
+Nagelschmidt, Matthias. 12.11.2020. {``Evaluation von Annif f{ü}r Die
+Maschinelle Inhaltserschlie{ß}ung an Der Deutschen
+Nationalbibliothek.''}
+\url{https://wiki.dnb.de/download/attachments/181735291/07-EvaluationVonAnnif.pdf?version=1\&modificationDate=1605778295000\&api=v2}.
 
 \leavevmode\hypertarget{ref-Parke.2013}{}%
 Parke, Carol. 2013. \emph{Essential First Steps to Data Analysis:
@@ -1057,6 +1826,12 @@ Idealisations: The Construction of Modern Linguistics.''}
 Suominen, Osma. 2019. {``Annif: DIY Automated Subject Indexing Using
 Multiple Algorithms.''} \emph{LIBER Quarterly} 29 (1): 1--25.
 \url{https://doi.org/10.18352/lq.10285}.
+
+\leavevmode\hypertarget{ref-Suominen.2021}{}%
+Suominen, Osma, Juho Inkinen, Tuomo Virolainen, Moritz Fürneisen, Bruno
+P. Kinoshita, Sara Veldhoen, Mats Sjöberg, Philipp Zumstein, Robin
+Neatherway, and monalehtinen. 2021. {``NatLibFi/Annif: Annif 0.51.''}
+\url{https://doi.org/10.5281/zenodo.4521923}.
 
 \leavevmode\hypertarget{ref-Toepfer.2016}{}%
 Toepfer, Martin, and Andreas Oskar Kempf. 2016. {``Automatische
