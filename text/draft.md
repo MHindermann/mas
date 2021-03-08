@@ -167,19 +167,13 @@ indexing tool developed at the Finnish National Library [see @Suominen.2019 for 
 
 [^2]: This API is specifically intended for testing. For integration into a production system, the Finto AI API is available (see https://ai.finto.fi/v1/ui/).
 
+Annif vocs that are available
+
 ## Implementation
 
-As explained above, for the prototype we will use the out
+Machine indexing with Annif was implemented using the annif-client Python library (see https://pypi.org/project/annif-client/). The desired output is that every item in the Edoc sample data set is assigned subject terms by all available Annif API projects (namely, `yso-en`, `yso-maui-en`, `yso-bonsai-en`, `yso-fasttext-en`, `wikidata-en`) based on all available text bases (title or title and abstract). In order to distinguish these assignments, we use a unique ID (called "marker" in what follows) for each Annif configuration. A marker is constructed by the convention: `{project_id}-{abstract}-{fulltext}-{n}-{threshold}`, where `project_id` is the Annif project, `abstract` and `fulltext` are boolean variables, `n` is the maximum number of suggestions per item, and `threshold` is a variable for a threshold Annif score. 
 
-!! Explain how to implementation works.
-
-In addition to the already used algorithms we should also try https://ai.finto.fi/?locale=en
-
-!! Somewhere here we talk about indexing based on title and/or abstract and/or fulltext. Fulltext is not yet
- implemented. Some observations to do so:
- - the link to the fulltext is constructed from the data fields `offical url` and `documebts - main`, e.g., `https
- ://edoc.unibas.ch/79633/` + `1/` + `2020_18_Informed by wet feet_How do floods affect property prices.pdf` to get
-  `https://edoc.unibas.ch/79633/1/2020_18_Informed by wet feet_How do floods affect property prices.pdf`
+In order to generate the ouput, we call `Data.super_enrich_with_annif`, thereby iteratively calling `Data.enrich_with_annif` for all items in `/files/sample/sample_master.json` for all Annif projects. The output is saved in `/indexed/` as `indexed_master.json`.
 
 # Gold standard
 
@@ -194,11 +188,11 @@ A gold standard is usually the product of manual indexing by "information expert
 
 There are other methods for assessing machine indexing quality besides comparison with a gold standard that are worth mentioning. These include an evaluation in the context of indexing workflows [@Golub.2016, p. 13ff.], the assessment of retrieval performance [@Golub.2016, p. 15-23.], and so-called model free assessments [@Louis.2013]. 
 
-The construction of the derivative gold standard takes x steps:
+The construction of the derivative gold standard takes three steps:
 
-1. Extract the keywords from the sample data set.  
-2. Clean the extracted keywords.
-3. Reconcile the extracted keywords with...  
+1. Extract the keywords from the sample data set. 
+2. Clean the extracted keywords. 
+3. Reconcile the extracted keywords with. 
 
 The intended output of this transformation process is...
 
@@ -251,7 +245,7 @@ The median number of keywords for an item in the sample data set is 6 with an IQ
 
 ## Reconciliation
 
-As explained in section X, Annif assigns index terms from a controlled vocabulary. If we want to assess the quality of the indexing via a gold standard, we must therefore ensure that the gold standard makes use of the vocabulary used by Annif. As seen in section Y, the relevant (English) vocabularies are Wikidata YSO. The next step in constructing the derivative gold standard is hence to match the extracted and cleaned keywords with keywords from YSO and Wikidata. This process is called "reconciliation" (see https://docs.openrefine.org/manual/reconciling) and the tool of choice for this task is OpenRefine (see [section OpenRefine](#openrefine)). 
+As explained in [section "Machine indexing"](#machine-indexing), Annif assigns index terms from a controlled vocabulary. If we want to assess the quality of the indexing via a gold standard, we must therefore ensure that the gold standard makes use of the vocabulary used by Annif. The relevant (English) vocabularies are Wikidata and YSO. The next step in constructing the derivative gold standard is hence to match the extracted and cleaned keywords with keywords from YSO and Wikidata. This process is called "reconciliation" (see https://docs.openrefine.org/manual/reconciling) and the tool of choice for this task is OpenRefine (see [section "Introduction"](#openrefine)). 
 
 In this section, I will describe how the cleaned keywords were reconciled with Wikidata and YSO, and which additional steps for refinement were undertaken. In total, 2'104 data transformation operations were performed; the complete operation history is available as `/keywords/operation_history.json`. 
 
@@ -337,7 +331,7 @@ I will now describe how the data foundation for the assessment was created. Ther
 2. The text base per item, namely title versus title and abstract.
 3. The maximum number of suggestions per item. Since we required 10 suggestions per item, we can choose between 1-10 suggestions.
  
-Combining these parameters, we really have 100 Annif configurations whose performance we want to compare and assess: Annif project $*$ text base $*$ maximum number of suggestions $= 5 * 2 * 10 = 100$. Each configuration has a unique ID (called "marker" in what follows) constructed by the convention: `{project_id}-{abstract}-{fulltext}-{n}-{threshold}` where `project_id` is the Annif project, `abstract` and `fulltext` are boolean variables, `n` is the maximum number of suggestions per item, and `threshold` is a variable for a threshold Annif score.
+Combining these parameters, we really have 100 Annif configurations whose performance we want to compare and assess: Annif project $*$ text base $*$ maximum number of suggestions $= 5 * 2 * 10 = 100$. Remember the convention for constructing the marker that identifies a configuration (see [section "Annif"](#annif)): `{project_id}-{abstract}-{fulltext}-{n}-{threshold}`.
 
 For each configuration, the F1-score was then computed. It is important to note that each metric comes in three different flavors dubbed "macro", "micro", and "weighted" respectively [see @Sokolova.2009]. In the macro flavor, the metric represents simply the mean per class (i.e., correct or incorrect suggestion). The weighted metric is the macro metric but each class is weighted by its true positives. By contrast, a metric with the micro flavor is computed globally over all true positives and false positives respectively negatives. So the "macro" and "weighted" flavors are useful for assessing the performance of a configuration with respect to individual cases of assigning subject terms (call them "samples") whereas the "micro" flavor is most suitable to assess the overall performance of a configuration with respect to assigning subject terms.
 
@@ -1045,6 +1039,11 @@ https://bolt.mph.ufl.edu/6050-6052/unit-1/one-quantitative-variable-introduction
 
 Chi-Square Test: 
 https://www.statology.org/chi-square-goodness-of-fit-test-python/
+
+Somewhere here we talk about indexing based on title and/or abstract and/or fulltext. Fulltext is not yet
+ implemented. Some observations to do so: the link to the fulltext is constructed from the data fields `offical url` and `documebts - main`, e.g., `https
+ ://edoc.unibas.ch/79633/` + `1/` + `2020_18_Informed by wet feet_How do floods affect property prices.pdf` to get
+  `https://edoc.unibas.ch/79633/1/2020_18_Informed by wet feet_How do floods affect property prices.pdf`
 
 Codeblocks are done like so:
 ~~~~{.Python .numberLines caption="test"}

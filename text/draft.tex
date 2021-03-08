@@ -317,24 +317,31 @@ constructing a gold standard (see
 \protect\hyperlink{gold-standard}{section ``Gold standard''}) remains
 the same.
 
+Annif vocs that are available
+
 \hypertarget{implementation}{%
 \subsection{Implementation}\label{implementation}}
 
-As explained above, for the prototype we will use the out
+Machine indexing with Annif was implemented using the annif-client
+Python library (see https://pypi.org/project/annif-client/). The desired
+output is that every item in the Edoc sample data set is assigned
+subject terms by all available Annif API projects (namely,
+\texttt{yso-en}, \texttt{yso-maui-en}, \texttt{yso-bonsai-en},
+\texttt{yso-fasttext-en}, \texttt{wikidata-en}) based on all available
+text bases (title or title and abstract). In order to distinguish these
+assignments, we use a unique ID (called ``marker'' in what follows) for
+each Annif configuration. A marker is constructed by the convention:
+\texttt{\{project\_id\}-\{abstract\}-\{fulltext\}-\{n\}-\{threshold\}},
+where \texttt{project\_id} is the Annif project, \texttt{abstract} and
+\texttt{fulltext} are boolean variables, \texttt{n} is the maximum
+number of suggestions per item, and \texttt{threshold} is a variable for
+a threshold Annif score.
 
-!! Explain how to implementation works.
-
-In addition to the already used algorithms we should also try
-https://ai.finto.fi/?locale=en
-
-!! Somewhere here we talk about indexing based on title and/or abstract
-and/or fulltext. Fulltext is not yet implemented. Some observations to
-do so: - the link to the fulltext is constructed from the data fields
-\texttt{offical\ url} and \texttt{documebts\ -\ main}, e.g.,
-\texttt{https\ \ ://edoc.unibas.ch/79633/} + \texttt{1/} +
-\texttt{2020\_18\_Informed\ by\ wet\ feet\_How\ do\ floods\ affect\ property\ prices.pdf}
-to get
-\texttt{https://edoc.unibas.ch/79633/1/2020\_18\_Informed\ by\ wet\ feet\_How\ do\ floods\ affect\ property\ prices.pdf}
+In order to generate the ouput, we call
+\texttt{Data.super\_enrich\_with\_annif}, thereby iteratively calling
+\texttt{Data.enrich\_with\_annif} for all items in
+\texttt{/files/sample/sample\_master.json} for all Annif projects. The
+output is saved in \texttt{/indexed/} as \texttt{indexed\_master.json}.
 
 \hypertarget{gold-standard}{%
 \section{Gold standard}\label{gold-standard}}
@@ -373,17 +380,17 @@ an evaluation in the context of indexing workflows (Golub et al. 2016,
 13ff.), the assessment of retrieval performance (Golub et al. 2016,
 15--23.), and so-called model free assessments (Louis and Nenkova 2013).
 
-The construction of the derivative gold standard takes x steps:
+The construction of the derivative gold standard takes three steps:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  Extract the keywords from the sample data set.\\
+  Extract the keywords from the sample data set.
 \item
   Clean the extracted keywords.
 \item
-  Reconcile the extracted keywords with\ldots{}
+  Reconcile the extracted keywords with.
 \end{enumerate}
 
 The intended output of this transformation process is\ldots{}
@@ -775,13 +782,9 @@ created. There are three parameters that need to be distinguished (see
 Combining these parameters, we really have 100 Annif configurations
 whose performance we want to compare and assess: Annif project \(*\)
 text base \(*\) maximum number of suggestions \(= 5 * 2 * 10 = 100\).
-Each configuration has a unique ID (called ``marker'' in what follows)
-constructed by the convention:
-\texttt{\{project\_id\}-\{abstract\}-\{fulltext\}-\{n\}-\{threshold\}}
-where \texttt{project\_id} is the Annif project, \texttt{abstract} and
-\texttt{fulltext} are boolean variables, \texttt{n} is the maximum
-number of suggestions per item, and \texttt{threshold} is a variable for
-a threshold Annif score.
+Remember the convention for constructing the marker that identifies a
+configuration (see \protect\hyperlink{annif}{section ``Annif''}):
+\texttt{\{project\_id\}-\{abstract\}-\{fulltext\}-\{n\}-\{threshold\}}.
 
 For each configuration, the F1-score was then computed. It is important
 to note that each metric comes in three different flavors dubbed
