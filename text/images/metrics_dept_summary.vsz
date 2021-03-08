@@ -1,5 +1,5 @@
 # Veusz saved document (version 3.3.1)
-# Saved at 2021-03-07T13:20:35.783984
+# Saved at 2021-03-08T20:39:52.498203
 
 AddImportPath(u'C:\\Users\\Max\\PycharmProjects\\mas\\text\\images')
 ImportFileCSV(u'metrics_dept_best.csv', linked=True, numericlocale=u'de_CH')
@@ -191,8 +191,10 @@ Set('GridLines/hide', True)
 To('..')
 Add('xy', name=u'xy1', autoadd=False)
 To(u'xy1')
-Set('marker', u'diamond')
+Set('marker', u'asterisk')
+Set('markerSize', u'5pt')
 Set('color', u'blue')
+Set('thinfactor', 1)
 Set('xData', u'F1')
 Set('yData', [])
 Set('key', u'wikidata-en-F-F/T-4-N')

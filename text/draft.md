@@ -1,14 +1,10 @@
 <!-- 
-Markdown Syntax: https://www.markdownguide.org/basic-syntax/
-PyCharm and Markdown: https://www.jetbrains.com/help/pycharm/markdown.html 
-Convert Markdown to LaTeX or PDF: https://pandoc.org/getting-started.html (PS C:\Users\Max\PycharmProjects\mas\text> 
-pandoc .\draft.md --from markdown+footnotes+implicit_figures+tex_math_dollars --number-sections --bibliography biblio.bib --citeproc --toc -o draft.pdf)
-Write a research paper in Markdown: https://opensource.com/article/18/9/pandoc-research-paper
+$ pandoc draft.md --bibliography biblio.bib --citeproc -o draft.tex
 -->
 
 # Introduction
 
-In this section I will...
+In this section, the problem and goal of this project are stated and the employed methodology is outlined. 
 
 ## Problem statement and goal 
 
@@ -22,12 +18,12 @@ Today Edoc contains roughly 68’000 items, most of them journal articles withou
 
 ## Method
 
+The proof of the pudding is in the creation of a functional prototype. 
+
 !! Say something to the effect that all data and code are available on GitHub.
 
 !! In this chapter, the prototype for a machine indexing of Edoc is presented. The focus is primarily on practical 
 implementation although care is taken to spell out design decisions in as much detail as is needed.
-
-## Outline
 
 Let us start by stating the aim of the prototype.  From a functional 
 perspective, the prototype takes a subset of the data from Edoc as input and provides index terms for each item in this 
@@ -40,12 +36,6 @@ subset as output. In order to fulfill this aim we can distinguish a number of st
 5. Assess the quality of the output based on the gold standard.
 
 In the sections below, these steps will be discussed in detail.
-
-## Tools
-
-For data refinement I use OpenRefine version 3.4.1 (https://openrefine.org/). Data manipulation in OpenRefine is 
-tracked: 
-the manipulation history of some data can be exported as JSON file and then reproduced (on the same data on a different machine or on different data) by loading said file. I will supply a corresponding manipulation history whenever appropriate. Note that when using OpenRefine with larger files (and there are many such files in this project), the memory allocation to OpenRefine must be manually increased (see https://docs.openrefine.org/manual/installing/#increasing-memory-allocation for details). Also note that OpenRefine always counts the number of records by the first column (a fact which caused me many headaches). 
 
 # Edoc data
 
@@ -257,7 +247,11 @@ The median number of keywords for an item in the sample data set is 6 with an IQ
 
 ## Reconciliation
 
-As explained in [section "Machine indexing"](#machine-indexing), Annif assigns index terms from a controlled vocabulary. If we want to assess the quality of the indexing via a gold standard, we must therefore ensure that the gold standard makes use of the vocabulary used by Annif. The relevant (English) vocabularies are Wikidata and YSO. The next step in constructing the derivative gold standard is hence to match the extracted and cleaned keywords with keywords from Wikidata and YSO. This process is called "reconciliation" (see https://docs.openrefine.org/manual/reconciling) and the tool of choice for this task is OpenRefine (see [section "Introduction"](#introduction)). 
+As explained in [section "Machine indexing"](#machine-indexing), Annif assigns index terms from a controlled vocabulary. If we want to assess the quality of the indexing via a gold standard, we must therefore ensure that the gold standard makes use of the vocabulary used by Annif. The relevant (English) vocabularies are Wikidata and YSO. The next step in constructing the derivative gold standard is hence to match the extracted and cleaned keywords with keywords from Wikidata and YSO. This process is called "reconciliation" (see https://docs.openrefine.org/manual/reconciling) and the tool of choice for this task is OpenRefine).[^3]
+
+[^3]: For data refinement I use OpenRefine version 3.4.1 (https://openrefine.org/). Data manipulation in OpenRefine is 
+tracked: 
+the manipulation history of some data can be exported as JSON file and then reproduced (on the same data on a different machine or on different data) by loading said file. I will supply a corresponding manipulation history whenever appropriate. Note that when using OpenRefine with larger files (and there are many such files in this project), the memory allocation to OpenRefine must be manually increased (see https://docs.openrefine.org/manual/installing/#increasing-memory-allocation for details). Also note that OpenRefine always counts the number of records by the first column (a fact which caused me many headaches). 
 
 In what follows, I will describe how the cleaned keywords were reconciled with Wikidata and YSO, and which additional steps for refinement were undertaken. In total, 2'104 data transformation operations were performed; the complete operation history is available as `/keywords/operation_history.json`. 
 
@@ -267,10 +261,10 @@ The reconciliation service API returns automatic matches (call them "suggestions
 
 First, the suggestions to the top 500 keywords were manually verified. These keywords account for 14'996 occurrences or 40.638% of the total occurrences and thus constitute an effective lever.
 
-Second, systematic biases were identified and removed. The most prevalent bias was an due to a suggestion's type. As stated above, the reconciliation service API was not constrained by type but had access to the complete Wikidata database. Since Wikidata is an ontology that encompasses everything, it also features types whose concepts cannot qualify as subject terms (at least in the present context). The most prominent example is the type Q13442814 "scholarly article". Wikidata contains the metadata of many scholarly articles. Now, for some of our keywords, there is a scholarly article with a title that exactly matches the keyword; and since there is no restriction concerning the type, the scholarly article is suggested with high confidence (see https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation-Service-API for details). To generalize, suggestions with types whose concepts are proper names are usually incorrect. Based on this observation, suggestions with types such as "scholarly article", "clinical trial", and "scientific journal" were rejected.[^3] Suggestions types such as  "human", "album", and "commune of France" were manually verified (i.e., checked for correctness).[^4]
+Second, systematic biases were identified and removed. The most prevalent bias was an due to a suggestion's type. As stated above, the reconciliation service API was not constrained by type but had access to the complete Wikidata database. Since Wikidata is an ontology that encompasses everything, it also features types whose concepts cannot qualify as subject terms (at least in the present context). The most prominent example is the type Q13442814 "scholarly article". Wikidata contains the metadata of many scholarly articles. Now, for some of our keywords, there is a scholarly article with a title that exactly matches the keyword; and since there is no restriction concerning the type, the scholarly article is suggested with high confidence (see https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation-Service-API for details). To generalize, suggestions with types whose concepts are proper names are usually incorrect. Based on this observation, suggestions with types such as "scholarly article", "clinical trial", and "scientific journal" were rejected.[^4] Suggestions types such as  "human", "album", and "commune of France" were manually verified (i.e., checked for correctness).[^5]
 
-[^3]: The complete list includes "academic journal", "open access journal", "thesis", "doctoral thesis", and "natural number".
-[^4]: The complete list includes "film", "musical group", "business", "literary work", "television series", "organization", "family name", "written work", "video game", "single, television series episode", "painting", , "city of the United States", "magazine", "studio album", "year", "nonprofit organization", "border town", "international organization", "political party", "software", "song", "website", "article comic strip", "collection", "commune of Italy", "fictional human", "film", "government agency", "village", "academic journal article", "female given name", and "poem".
+[^4]: The complete list includes "academic journal", "open access journal", "thesis", "doctoral thesis", and "natural number".
+[^5]: The complete list includes "film", "musical group", "business", "literary work", "television series", "organization", "family name", "written work", "video game", "single, television series episode", "painting", , "city of the United States", "magazine", "studio album", "year", "nonprofit organization", "border town", "international organization", "political party", "software", "song", "website", "article comic strip", "collection", "commune of Italy", "fictional human", "film", "government agency", "village", "academic journal article", "female given name", and "poem".
 
 With these improvements in place, each keyword with a suggestion was assigned a QID via the "Add cloumns from reconciled values"-function (and similar for YSO and MeSH identifiers). The data was then exported and saved as `/keywords/keywords_reference.json`. Keywords with a QID now constitute 69% of all keywords and 78% of their total occurrences in the sample data set, but these numbers are significantly lower for the MeSH identifier (53.6% of all keywords with only 28.8% of all occurrences) and especially low for the YSO identifier (26.9% of all keywords with 11% of all occurrences). In both cases, the problem is due to the fact that Wikidata's mapping of MeSH respectively YSO is only partial. There can be two reasons for this state of affairs for a given entry: either there is no match between Wikidata and YSO or MeSH (after all, Wikidata is much larger than MeSH and YSO taken together), or there is a match but it has not yet been added to the mapping. In the latter case, at least with respect to YSO, there is a solution: Finto provides a REST-style API to access the YSO vocabulary directly (see https://api.finto.fi/). For each keyword in the list of reference keywords that lacks a YSO identifier, the Finto API is queried; if a term turns up, it is added to the keyword. The effect of this second reconcilement is detailed in Figure 4. It is achieved by calling `Keywords.enrich_with_yso` on `/keywords/keywords_reference.json` and saving the output as `/keywords/keywords_reference_master.json`
 
@@ -412,25 +406,34 @@ Let us now look at the results. First consider the distribution of the performan
 
 Let us now consider the best performing Annif configurations per department as summarized in Figure 12. It is evident that only two of the ten departments (namely Associated and Central Services) have as best performing configuration the configuration that was declared the overall best performing configuration (namely `wikidata-en-F-F-4-N`). More surprisingly, YSO outperforms Wikidata in all other departments except Interdisciplinary. However, the margin is rather slim. The notable exception is the department Economics, where the YSO configuration outperforms the Wikidata configuration by a factor of 3. More importantly, the best performing YSO configurations are significantly less productive than the slightly worse performing Wikidata configuration, except for `yso-en-F-F-4-N` in the Medicine department. 
 
-# Outlook and conclusion
+# Conclusion and outlook
 
-## Refinement
+In this section, ..
 
-- fulltext support
-- mesh; A gold standard is usually the product of manual indexing by "information experts, subject experts, or potential or real end users" [@Golub.2016, p. 10]. This entails its own host of epistemic problems relating to objectivity and consistency of the assigned subject terms. Most importantly, however, the construction of a gold standard from scratch is very expensive. It is therefore not an option for the project at hand. Rather, I will construct what could be called derivative gold standards by reusing indexing data that is already available. Here we can distinguish two distinct kinds of derivative gold standards: first, I will construct a derivative gold standard based on the author keywords available in the sample data set; call this the "derivative" gold standard. Second, I will construct a derivative gold standard based on indexing metadata available in repositories distinct from Edoc; call this the "foreign" gold standard. 
--We enrich the sample items with MeSH keywords from PubMed if available (item needs a PubMed ID and items needs to
+## Recommendation
+
+Answer some questions asked in the proposal. Briefly summarize results. Recommend using Out of the box annif for production. sketch implementation strategy. 
+
+## Further research
+
+Apart from implementing a production system as discussed above, natural next steps to build on this project include:
+
+1. mesh. mesh; A gold standard is usually the product of manual indexing by "information experts, subject experts, or potential or real end users" [@Golub.2016, p. 10]. This entails its own host of epistemic problems relating to objectivity and consistency of the assigned subject terms. Most importantly, however, the construction of a gold standard from scratch is very expensive. It is therefore not an option for the project at hand. Rather, I will construct what could be called derivative gold standards by reusing indexing data that is already available. Here we can distinguish two distinct kinds of derivative gold standards: first, I will construct a derivative gold standard based on the author keywords available in the sample data set; call this the "derivative" gold standard. Second, I will construct a derivative gold standard based on indexing metadata available in repositories distinct from Edoc; call this the "foreign" gold standard. / We enrich the sample items with MeSH keywords from PubMed if available (item needs a PubMed ID and items needs to
 be indexed with MeSH on PubMed, 1653 items match this requirement); the resulting file is indexed_master_mesh.json. Like 
 so: 
 Data.enrich_with_mesh(DIR + "/indexed/indexed_master.json", DIR + "/indexed/indexed_master_mesh")
+ 
+2. full text
 
-## Implementation strategy
+3. german vocabulary
+
+4. select domain specific vocabularies with bartoc suggest
 
 # Appendix
 
-<!-- mas documentation master file, created by
-sphinx-quickstart on Sun Mar  7 20:23:58 2021. -->
-Codebase available at: [https://github.com/MHindermann/mas](https://github.com/MHindermann/mas)
+As mentioned in [section "Introduction"](#introduction), all files, data, and code used in this project is available at https://github.com/MHindermann/mas and will not be replicated here.
 
+<!-- 
 ## class files.Utility()
 A collection of utility functions.
 
@@ -1033,6 +1036,7 @@ Output is saved as /analysis/metrics.json.
 * **Return type**
 
     `None`
+-->
 
 # Bibliography
 
