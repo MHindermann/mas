@@ -57,7 +57,22 @@ below:
 
 The focus of this project lies primarily on practical implementation of
 the prototype although care is taken to spell out design decisions in as
-much detail as is needed.
+much detail as is needed. All code written and data generated during the
+process of implementing the prototype is available at
+\url{https://github.com/MHindermann/mas}:
+
+\begin{itemize}
+\tightlist
+\item
+  Text and images available at
+  \href{https://github.com/MHindermann/mas/tree/main/text}{\texttt{/text/}}
+\item
+  Codebase and data available at
+  \href{https://github.com/MHindermann/mas/tree/main/files}{\texttt{/files/}}
+\item
+  Documentation available at
+  \href{https://github.com/MHindermann/mas/tree/main/docs}{\texttt{/docs/}}
+\end{itemize}
 
 \hypertarget{edoc-data}{%
 \section{Edoc data}\label{edoc-data}}
@@ -90,7 +105,8 @@ editors requiring special editors such as Oxygen. For these reasons
 handled and can be uploaded to GitHub. For this
 \texttt{Utility.split\_json} was used yielding 14 files of size 20 MB or
 less containing 5000 or fewer entries each. These files are called
-\texttt{raw\_master\_\{year\}.json} and saved under \texttt{/raw}.
+\texttt{raw\_master\_\{year\}.json} and saved under
+\href{https://github.com/MHindermann/mas/tree/main/files/raw}{\texttt{/raw/}}.
 
 \hypertarget{data-description}{%
 \subsection{Data description}\label{data-description}}
@@ -100,14 +116,14 @@ to the class of descriptive metadata. The data entry for an item's
 descriptive metadata is undertaken by the person who uploads the item
 which is in most cases one of the item's authors. The Note that an item
 is first uploaded to the University of Basel's research database
-(https://www.forschdb2.unibas.ch) before being automatically fed into
-Edoc. There are explicit rules on how to enter the data as summarized in
-the user manual (Universität Basel, n.d.). However, there is no (or at
-least no systematic) manual or automatic validation of the entered data.
-This means that some data fields are very heterogenous and require
-further parsing (see \protect\hyperlink{gold-standard}{section ``Gold
-standard''}). The data fields that are of interest to the project at
-hand are discussed in more detail in (see
+\url{https://www.forschdb2.unibas.ch} before being automatically fed
+into Edoc. There are explicit rules on how to enter the data as
+summarized in the user manual (Universität Basel, n.d.). However, there
+is no (or at least no systematic) manual or automatic validation of the
+entered data. This means that some data fields are very heterogenous and
+require further parsing (see \protect\hyperlink{gold-standard}{section
+``Gold standard''}). The data fields that are of interest to the project
+at hand are discussed in more detail in (see
 \protect\hyperlink{sample-data-set}{section ``Sample data set''} below).
 
 \hypertarget{sample-data-set}{%
@@ -166,14 +182,14 @@ into account other data fields such as \texttt{type},
 \texttt{publication} or \texttt{department}. Especially the latter might
 be valuable when disambiguating homonymous or polysemous words. For
 example, consider the item
-\texttt{https://edoc.unibas.ch/id/eprint/76510} which is titled
-``Blacking Out.'' Without further context, this title could refer
-(amongst others) to a physiological phenomenon, a sudden loss of
-electricity, or a measure taken in wartime. Knowing that the item was
-published by a researcher employed by the Faculty of Business and
-Economics (and not, say, by the Faculty of Medicine) gives us reason to
-exclude the first meaning. However, this idea cannot be implemented with
-the out of the box instance of Annif employed in this chapter (see
+\href{https://edoc.unibas.ch/id/eprint/76510}{\texttt{https://edoc.unibas.ch/id/eprint/76510}}
+which is titled ``Blacking Out.'' Without further context, this title
+could refer (amongst others) to a physiological phenomenon, a sudden
+loss of electricity, or a measure taken in wartime. Knowing that the
+item was published by a researcher employed by the Faculty of Business
+and Economics (and not, say, by the Faculty of Medicine) gives us reason
+to exclude the first meaning. However, this idea cannot be implemented
+with the out of the box instance of Annif employed in this chapter (see
 \protect\hyperlink{machine-indexing}{section ``Machine indexing''}).
 
 The second constraint is that the index terms assigned to each item in
@@ -186,20 +202,23 @@ sample data set, for every item in the sample data set, there is an
 approved subset of the vocabulary. The production of a standard from
 scratch is of course is very costly since a person, usually highly
 skilled in a certain academic domain, must assign and/or approve each
-item's index terms (!!source). For this reason we try to avoid having to
-produce a standard. One way of doing so is by requiring items in the
-sample data set to have non-empty \texttt{keywords} data field. The
-caveats of this approach are discussed in
-\protect\hyperlink{assessment}{section ``Assessment''}.
+item's index terms. For this reason we try to avoid having to produce a
+standard. One way of doing so is by requiring items in the sample data
+set to have non-empty \texttt{keywords} data field. The caveats of this
+approach are discussed in \protect\hyperlink{assessment}{section
+``Assessment''}.
 
 Taking into account the third constraint simply means that we do not
 employ any further restrictions. We can hence construct the sample data
-set by choosing exactly those items from \texttt{/raw} which have
-non-empty data fields \texttt{title}, \texttt{abstract},
+set by choosing exactly those items from
+\href{https://github.com/MHindermann/mas/tree/main/files/raw}{\texttt{/raw/}}
+which have non-empty data fields \texttt{title}, \texttt{abstract},
 \texttt{id\_number}, and \texttt{keywords}. We do so by calling
 \texttt{Data.select\_from\_file} iteratively for all files in
-\texttt{/raw}. The resulting file is saved in \texttt{/selected} as
-\texttt{selected\_master.json}.
+\href{https://github.com/MHindermann/mas/tree/main/files/raw}{\texttt{/raw/}}.
+The resulting file is saved in
+\href{https://github.com/MHindermann/mas/tree/main/files/sample}{\texttt{/sample/}}
+as \texttt{sample\_master.json}.
 
 \hypertarget{analysis}{%
 \subsection{Analysis}\label{analysis}}
@@ -218,18 +237,20 @@ The data foundation is available at
 \texttt{Analysis.print\_chi\_square\_fit} on the data foundation files.}
 \end{figure}
 
-Of the 68'345 items in \texttt{/raw}, all have a title (non-empty
-\texttt{title} data field), a little more than half of the items have an
-abstract (37'381 items with non-empty \texttt{abstract} data field),
-roughly half of the items have an ID (35'355 items with non-empty
-\texttt{id\_number} data field),\footnote{Note that when using the facet
-  by blank on \texttt{id\_number} in OpenRefine, there are 57'153
-  matches; this is due to the fact that many items with an ID such as
-  DOI have secondary or tertiary IDs such as ISI or PMID.} and less than
-10\% of the items have keywords (6'660 items with non-empty
-\texttt{keywords} data field). The sample data set as requires all the
-above data fields to be non-empty; \texttt{/sample/sample\_master.json}
-has 4'111 items and hence constitutes 6\% of the raw data.
+Of the 68'345 items in
+\href{https://github.com/MHindermann/mas/tree/main/files/raw}{\texttt{/raw/}},
+all have a title (non-empty \texttt{title} data field), a little more
+than half of the items have an abstract (37'381 items with non-empty
+\texttt{abstract} data field), roughly half of the items have an ID
+(35'355 items with non-empty \texttt{id\_number} data field),\footnote{Note
+  that when using the facet by blank on \texttt{id\_number} in
+  OpenRefine, there are 57'153 matches; this is due to the fact that
+  many items with an ID such as DOI have secondary or tertiary IDs such
+  as ISI or PMID.} and less than 10\% of the items have keywords (6'660
+items with non-empty \texttt{keywords} data field). The sample data set
+as requires all the above data fields to be non-empty;
+\texttt{/sample/sample\_master.json} has 4'111 items and hence
+constitutes 6\% of the raw data.
 
 In order to determine how well the sample data set represents the raw
 Edoc data, a one-sample \(\chi^2\) goodnes of fit test was conducted on
@@ -283,25 +304,25 @@ the German National Library (Nagelschmidt 12.11.2020). As stated in
 section \protect\hyperlink{introduction}{section ``Introduction''}, in
 this project I am interested in using Annif out of the box. This means
 that instead of training a local Annif instance, I will be relying on
-the Annif REST-style API (see https://api.annif.org/).\footnote{This API
-  is specifically intended for testing. For integration into a
+the Annif REST-style API (see \url{https://api.annif.org/}).\footnote{This
+  API is specifically intended for testing. For integration into a
   production system, the Finto AI API is available (see
-  https://ai.finto.fi/v1/ui/).} The advantage of this approach is that
-it is quick and relatively easy to implement. The disadvantage is that
-no custom algorithms or vocabularies can be used. The task of
+  \url{https://ai.finto.fi/v1/ui/}).} The advantage of this approach is
+that it is quick and relatively easy to implement. The disadvantage is
+that no custom algorithms or vocabularies can be used. The task of
 constructing a gold standard (see
 \protect\hyperlink{gold-standard}{section ``Gold standard''}) remains
 the same.
 
 The vocabularies provided by the Annif API are the General Finnish
-Ontology or YSO in short (see https://finto.fi/yso/en/) and Wikidata
-(see https://www.wikidata.org/). Each vocabulary is combined with an
-algorithm or algorithm ensemble respectively and a specific language to
-create a so-called Annif ``project.'' The five projects used in what
-follows are summarized in Table 1. A high-level description of the
-algorithm(s) is given by Suominen (2019, 7--10). Information on
-implementation can be found at the Annif GitHub Wiki (see
-https://github.com/NatLibFi/Annif/wiki).
+Ontology or YSO in short (see \url{https://finto.fi/yso/en/}) and
+Wikidata (see \url{https://www.wikidata.org/}). Each vocabulary is
+combined with an algorithm or algorithm ensemble respectively and a
+specific language to create a so-called Annif ``project.'' The five
+projects used in what follows are summarized in Table 1. A high-level
+description of the algorithm(s) is given by Suominen (2019, 7--10).
+Information on implementation can be found at the Annif GitHub Wiki (see
+\url{https://github.com/NatLibFi/Annif/wiki}).
 
 \begin{table}[]
 \centering
@@ -321,9 +342,9 @@ Annif project   & Vocabulary & Language & Algorithm(s)   \\ \hline
 \subsection{Implementation}\label{implementation}}
 
 Machine indexing with Annif was implemented using the annif-client
-Python library (see https://pypi.org/project/annif-client/). The desired
-output is that every item in the Edoc sample data set is assigned
-subject terms by all available Annif API projects (namely,
+Python library (see \url{https://pypi.org/project/annif-client/}). The
+desired output is that every item in the Edoc sample data set is
+assigned subject terms by all available Annif API projects (namely,
 \texttt{yso-en}, \texttt{yso-maui-en}, \texttt{yso-bonsai-en},
 \texttt{yso-fasttext-en}, \texttt{wikidata-en}) based on all available
 text bases (title or title and abstract). In order to distinguish these
@@ -339,7 +360,9 @@ In order to generate the ouput, we call
 \texttt{Data.super\_enrich\_with\_annif}, thereby iteratively calling
 \texttt{Data.enrich\_with\_annif} for all items in
 \texttt{/sample/sample\_master.json} for all Annif projects. The output
-is saved in \texttt{/indexed/} as \texttt{indexed\_master.json}.
+is saved in
+\href{https://github.com/MHindermann/mas/tree/main/files/indexed}{\texttt{/indexed/}}
+as \texttt{indexed\_master.json}.
 
 \hypertarget{gold-standard}{%
 \section{Gold standard}\label{gold-standard}}
@@ -525,17 +548,17 @@ used by Annif. The relevant (English) vocabularies are Wikidata and YSO.
 The next step in constructing the derivative gold standard is hence to
 match the extracted and cleaned keywords with keywords from Wikidata and
 YSO. This process is called ``reconciliation'' (see
-https://docs.openrefine.org/manual/reconciling) and the tool of choice
-for this task is OpenRefine).\footnote{For data refinement I use
-  OpenRefine version 3.4.1 (https://openrefine.org/). Data manipulation
-  in OpenRefine is tracked: the manipulation history of some data can be
-  exported as JSON file and then reproduced (on the same data on a
-  different machine or on different data) by loading said file. I will
-  supply a corresponding manipulation history whenever appropriate. Note
-  that when using OpenRefine with larger files (and there are many such
-  files in this project), the memory allocation to OpenRefine must be
-  manually increased (see
-  https://docs.openrefine.org/manual/installing/\#increasing-memory-allocation
+\url{https://docs.openrefine.org/manual/reconciling}) and the tool of
+choice for this task is OpenRefine).\footnote{For data refinement I use
+  OpenRefine version 3.4.1 (see \url{https://openrefine.org/}). Data
+  manipulation in OpenRefine is tracked: the manipulation history of
+  some data can be exported as JSON file and then reproduced (on the
+  same data on a different machine or on different data) by loading said
+  file. I will supply a corresponding manipulation history whenever
+  appropriate. Note that when using OpenRefine with larger files (and
+  there are many such files in this project), the memory allocation to
+  OpenRefine must be manually increased (see
+  \url{https://docs.openrefine.org/manual/installing/\#increasing-memory-allocation}
   for details). Also note that OpenRefine always counts the number of
   records by the first column (a fact which caused me many headaches).}
 
@@ -579,7 +602,7 @@ contains the metadata of many scholarly articles. Now, for some of our
 keywords, there is a scholarly article with a title that exactly matches
 the keyword; and since there is no restriction concerning the type, the
 scholarly article is suggested with high confidence (see
-https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation-Service-API
+\url{https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation-Service-API}
 for details). To generalize, suggestions with types whose concepts are
 proper names are usually incorrect. Based on this observation,
 suggestions with types such as ``scholarly article,'' ``clinical
@@ -615,7 +638,7 @@ given entry: either there is no match between Wikidata and YSO or MeSH
 or there is a match but it has not yet been added to the mapping. In the
 latter case, at least with respect to YSO, there is a solution: Finto
 provides a REST-style API to access the YSO vocabulary directly (see
-https://api.finto.fi/). For each keyword in the list of reference
+\url{https://api.finto.fi/}). For each keyword in the list of reference
 keywords that lacks a YSO identifier, the Finto API is queried; if a
 term turns up, it is added to the keyword. The effect of this second
 reconcilement is detailed in Figure 4. It is achieved by calling
@@ -708,7 +731,7 @@ Precision and recall are standard metrics for indexing quality (e.g.,
 Gantert 2016, 197) whereby the F1 score plays are more prominent role in
 the assessment of machine indexing (e.g., Suominen 2019, 11--14; Toepfer
 and Kempf 2016, 93f.). Of course, there is a host of alternative metrics
-(such as indexing consistency, transparency, reproducability) that are
+(such as indexing consistency, transparency, reproducibility) that are
 neglected here.
 
 Let us briefly look at the definitions and motivations of the chosen
@@ -889,7 +912,7 @@ basis was slightly worse (see Figure 6, right). There is again no easy
 explanation for this find since there are multiple plausible causes
 which cannot be distangled here. For example, the abstract of an item in
 the Edoc sample data set might be less representative of the item's
-content than its title. In that case, the observed worse perfomance of
+content than its title. In that case, the observed worse performance of
 the Annif configurations based on title and abstracts would even be
 expected. Alternatively, it might be the case that the problem lies with
 Annif: a larger text basis introduces more confounding factors and might
@@ -1068,7 +1091,7 @@ next steps to build on this project include:
 
 As mentioned in \protect\hyperlink{introduction}{section
 ``Introduction''}, all files, data, and code used in this project is
-available at https://github.com/MHindermann/mas and will not be
+available at \url{https://github.com/MHindermann/mas} and will not be
 replicated here.
 
 \hypertarget{bibliography}{%
