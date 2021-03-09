@@ -8,13 +8,9 @@ In this section, the problem and goal of this project are stated and the employe
 
 ## Problem statement and goal 
 
-Edoc is the institutional repository of the University of Basel. It runs on the EPrints 3 document management system (https://github.com/eprints/eprints). Edoc was conceived in 2009 as repository for 
+Edoc is the institutional repository of the University of Basel. It runs on the EPrints 3 document management system (see [https://github.com/eprints/eprints](https://github.com/eprints/eprints)). Edoc was conceived in 2009 as repository for 
 electronic dissertations and grew in scope when the University of Basel adapted its first open access policy in 2013. 
-Today Edoc contains roughly 68’000 items, most of them journal articles without full text support. Even though descriptive and administrative metadata are collected for each item, this does not include subject terms. The lack of subject indexing  hampers the repository’s usability and potential with respect to the topic-based monitoring of research output and, to a lesser extent, information retrieval. The goal of this project is to remedy this situation with the help of machine indexing.
-
-!! More precisely, this project aims to provide a roadmap for indexing the elements of Edoc with Annif (Suominen, 2018) – an open source tool for automated subject indexing and classification – and BARTOC FAST (Hindermann and Ledl, 2020), a federated asynchronous search tool that covers concepts of thousands of knowledge organization systems like thesauri, classifications etc.
-
-!! The goal of this thesis is to investigate to what extent machine indexing can be used to ameliorate institutional repositories. 
+In early 2021, Edoc contained roughly 68’000 items, most of them journal articles without full text support. Even though descriptive and administrative metadata are collected for each item, this does not include subject terms. The lack of subject indexing  hampers the repository’s usability and potential with respect to the topic-based monitoring of research output and, to a lesser extent, information retrieval. The goal of this project is to remedy this situation with the help of machine indexing.
 
 ## Method
 
@@ -27,7 +23,7 @@ The proof of the pudding is in the creation of a software prototype. The prototy
 5. Assess the quality of the output based on the gold standard.
 
 The focus of this project lies primarily on practical 
-implementation of the prototype although care is taken to spell out design decisions in as much detail as is needed. All code written and data generated during the process of implementing the prototype is available at [https://github.com/MHindermann/mas](https://github.com/MHindermann/mas):
+implementation of the prototype although care is taken to spell out design decisions in as much detail as is needed. All code written and data generated during the process of implementing the prototype is available at [https://github.com/MHindermann/mas](https://github.com/MHindermann/mas) and comes in three categories:
 
 - Text and images available at [`/text/`](https://github.com/MHindermann/mas/tree/main/text)
 - Codebase and data available at [`/files/`](https://github.com/MHindermann/mas/tree/main/files)
@@ -231,7 +227,7 @@ An analysis of `/keywords/keywords_clean_histogram.json` shows that the lion's s
 
 ![In `keywords/keywords_clean_histogram.json`, the distribution of keywords is strongly skewed right (min = Q1 = M = Q3 = 1, max = 910). However, even though keywords with only one occurrence constitute over 75% of the total keywords, their occurrences constitute less than 35% of the total occurrences. The most common keywords with 50 or more occurrences are extreme outliers but make up almost 20% of the total occurrences.](images/keywords_clean_histogram_abc.pdf)
 
-To analyse the spread of keywords in the sample data set, the keywords per item are counted. To do so, we call `Keywords.make_count` on `/indexed/indexed_master_mesh_enriched.json` and save the output as `/analysis/keywords_counted.json`:
+To analyse the spread of keywords in the sample data set, the keywords per item are counted. To do so, we call `Keywords.make_count` on `/indexed/indexed_master.json` and save the output as `/analysis/keywords_counted.json`:
 
 ~~~~{.Python caption="count_keywords"}
 sample_data_set = Utility.load_json("/indexed/indexed_master.json")
@@ -383,7 +379,7 @@ Let us turn to the parameter of the maximum number of suggestions per item in th
 
 ## Departmental results
 
-In [section "General results"](#general-results) I have identified and discussed the overall best Annif configerations. However, in [section "Analysis"](#analysis), I had noted the caveat that the performance of Annif might vary according to department due to systematic biases in constructing the Edoc sample data set. In this section I will therefore assess the performance of the various Annif configurations per department. 
+In [subsection "General results"](#general-results) I have identified and discussed the overall best Annif configerations. However, in [section "Sample data set"](#sample-data-set), I had noted the caveat that the performance of Annif might vary according to department due to systematic biases in constructing the Edoc sample data set. In this section I will therefore assess the performance of the various Annif configurations per department. 
 
 We begin again by constructing the data foundation. Since the Edoc `department` data field is mandatory, the sample data set is partitioned into blocks of departments by default. We can thus create a data foundation for each such block by calling `Analysis.super_make_metrics` with a departmental parameter:
 
@@ -402,29 +398,29 @@ Let us now look at the results. First consider the distribution of the performan
 
 Let us now consider the best performing Annif configurations per department as summarized in Figure 12. It is evident that only two of the ten departments (namely Associated and Central Services) have as best performing configuration the configuration that was declared the overall best performing configuration (namely `wikidata-en-F-F-4-N`). More surprisingly, YSO outperforms Wikidata in all other departments except Interdisciplinary. However, the margin is rather slim. The notable exception is the department Economics, where the YSO configuration outperforms the Wikidata configuration by a factor of 3. More importantly, the best performing YSO configurations are significantly less productive than the slightly worse performing Wikidata configuration, except for `yso-en-F-F-4-N` in the Medicine department. 
 
+
 # Conclusion and outlook
 
-In this section, ..
+The main take home from this project is that the out of the box Annif API is suitable to index an institutional repository such as Edoc. 
 
-## Recommendation
+performs reasonably well be used to index an institutional 
 
-Answer some questions asked in the proposal. Briefly summarize results. Recommend using Out of the box annif for production. sketch implementation strategy. 
+!! improve data collection of keywords
 
-## Further research
+!! Answer some questions asked in the proposal. Briefly summarize results. Recommend using Out of the box annif for production. sketch implementation strategy. 
 
 Apart from implementing a production system as discussed above, natural next steps to build on this project include:
 
-1. mesh. mesh; A gold standard is usually the product of manual indexing by "information experts, subject experts, or potential or real end users" [@Golub.2016, p. 10]. This entails its own host of epistemic problems relating to objectivity and consistency of the assigned subject terms. Most importantly, however, the construction of a gold standard from scratch is very expensive. It is therefore not an option for the project at hand. Rather, I will construct what could be called derivative gold standards by reusing indexing data that is already available. Here we can distinguish two distinct kinds of derivative gold standards: first, I will construct a derivative gold standard based on the author keywords available in the sample data set; call this the "derivative" gold standard. Second, I will construct a derivative gold standard based on indexing metadata available in repositories distinct from Edoc; call this the "foreign" gold standard. / We enrich the sample items with MeSH keywords from PubMed if available (item needs a PubMed ID and items needs to
-be indexed with MeSH on PubMed, 1653 items match this requirement); the resulting file is indexed_master_mesh.json. Like 
-so: 
-Data.enrich_with_mesh(DIR + "/indexed/indexed_master.json", DIR + "/indexed/indexed_master_mesh")
+1. In response to the result that increasing the text basis to titles and abstracts does not increase performance discussed in [section "Assessment"](#assessment), add full text support and evaluate the performance by increasing the text basis even further. To do this, `Data.enrich_with_annif` must be amended to fetch and parse the full text PDFs. For an item in the sample data set, the link to the full text is constructed from the data fields `offical url` and `documents - main`. Initial tests using the Tika Python library for parsing were promising. 
+
+2. Originally I had intended to undertake an additional performance test based on a gold standard distinct from the derivative gold standard constructed in [section "Gold standard"](#gold-standard). In order to do so, items in the Edoc sample data set were enriched with MeSH terms (see [https://www.nlm.nih.gov/mesh/meshhome.html](https://www.nlm.nih.gov/mesh/meshhome.html)) retrieved from PubMed (if they had a PubMed ID). This was achieved by calling `Data.enrich_with_mesh` on `/indexed/indexed_master.json`. However, the Annif API does not include a configuration with a MeSH vocabulary, and there is no concordance between MeSH and either Wikidata or YSO (see [https://coli-conc.gbv.de/cocoda/app/concordances.html](https://coli-conc.gbv.de/cocoda/app/concordances.html)). Therefore, the MeSH terms obtained from PubMed would have to be reconciled with Wikidata and YSO in a very time-consuming manner, yielding again only a derivative gold standard. As a way forward, it would be more effective to train a local instance of Annif on the already obtained MeSh data.
+
+3. As shown in [section "Assessment"](#assessment), the performance of Annif configurations varies with department. It is hence plausible that some (subsets of) items in Edoc require domain-specific vocabularies that are not available in Annif. These vocabularies can be identified using BARTOC FAST [@Hindermann.2020]; the implementation is straightforward with my bartocsuggest Python library that already includes an Annif wrapper (see [https://pypi.org/project/bartocsuggest/](https://pypi.org/project/bartocsuggest/)).
+
+4. An issue that has been neglected in this project is the fact that Edoc is a multilingual repository containing more than 3'324 items in German (roughly 5% of Edoc) and 273 items in other languages (less than 0.5% of Edoc).[^6] Here it would be interesting to train a local instance of Annif with GND similar in spirit to @Nagelschmidt.12.11.2020 and compare its perfomance to other machine indexing tools such as DA-3 [@Beckmann.2019] which are currently informally evaluated at the University Library Basel.
+
+[^6]: The Edoc sample data set only contains 53 non-English (inclduding 48 German) items; the negligence is hence well justified.
  
-2. full text
-
-3. german vocabulary
-
-4. select domain specific vocabularies with bartoc suggest
-
 # Appendix
 
 As mentioned in [section "Introduction"](#introduction), all files, data, and code used in this project is available at [https://github.com/MHindermann/mas](https://github.com/MHindermann/mas) and will not be replicated here.
@@ -451,9 +447,7 @@ Chi-Square Test:
 https://www.statology.org/chi-square-goodness-of-fit-test-python/
 
 Somewhere here we talk about indexing based on title and/or abstract and/or fulltext. Fulltext is not yet
- implemented. Some observations to do so: the link to the fulltext is constructed from the data fields `offical url` and `documebts - main`, e.g., `https
- ://edoc.unibas.ch/79633/` + `1/` + `2020_18_Informed by wet feet_How do floods affect property prices.pdf` to get
-  `https://edoc.unibas.ch/79633/1/2020_18_Informed by wet feet_How do floods affect property prices.pdf`
+ implemented. 
 
 Codeblocks are done like so:
 ~~~~{.Python .numberLines caption="test"}

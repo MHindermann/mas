@@ -9,27 +9,18 @@ employed methodology is outlined.
 goal}\label{problem-statement-and-goal}}
 
 Edoc is the institutional repository of the University of Basel. It runs
-on the EPrints 3 document management system
-(https://github.com/eprints/eprints). Edoc was conceived in 2009 as
+on the EPrints 3 document management system (see
+\url{https://github.com/eprints/eprints}). Edoc was conceived in 2009 as
 repository for electronic dissertations and grew in scope when the
-University of Basel adapted its first open access policy in 2013. Today
-Edoc contains roughly 68'000 items, most of them journal articles
-without full text support. Even though descriptive and administrative
-metadata are collected for each item, this does not include subject
-terms. The lack of subject indexing hampers the repository's usability
-and potential with respect to the topic-based monitoring of research
-output and, to a lesser extent, information retrieval. The goal of this
-project is to remedy this situation with the help of machine indexing.
-
-!! More precisely, this project aims to provide a roadmap for indexing
-the elements of Edoc with Annif (Suominen, 2018) -- an open source tool
-for automated subject indexing and classification -- and BARTOC FAST
-(Hindermann and Ledl, 2020), a federated asynchronous search tool that
-covers concepts of thousands of knowledge organization systems like
-thesauri, classifications etc.
-
-!! The goal of this thesis is to investigate to what extent machine
-indexing can be used to ameliorate institutional repositories.
+University of Basel adapted its first open access policy in 2013. In
+early 2021, Edoc contained roughly 68'000 items, most of them journal
+articles without full text support. Even though descriptive and
+administrative metadata are collected for each item, this does not
+include subject terms. The lack of subject indexing hampers the
+repository's usability and potential with respect to the topic-based
+monitoring of research output and, to a lesser extent, information
+retrieval. The goal of this project is to remedy this situation with the
+help of machine indexing.
 
 \hypertarget{method}{%
 \subsection{Method}\label{method}}
@@ -59,7 +50,7 @@ The focus of this project lies primarily on practical implementation of
 the prototype although care is taken to spell out design decisions in as
 much detail as is needed. All code written and data generated during the
 process of implementing the prototype is available at
-\url{https://github.com/MHindermann/mas}:
+\url{https://github.com/MHindermann/mas} and comes in three categories:
 
 \begin{itemize}
 \tightlist
@@ -517,8 +508,8 @@ the total occurrences.}
 
 To analyse the spread of keywords in the sample data set, the keywords
 per item are counted. To do so, we call \texttt{Keywords.make\_count} on
-\texttt{/indexed/indexed\_master\_mesh\_enriched.json} and save the
-output as \texttt{/analysis/keywords\_counted.json}:
+\texttt{/indexed/indexed\_master.json} and save the output as
+\texttt{/analysis/keywords\_counted.json}:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -971,13 +962,13 @@ F1-score).}
 \hypertarget{departmental-results}{%
 \subsection{Departmental results}\label{departmental-results}}
 
-In \protect\hyperlink{general-results}{section ``General results''} I
+In \protect\hyperlink{general-results}{subsection ``General results''} I
 have identified and discussed the overall best Annif configerations.
-However, in \protect\hyperlink{analysis}{section ``Analysis''}, I had
-noted the caveat that the performance of Annif might vary according to
-department due to systematic biases in constructing the Edoc sample data
-set. In this section I will therefore assess the performance of the
-various Annif configurations per department.
+However, in \protect\hyperlink{sample-data-set}{section ``Sample data
+set''}, I had noted the caveat that the performance of Annif might vary
+according to department due to systematic biases in constructing the
+Edoc sample data set. In this section I will therefore assess the
+performance of the various Annif configurations per department.
 
 We begin again by constructing the data foundation. Since the Edoc
 \texttt{department} data field is mandatory, the sample data set is
@@ -1042,15 +1033,11 @@ worse performing Wikidata configuration, except for
 
 In this section, ..
 
-\hypertarget{recommendation}{%
-\subsection{Recommendation}\label{recommendation}}
+!! improve data collection of keywords
 
-Answer some questions asked in the proposal. Briefly summarize results.
-Recommend using Out of the box annif for production. sketch
+!! Answer some questions asked in the proposal. Briefly summarize
+results. Recommend using Out of the box annif for production. sketch
 implementation strategy.
-
-\hypertarget{further-research}{%
-\subsection{Further research}\label{further-research}}
 
 Apart from implementing a production system as discussed above, natural
 next steps to build on this project include:
@@ -1058,32 +1045,53 @@ next steps to build on this project include:
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \item
-  mesh. mesh; A gold standard is usually the product of manual indexing
-  by ``information experts, subject experts, or potential or real end
-  users'' (Golub et al. 2016, 10). This entails its own host of
-  epistemic problems relating to objectivity and consistency of the
-  assigned subject terms. Most importantly, however, the construction of
-  a gold standard from scratch is very expensive. It is therefore not an
-  option for the project at hand. Rather, I will construct what could be
-  called derivative gold standards by reusing indexing data that is
-  already available. Here we can distinguish two distinct kinds of
-  derivative gold standards: first, I will construct a derivative gold
-  standard based on the author keywords available in the sample data
-  set; call this the ``derivative'' gold standard. Second, I will
-  construct a derivative gold standard based on indexing metadata
-  available in repositories distinct from Edoc; call this the
-  ``foreign'' gold standard. / We enrich the sample items with MeSH
-  keywords from PubMed if available (item needs a PubMed ID and items
-  needs to be indexed with MeSH on PubMed, 1653 items match this
-  requirement); the resulting file is indexed\_master\_mesh.json. Like
-  so: Data.enrich\_with\_mesh(DIR + ``/indexed/indexed\_master.json,''
-  DIR + ``/indexed/indexed\_master\_mesh'')
+  In response to the result that increasing the text basis to titles and
+  abstracts does not increase performance discussed in
+  \protect\hyperlink{assessment}{section ``Assessment''}, add full text
+  support and evaluate the performance by increasing the text basis even
+  further. To do this, \texttt{Data.enrich\_with\_annif} must be amended
+  to fetch and parse the full text PDFs. For an item in the sample data
+  set, the link to the full text is constructed from the data fields
+  \texttt{offical\ url} and \texttt{documents\ -\ main}. Initial tests
+  using the Tika Python library for parsing were promising.
 \item
-  full text
+  Originally I had intended to undertake an additional performance test
+  based on a gold standard distinct from the derivative gold standard
+  constructed in \protect\hyperlink{gold-standard}{section ``Gold
+  standard''}. In order to do so, items in the Edoc sample data set were
+  enriched with MeSH terms (see
+  \url{https://www.nlm.nih.gov/mesh/meshhome.html}) retrieved from
+  PubMed (if they had a PubMed ID). This was achieved by calling
+  \texttt{Data.enrich\_with\_mesh} on
+  \texttt{/indexed/indexed\_master.json}. However, the Annif API does
+  not include a configuration with a MeSH vocabulary, and there is no
+  concordance between MeSH and either Wikidata or YSO (see
+  \url{https://coli-conc.gbv.de/cocoda/app/concordances.html}).
+  Therefore, the MeSH terms obtained from PubMed would have to be
+  reconciled with Wikidata and YSO in a very time-consuming manner,
+  yielding again only a derivative gold standard. As a way forward, it
+  would be more effective to train a local instance of Annif on the
+  already obtained MeSh data.
 \item
-  german vocabulary
+  As shown in \protect\hyperlink{assessment}{section ``Assessment''},
+  the performance of Annif configurations varies with department. It is
+  hence plausible that some (subsets of) items in Edoc require
+  domain-specific vocabularies that are not available in Annif. These
+  vocabularies can be identified using BARTOC FAST (Hindermann and Ledl
+  2020); the implementation is straightforward with my bartocsuggest
+  Python library that already includes an Annif wrapper (see
+  \url{https://pypi.org/project/bartocsuggest/}).
 \item
-  select domain specific vocabularies with bartoc suggest
+  An issue that has been neglected in this project is the fact that Edoc
+  is a multilingual repository containing more than 3'324 items in
+  German (roughly 5\% of Edoc) and 273 items in other languages (less
+  than 0.5\% of Edoc).\footnote{The Edoc sample data set only contains
+    53 non-English (inclduding 48 German) items; the negligence is hence
+    well justified.} Here it would be interesting to train a local
+  instance of Annif with GND similar in spirit to Nagelschmidt
+  (12.11.2020) and compare its perfomance to other machine indexing
+  tools such as DA-3 (Beckmann et al. 2019) which are currently
+  informally evaluated at the University Library Basel.
 \end{enumerate}
 
 \hypertarget{appendix}{%
@@ -1099,6 +1107,12 @@ replicated here.
 
 \hypertarget{refs}{}
 \begin{CSLReferences}{1}{0}
+\leavevmode\hypertarget{ref-Beckmann.2019}{}%
+Beckmann, Regine, Imma Hinrichs, Melanie Janßen, Gérard Milmeister, and
+Peter Schäuble. 2019. {``Digitale Assistent DA-3.''} \emph{O-Bib. Das
+Offene Bibliotheksjournal} 6 (3): 1--20.
+\url{https://doi.org/10.5282/O-BIB/2019H3S1-20}.
+
 \leavevmode\hypertarget{ref-Gantert.2016}{}%
 Gantert, Klaus. 2016. \emph{Bibliothekarisches Grundwissen}. 9.,
 vollst{ä}ndig neu bearbeitete und erweiterte Auflage. Berlin: {De
@@ -1115,6 +1129,16 @@ Marianne Lykke, and Debra Hiom. 2016. {``A Framework for Evaluating
 Automatic Indexing or Classification in the Context of Retrieval.''}
 \emph{Journal of the Association for Information Science and Technology}
 67 (1): 3--16. \url{https://doi.org/10.1002/asi.23600}.
+
+\leavevmode\hypertarget{ref-Hindermann.2020}{}%
+Hindermann, Maximilian, and Andreas Ledl. 2020. {``BARTOC FAST: A
+Federated Asynchronous Search Tool for Remote Vocabulary Access.''} In
+\emph{Knowledge Organization at the Interface}, edited by Marianne
+Lykke, Tanja Svarre, Mette Skov, Daniel Martínez-Ávila, and
+International Society for Knowledge Organziation International Society
+for Knowledge Organziation, 200--206. Advances in Knowledge
+Organization. Baden-Baden: {Ergon -- ein Verlag in der Nomos
+Verlagsgesellschaft}. \url{https://doi.org/10.5771/9783956507762-200}.
 
 \leavevmode\hypertarget{ref-Louis.2013}{}%
 Louis, Annie, and Ani Nenkova. 2013. {``Automatically Assessing Machine
