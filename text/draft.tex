@@ -34,36 +34,30 @@ indexing can be used to ameliorate institutional repositories.
 \hypertarget{method}{%
 \subsection{Method}\label{method}}
 
-!! Say something to the effect that all data and code are available on
-GitHub.
-
-!! In this chapter, the prototype for a machine indexing of Edoc is
-presented. The focus is primarily on practical implementation although
-care is taken to spell out design decisions in as much detail as is
-needed.
-
-Let us start by stating the aim of the prototype. From a functional
-perspective, the prototype takes a subset of the data from Edoc as input
-and provides index terms for each item in this subset as output. In
-order to fulfill this aim we can distinguish a number of steps that need
-to be taken:
+The proof of the pudding is in the creation of a software prototype. The
+prototype must take a subset of the data from Edoc as input and provide
+index terms for each item in this subset as output. In order to fulfill
+this aim we can distinguish five steps corresponding to sections 2 to 6
+below:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  Understand the Edoc data.\\
+  Understand the Edoc data.
 \item
-  Select and construct a sample data set.
+  Select and construct an Edoc sample data set.
 \item
-  Use Annif to index the items in the sample data set.
+  Use Annif to index the items in the Edoc sample data set.
 \item
   Construct a gold standard from the keywords.
 \item
   Assess the quality of the output based on the gold standard.
 \end{enumerate}
 
-In the sections below, these steps will be discussed in detail.
+The focus of this project lies primarily on practical implementation of
+the prototype although care is taken to spell out design decisions in as
+much detail as is needed.
 
 \hypertarget{edoc-data}{%
 \section{Edoc data}\label{edoc-data}}
@@ -1028,13 +1022,21 @@ In this section, ..
 \hypertarget{recommendation}{%
 \subsection{Recommendation}\label{recommendation}}
 
-\begin{itemize}
-\tightlist
+Answer some questions asked in the proposal. Briefly summarize results.
+Recommend using Out of the box annif for production. sketch
+implementation strategy.
+
+\hypertarget{further-research}{%
+\subsection{Further research}\label{further-research}}
+
+Apart from implementing a production system as discussed above, natural
+next steps to build on this project include:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
 \item
-  fulltext support
-\item
-  mesh; A gold standard is usually the product of manual indexing by
-  ``information experts, subject experts, or potential or real end
+  mesh. mesh; A gold standard is usually the product of manual indexing
+  by ``information experts, subject experts, or potential or real end
   users'' (Golub et al. 2016, 10). This entails its own host of
   epistemic problems relating to objectivity and consistency of the
   assigned subject terms. Most importantly, however, the construction of
@@ -1047,24 +1049,12 @@ In this section, ..
   set; call this the ``derivative'' gold standard. Second, I will
   construct a derivative gold standard based on indexing metadata
   available in repositories distinct from Edoc; call this the
-  ``foreign'' gold standard. -We enrich the sample items with MeSH
+  ``foreign'' gold standard. / We enrich the sample items with MeSH
   keywords from PubMed if available (item needs a PubMed ID and items
   needs to be indexed with MeSH on PubMed, 1653 items match this
   requirement); the resulting file is indexed\_master\_mesh.json. Like
   so: Data.enrich\_with\_mesh(DIR + ``/indexed/indexed\_master.json,''
   DIR + ``/indexed/indexed\_master\_mesh'')
-\end{itemize}
-
-\hypertarget{further-research}{%
-\subsection{Further research}\label{further-research}}
-
-Apart from implementing a production system as discussed above, natural
-next steps to build on this project include:
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\item
-  mesh
 \item
   full text
 \item
@@ -1078,7 +1068,8 @@ next steps to build on this project include:
 
 As mentioned in \protect\hyperlink{introduction}{section
 ``Introduction''}, all files, data, and code used in this project is
-available at https://github.com/MHindermann/mas.
+available at https://github.com/MHindermann/mas and will not be
+replicated here.
 
 \hypertarget{bibliography}{%
 \section{Bibliography}\label{bibliography}}

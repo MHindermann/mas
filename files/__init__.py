@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List, Optional, Dict, Union, Tuple
+from typing import List, Dict, Union
 from json import load, dump
 import csv
 from datetime import datetime
@@ -447,7 +447,7 @@ class Keywords:
     def enrich_with_yso(cls,
                         file_path: str,
                         save_path: str):
-        """ Blah.
+        """ Enrich items in file with YSO IDs if available.
 
         :param file_path: complete path to file including filename and extension
         :param save_path: complete path to save folder including filename without extension

@@ -18,24 +18,16 @@ Today Edoc contains roughly 68’000 items, most of them journal articles withou
 
 ## Method
 
-The proof of the pudding is in the creation of a functional prototype. 
+The proof of the pudding is in the creation of a software prototype. The prototype must take a subset of the data from Edoc as input and provide index terms for each item in this subset as output. In order to fulfill this aim we can distinguish five steps corresponding to sections 2 to 6 below:
 
-!! Say something to the effect that all data and code are available on GitHub.
-
-!! In this chapter, the prototype for a machine indexing of Edoc is presented. The focus is primarily on practical 
-implementation although care is taken to spell out design decisions in as much detail as is needed.
-
-Let us start by stating the aim of the prototype.  From a functional 
-perspective, the prototype takes a subset of the data from Edoc as input and provides index terms for each item in this 
-subset as output. In order to fulfill this aim we can distinguish a number of steps that need to be taken:
-
-1. Understand the Edoc data.  
-2. Select and construct a sample data set.
-3. Use Annif to index the items in the sample data set.
+1. Understand the Edoc data. 
+2. Select and construct an Edoc sample data set.
+3. Use Annif to index the items in the Edoc sample data set.
 4. Construct a gold standard from the keywords.
 5. Assess the quality of the output based on the gold standard.
 
-In the sections below, these steps will be discussed in detail.
+The focus of this project lies primarily on practical 
+implementation of the prototype although care is taken to spell out design decisions in as much detail as is needed. All code written and data generated during the process of implementing the prototype is available at https://github.com/MHindermann/mas. Note espeacially the documentation of the classes and functions used below at 
 
 # Edoc data
 

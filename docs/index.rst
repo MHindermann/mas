@@ -1,9 +1,7 @@
 .. mas documentation master file, created by
    sphinx-quickstart on Sun Mar  7 20:23:58 2021.
 
-Codebase available at: https://github.com/MHindermann/mas
-
-Documentation
+Documentation of classes and functions in /mas/files
 ===============================
 
 .. automodule:: files
