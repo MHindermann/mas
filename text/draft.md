@@ -403,8 +403,6 @@ Let us now consider the best performing Annif configurations per department as s
 
 The main take home from this project is that the out of the box Annif API is suitable to index an institutional repository such as Edoc. 
 
-performs reasonably well be used to index an institutional 
-
 !! improve data collection of keywords
 
 !! Answer some questions asked in the proposal. Briefly summarize results. Recommend using Out of the box annif for production. sketch implementation strategy. 
