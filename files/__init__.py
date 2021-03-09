@@ -633,10 +633,6 @@ class Analysis:
 
         Available Annif-client project IDs are yso-en, yso-maui-en, yso-bonsai-en, yso-fasttext-en, wikidata-en.
 
-        https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html
-        https://scikit-learn.org/stable/modules/generated/sklearn.metrics.recall_score.html
-        https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_score.html
-
         :param file_path: complete path to file including filename and extension
         :param project_id: Annif-client project ID
         :param abstract: toggle use abstract for indexing, defaults to False
