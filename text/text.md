@@ -1,5 +1,5 @@
 <!-- 
-$ pandoc draft.md --bibliography biblio.bib --citeproc -o draft.tex
+$ pandoc text.md --bibliography biblio.bib --citeproc -o text.tex
 -->
 
 # Introduction
@@ -397,7 +397,6 @@ Let us now look at the results. First consider the distribution of the performan
 ![Best performing Annif configuration (according to weighted F1-score) per department as compared to the overall best performing Annif configuration `wikidata-en-F-F-4-N`.](images/metrics_dept_summary.pdf)
 
 Let us now consider the best performing Annif configurations per department as summarized in Figure 11. It is evident that only two of the ten departments (namely Associated and Central Services) have as best performing configuration the configuration that was declared the overall best performing configuration (namely `wikidata-en-F-F-4-N`). More surprisingly, YSO outperforms Wikidata in all other departments except Interdisciplinary. However, the margin is rather slim. The notable exception is the department Economics, where the YSO configuration outperforms the Wikidata configuration by a factor of 3. More importantly, the best performing YSO configurations are significantly less productive than the slightly worse performing Wikidata configuration, except for `yso-en-F-F-4-N` in the Medicine department. 
-
 
 # Conclusion and outlook
 

@@ -91,7 +91,7 @@ this query yielded 68'345 results. These results were then exported as a
 326 MB JSON file called \texttt{1942-2020.json}. \texttt{1942-2020.json}
 has two drawbacks. First, the maximum file size on GitHub is 100 MB. And
 second, \texttt{1942-2020.json} is too big to be handled by standard
-editors requiring special editors such as Oxygen. For these reasons
+editors requiring special editors. For these reasons
 \texttt{1942-2020.json} was split into smaller files that are easier
 handled and can be uploaded to GitHub. For this
 \texttt{Utility.split\_json} was used yielding 14 files of size 20 MB or
@@ -105,8 +105,8 @@ less containing 5000 or fewer entries each. These files are called
 Each Edoc item has 43 main data fields. Most of these data fields belong
 to the class of descriptive metadata. The data entry for an item's
 descriptive metadata is undertaken by the person who uploads the item
-which is in most cases one of the item's authors. The Note that an item
-is first uploaded to the University of Basel's research database
+which is (in most cases) one of the item's authors. Note that an item is
+first uploaded to the University of Basel's research database
 \url{https://www.forschdb2.unibas.ch} before being automatically fed
 into Edoc. There are explicit rules on how to enter the data as
 summarized in the user manual (Universität Basel, n.d.). However, there
@@ -129,18 +129,19 @@ this selection.
 \subsection{Selection}\label{selection}}
 
 There are a number of constraints for selecting the sample data set
-pertaining to an items's text, evaluability and the data set's scope.
+pertaining to an items's text, evaluability, and the data set's scope.
 
 The first constraint stems from Annif, the machine indexing framework
-that will be used. Put simply, machine indexing assigns index terms to a
-text based on training data. The training data consists of a set of
-texts, a vocabulary, and function from vocabulary to texts. In this
-context we mean by ``text'' a sequence of words in a natural language
-and by ``vocabulary'' a set of words. Intuitively, the training data
-consists of pairs of text and subject terms that meet some standard. The
-training data and the vocabulary are already supplied by Annif, we only
-need to provide a text for each item that we want to be assigned index
-terms. Therefore, we only select items with text.
+that will be used (see \protect\hyperlink{machine-indexing}{section
+``Machine indexing''} for more details). Put simply, machine indexing
+assigns index terms to a text based on training data. The training data
+consists of a set of texts, a vocabulary, and function from vocabulary
+to texts. In this context we mean by ``text'' a sequence of words in a
+natural language and by ``vocabulary'' a set of words. Intuitively, the
+training data consists of pairs of text and subject terms that meet some
+standard. The training data and the vocabulary are already supplied by
+Annif, we only need to provide a text for each item that we want to be
+assigned index terms. Therefore, we only select items with text.
 
 The second constraint is that we must be able to evaluate the quality of
 the index terms assigned by Annif to any item in the sample data set.
@@ -200,8 +201,8 @@ approach are discussed in \protect\hyperlink{assessment}{section
 ``Assessment''}.
 
 Taking into account the third constraint simply means that we do not
-employ any further restrictions. We can hence construct the sample data
-set by choosing exactly those items from
+employ any further restrictions. We can hence construct the Edoc sample
+data set by choosing exactly those items from
 \href{https://github.com/MHindermann/mas/tree/main/files/raw}{\texttt{/raw/}}
 which have non-empty data fields \texttt{title}, \texttt{abstract},
 \texttt{id\_number}, and \texttt{keywords}. We do so by calling
@@ -238,8 +239,8 @@ than half of the items have an abstract (37'381 items with non-empty
   OpenRefine, there are 57'153 matches; this is due to the fact that
   many items with an ID such as DOI have secondary or tertiary IDs such
   as ISI or PMID.} and less than 10\% of the items have keywords (6'660
-items with non-empty \texttt{keywords} data field). The sample data set
-as requires all the above data fields to be non-empty;
+items with non-empty \texttt{keywords} data field). The Edoc sample data
+set as requires all the above data fields to be non-empty;
 \texttt{/sample/sample\_master.json} has 4'111 items and hence
 constitutes 6\% of the raw data.
 
@@ -291,7 +292,7 @@ Annif (Suominen et al. 2021) is an open source multi-algorithm automated
 indexing tool developed at the Finnish National Library (see Suominen
 2019 for an overview). Training a local Annif instance for machine
 indexing is currently evaluated at different libraries, for example at
-the German National Library (Nagelschmidt 12.11.2020). As stated in
+the German National Library (see Nagelschmidt 12.11.2020). As stated in
 section \protect\hyperlink{introduction}{section ``Introduction''}, in
 this project I am interested in using Annif out of the box. This means
 that instead of training a local Annif instance, I will be relying on
@@ -312,7 +313,8 @@ combined with an algorithm or algorithm ensemble respectively and a
 specific language to create a so-called Annif ``project.'' The five
 projects used in what follows are summarized in Table 1. A high-level
 description of the algorithm(s) is given by Suominen (2019, 7--10).
-Information on implementation can be found at the Annif GitHub Wiki (see
+Information on the implementation of the algorithm(s) can be found at
+the Annif GitHub Wiki (see
 \url{https://github.com/NatLibFi/Annif/wiki}).
 
 \begin{table}[]
@@ -359,7 +361,8 @@ as \texttt{indexed\_master.json}.
 \section{Gold standard}\label{gold-standard}}
 
 In this section I will construct a derivative gold standard in order to
-assess the quality of machine indexing the sample data set with Annif.
+assess the quality of machine indexing the Edoc sample data set with
+Annif.
 
 \hypertarget{definition}{%
 \subsection{Definition}\label{definition}}
@@ -411,8 +414,8 @@ These steps are explained in more detail in what follows.
 \subsection{Extract and clean
 keywords}\label{extract-and-clean-keywords}}
 
-In a first step, the keywords must be extracted from the sample data set
-\texttt{/sample/sample\_master.json}. Recall that we mandated a
+In a first step, the keywords must be extracted from the Edoc sample
+data set \texttt{/sample/sample\_master.json}. Recall that we mandated a
 non-empty \texttt{keywords} data field for an item to be selected from
 the raw Edoc data (see \protect\hyperlink{selection}{subsection
 ``Selection''}). We can thus simply copy the information in the
@@ -428,8 +431,8 @@ so:
 \end{Highlighting}
 \end{Shaded}
 
-In second step, a list of all single keywords must be created. In order
-to do so, let us consider now in more detail the exact information
+In a second step, a list of all single keywords must be created. In
+order to do so, let us consider now in more detail the exact information
 extracted from the \texttt{keywords} data fields as per
 \texttt{/keywords/keywords\_extracted.json}. In Edoc, the
 \texttt{keywords} data field of an item is a non-mandatory free text
@@ -453,8 +456,8 @@ morphological duplicates such as ``Gene,'' ``gene,'' ``gene\_,''
 ``gene/,'' and so on. Also, some keywords are in fact keyword chains,
 for example ``Dendrites/metabolism/ultrastructure.'' Keyword chains must
 be broken into their component keywords and then parsed again. The
-reason for this is that Annif only assigns flat keywords and not keyword
-chains.
+reason for this is that Annif only assigns flat (i.e., non-hierarchical)
+keywords and not keyword chains.
 
 \texttt{Keywords.clean\_keywords} is the implementation the parser while
 the recursive cleaner is implemented by
@@ -524,8 +527,8 @@ with an IQR of 4 (min = 0, Q1 = 4, M = 6, Q3 = 8, max = 87). Of course,
 items in the sample data set with a number of keywords below the first
 and above the third quartile are highly suspect from a qualitative point
 of view: when it comes to subject indexing, some terms are required, but
-more is usually worse. Items with too few or too many keywords will be
-discussed in more detail in section
+more is usually not better but worse. Items with too few or too many
+keywords will be discussed in more detail in section
 \protect\hyperlink{assessment}{section ``Assessment''}
 
 \hypertarget{reconciliation}{%
@@ -635,7 +638,7 @@ term turns up, it is added to the keyword. The effect of this second
 reconcilement is detailed in Figure 4. It is achieved by calling
 \texttt{Keywords.enrich\_with\_yso} on
 \texttt{/keywords/keywords\_reference.json} and saving the output as
-\texttt{/keywords/keywords\_reference\_master.json}
+\texttt{/keywords/keywords\_reference\_master.json} like so:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -665,8 +668,9 @@ generated with \texttt{Keywords.make\_count} as described in
 \texttt{/analysis/keywords\_counted.json}. Figure 5 shows that the
 median number of keywords from MeSH or YSO might be too low to be
 adequate. This problem can be amended by imposing further constraints on
-the sample data set and such a solution is discussed in section {[}!!
-section{]}.
+the Edoc sample data set and such a solution is discussed in
+\protect\hyperlink{conclusion-and-outlook}{section ``Conclusion and
+outlook''}.
 
 \begin{figure}
 \centering
@@ -719,7 +723,7 @@ F1-score}\label{precision-recall-f1-score}}
 
 The metrics used for the assessment are precision, recall and F1-score.
 Precision and recall are standard metrics for indexing quality (e.g.,
-Gantert 2016, 197) whereby the F1 score plays are more prominent role in
+Gantert 2016, 197) whereby the F1-score plays are more prominent role in
 the assessment of machine indexing (e.g., Suominen 2019, 11--14; Toepfer
 and Kempf 2016, 93f.). Of course, there is a host of alternative metrics
 (such as indexing consistency, transparency, reproducibility) that are
@@ -769,7 +773,7 @@ The F1-score is the harmonic mean between precision and recall:
 $\text{F1} = \displaystyle 2 * \frac{\text{Precision} * \text{Recall}}{\text{Precision} + \text{Recall}}$
 \end{center}
 
-The above scoring metrics were implemented using the scikit-learn
+The above scoring metrics were implemented using the scikit-learn Python
 machine learning library (Pedregosa et al. 2011).
 
 \hypertarget{creating-the-data-foundation}{%
@@ -792,7 +796,7 @@ created. There are three parameters that need to be distinguished (see
   The text base per item, namely title versus title and abstract.
 \item
   The maximum number of suggestions per item. Since we required 10
-  suggestions per item, we can choose between 1-10 suggestions.
+  suggestions per item, we can choose between 1 to 10 suggestions.
 \end{enumerate}
 
 Combining these parameters, we really have 100 Annif configurations
@@ -852,9 +856,9 @@ is available at \texttt{/analysis/metrics.json}.
 \centering
 \includegraphics{images/metrics_all_project+abstract.pdf}
 \caption{Distribution of weighted F1-scores per class of project of
-Annif configuration (left) and per class of text basis of Annif
-configuration (right). \texttt{wikidata} (min = 0.239, Q1 = 0.355, M =
-0.415, Q3 = 0.492, max = 0.517) outperforms any YSO configuration.
+Annif configuration (left), and per class of text basis of Annif
+configuration (right). \texttt{wikidata-en} (min = 0.239, Q1 = 0.355, M
+= 0.415, Q3 = 0.492, max = 0.517) outperforms any YSO configuration.
 \texttt{yso-bonsai-en}, \texttt{yso-en} and \texttt{yso-fasttext-en} are
 on par (min = 0.169, Q1 = 0.218, M = 0.312, Q3 = 0.414, max = 0.496) and
 slightly outperformed by the more consistent \texttt{yso-maui-en} (min =
@@ -949,7 +953,7 @@ configuration for the purpose of a production system, we are usually
 interested in the best token configuration. The top 20 token
 configurations are summarized in Figure 9. The best performing
 configuration with a weighted F1-score of 0.517 is \texttt{wikidata-en}
-with a maximum number of 4 suggestions per item; the text basis (title
+with a maximum number of 4 suggestions per item; its text basis (title
 or abstract and title) does not matter.
 
 \begin{figure}
@@ -997,7 +1001,7 @@ per department.}
 \end{figure}
 
 Let us now look at the results. First consider the distribution of the
-performance scores across departments as shown in Figure 11. We can see
+performance scores across departments as shown in Figure 10. We can see
 that there are striking differences in variability between departments.
 The departments with the most consistent weighted F1-scores are Medicine
 and Central Services. However, these two departments have also the
@@ -1015,7 +1019,7 @@ Annif configuration \texttt{wikidata-en-F-F-4-N}.}
 \end{figure}
 
 Let us now consider the best performing Annif configurations per
-department as summarized in Figure 12. It is evident that only two of
+department as summarized in Figure 11. It is evident that only two of
 the ten departments (namely Associated and Central Services) have as
 best performing configuration the configuration that was declared the
 overall best performing configuration (namely
