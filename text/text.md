@@ -194,7 +194,7 @@ These steps are explained in more detail in what follows.
 
 ## Extract and clean keywords
 
-In a first step, the keywords must be extracted from the Edoc sample data set `/sample/sample_master.json`. Recall that we mandated a non-empty `keywords` data field for an item to be selected from the raw Edoc data (see [subsection "Selection"](#selection)). We can thus simply copy the information in the `keywords` data field on a per item basis. To do this, we call `Keywords.extract_keywords` with the sample data set as argument and save the output as `keywords/keywords_extracted.json` like so:
+In a first step, the keywords must be extracted from the Edoc sample data set `/sample/sample_master.json`. Recall that we mandated a non-empty `keywords` data field for an item to be selected from the raw Edoc data (see [subsection "Selection"](#selection)). We can thus simply copy the information in the `keywords` data field on a per item basis. To do this, we call `Keywords.extract_keywords` with the sample data set as argument and save the output as `/keywords/keywords_extracted.json` like so:
 
 ~~~~{.Python caption="extract_keywords"}
 keywords = Keywords.extract_keywords("/sample/sample_master.json")
@@ -210,7 +210,7 @@ Next the so parsed single keywords must be cleaned or normalized: we want the ke
 ~~~~{.Python caption="extract_keywords"}
 keywords_extracted = Utility.load_json("/keywords/keywords_extracted.json")
 keywords_clean = Keywords.clean_keywords(keywords_extracted)
-Utility.save_json(keywords_clean, "keywords/keywords_clean.json")
+Utility.save_json(keywords_clean, "/keywords/keywords_clean.json")
 ~~~~
 
 ## Analysis
@@ -220,12 +220,12 @@ Utility.save_json(keywords_clean, "keywords/keywords_clean.json")
 ~~~~{.Python caption="make_histogram"}
 keywords_clean = Utility.load_json("/keywords/keywords_clean.json")
 keywords_histogram = Keywords.make_histogram(keywords_clean)
-Utility.save_json(keywords_histogram, "keywords/keywords_clean_histogram.json")
+Utility.save_json(keywords_histogram, "/keywords/keywords_clean_histogram.json")
 ~~~~
 
 An analysis of `/keywords/keywords_clean_histogram.json` shows that the lion's share of keywords has only one occurrence but that the total occurrences are predominantly made up of keywords with more than one occurrence (see Figure 3 for details).
 
-![In `keywords/keywords_clean_histogram.json`, the distribution of keywords is strongly skewed right (min = Q1 = M = Q3 = 1, max = 910). However, even though keywords with only one occurrence constitute over 75% of the total keywords, their occurrences constitute less than 35% of the total occurrences. The most common keywords with 50 or more occurrences are extreme outliers but make up almost 20% of the total occurrences.](images/keywords_clean_histogram_abc.pdf)
+![In `/keywords/keywords_clean_histogram.json`, the distribution of keywords is strongly skewed right (min = Q1 = M = Q3 = 1, max = 910). However, even though keywords with only one occurrence constitute over 75% of the total keywords, their occurrences constitute less than 35% of the total occurrences. The most common keywords with 50 or more occurrences are extreme outliers but make up almost 20% of the total occurrences.](images/keywords_clean_histogram_abc.pdf)
 
 To analyse the spread of keywords in the sample data set, the keywords per item are counted. To do so, we call `Keywords.make_count` on `/indexed/indexed_master.json` and save the output as `/analysis/keywords_counted.json`:
 
@@ -263,7 +263,7 @@ With these improvements in place, each keyword with a suggestion was assigned a 
 ~~~~{.Python caption="enrich_with_yso"}
 keywords_reference = Utility.load_json("/keywords/keywords_reference.json")
 keywords_reference_new = Keywords.enrich_with_yso(keywords_reference)
-Utility.save_json(keywords_histogram, "keywords/keywords_reference_master.json")
+Utility.save_json(keywords_histogram, "/keywords/keywords_reference_master.json")
 ~~~~
 
 ![The coverage of `/keywords/keywords_reference_master.json` by the controlled vocabularies of Wikidata (QID), Medical Subject Headings (MeSH), and YSO (General Finnish Ontology). Both MeSH and YSO are dependent on QID but independent of each other. YSO enriched is the superset of YSO created by reconciling keywords that lack a YSO identifier directly with the YSO database provided by the Finto API; it is hence independent of Wikidata.](images/native_gold_standard.pdf)
@@ -280,7 +280,7 @@ An analysis of this data shows that 53% of the suggestions in the random sample 
 
 # Assessment
 
-In this section I will assess the quality of the sample data set's indexing by Annif based on the gold standard. 
+In this section I will assess the quality of the sample data set's indexing by Annif based on the derivative gold standard. 
 
 ## Precision, recall, F1-score
 
@@ -400,13 +400,10 @@ Let us now consider the best performing Annif configurations per department as s
 
 # Conclusion and outlook
 
-The main take home from this project is that the out of the box Annif API is suitable to index an institutional repository such as Edoc. 
+The main take home from this project is that the out of the box Annif API is suitable to index an institutional repository such as Edoc. This is based on the performance of the Annif API in indexing the Edoc sample data set measured against the derivative gold standard constructed from cleaned and reconciled Edoc author keywords. With the prototype in place, the next step now concerns the implementation of a production system. The function `Data.enrich_with_annif` can of course be called to index all Edoc data available at `/raw/`. It would also be relatively straightforward to implement indexing with Annif for items newly added to Edoc respectively the University of Basel's research database. An alternative and perhaps more sustainable approach would be 
+to improve the data quality by amending the process and requirements for data entry. Generally speaking, authors should be required to choose index terms from a controlled vocabulary or from a set of controlled vocabularies, and the entered data should be automatically validated. One way to implement this would be via the Skosmos recommendations feature of the BARTOC Skomos instance [see @Waeber.2019].
 
-!! improve data collection of keywords
-
-!! Answer some questions asked in the proposal. Briefly summarize results. Recommend using Out of the box annif for production. sketch implementation strategy. 
-
-Apart from implementing a production system as discussed above, natural next steps to build on this project include:
+Apart from implementing a production system as discussed above, natural next steps to improve upon this project include:
 
 1. In response to the result that increasing the text basis to titles and abstracts does not increase performance discussed in [section "Assessment"](#assessment), add full text support and evaluate the performance by increasing the text basis even further. To do this, `Data.enrich_with_annif` must be amended to fetch and parse the full text PDFs. For an item in the sample data set, the link to the full text is constructed from the data fields `offical url` and `documents - main`. Initial tests using the Tika Python library for parsing were promising. 
 
@@ -417,7 +414,9 @@ Apart from implementing a production system as discussed above, natural next ste
 4. An issue that has been neglected in this project is the fact that Edoc is a multilingual repository containing more than 3'324 items in German (roughly 5% of Edoc) and 273 items in other languages (less than 0.5% of Edoc).[^6] Here it would be interesting to train a local instance of Annif with GND similar in spirit to @Nagelschmidt.12.11.2020 and compare its perfomance to other machine indexing tools such as DA-3 [@Beckmann.2019] which are currently informally evaluated at the University Library Basel.
 
 [^6]: The Edoc sample data set only contains 53 non-English (inclduding 48 German) items; the negligence is hence well justified.
- 
+
+Finally, I had initially [monitoring,,,].
+
 # Appendix
 
 As mentioned in [section "Introduction"](#introduction), all files, data, and code used in this project is available at [https://github.com/MHindermann/mas](https://github.com/MHindermann/mas) and will not be replicated here.

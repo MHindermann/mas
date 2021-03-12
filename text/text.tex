@@ -421,7 +421,7 @@ the raw Edoc data (see \protect\hyperlink{selection}{subsection
 ``Selection''}). We can thus simply copy the information in the
 \texttt{keywords} data field on a per item basis. To do this, we call
 \texttt{Keywords.extract\_keywords} with the sample data set as argument
-and save the output as \texttt{keywords/keywords\_extracted.json} like
+and save the output as \texttt{/keywords/keywords\_extracted.json} like
 so:
 
 \begin{Shaded}
@@ -470,7 +470,7 @@ argument:
 \begin{Highlighting}[]
 \NormalTok{keywords\_extracted }\OperatorTok{=}\NormalTok{ Utility.load\_json(}\StringTok{"/keywords/keywords\_extracted.json"}\NormalTok{)}
 \NormalTok{keywords\_clean }\OperatorTok{=}\NormalTok{ Keywords.clean\_keywords(keywords\_extracted)}
-\NormalTok{Utility.save\_json(keywords\_clean, }\StringTok{"keywords/keywords\_clean.json"}\NormalTok{)}
+\NormalTok{Utility.save\_json(keywords\_clean, }\StringTok{"/keywords/keywords\_clean.json"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -488,7 +488,7 @@ of each keyword. This is achieved by calling
 \begin{Highlighting}[]
 \NormalTok{keywords\_clean }\OperatorTok{=}\NormalTok{ Utility.load\_json(}\StringTok{"/keywords/keywords\_clean.json"}\NormalTok{)}
 \NormalTok{keywords\_histogram }\OperatorTok{=}\NormalTok{ Keywords.make\_histogram(keywords\_clean)}
-\NormalTok{Utility.save\_json(keywords\_histogram, }\StringTok{"keywords/keywords\_clean\_histogram.json"}\NormalTok{)}
+\NormalTok{Utility.save\_json(keywords\_histogram, }\StringTok{"/keywords/keywords\_clean\_histogram.json"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -500,7 +500,7 @@ one occurrence (see Figure 3 for details).
 \begin{figure}
 \centering
 \includegraphics{images/keywords_clean_histogram_abc.pdf}
-\caption{In \texttt{keywords/keywords\_clean\_histogram.json}, the
+\caption{In \texttt{/keywords/keywords\_clean\_histogram.json}, the
 distribution of keywords is strongly skewed right (min = Q1 = M = Q3 =
 1, max = 910). However, even though keywords with only one occurrence
 constitute over 75\% of the total keywords, their occurrences constitute
@@ -644,7 +644,7 @@ reconcilement is detailed in Figure 4. It is achieved by calling
 \begin{Highlighting}[]
 \NormalTok{keywords\_reference }\OperatorTok{=}\NormalTok{ Utility.load\_json(}\StringTok{"/keywords/keywords\_reference.json"}\NormalTok{)}
 \NormalTok{keywords\_reference\_new }\OperatorTok{=}\NormalTok{ Keywords.enrich\_with\_yso(keywords\_reference)}
-\NormalTok{Utility.save\_json(keywords\_histogram, }\StringTok{"keywords/keywords\_reference\_master.json"}\NormalTok{)}
+\NormalTok{Utility.save\_json(keywords\_histogram, }\StringTok{"/keywords/keywords\_reference\_master.json"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -715,7 +715,7 @@ disappointing as it might seem at first glance.
 \section{Assessment}\label{assessment}}
 
 In this section I will assess the quality of the sample data set's
-indexing by Annif based on the gold standard.
+indexing by Annif based on the derivative gold standard.
 
 \hypertarget{precision-recall-f1-score}{%
 \subsection{Precision, recall,
@@ -1036,16 +1036,25 @@ worse performing Wikidata configuration, except for
 \section{Conclusion and outlook}\label{conclusion-and-outlook}}
 
 The main take home from this project is that the out of the box Annif
-API is suitable to index an institutional repository such as Edoc.
-
-!! improve data collection of keywords
-
-!! Answer some questions asked in the proposal. Briefly summarize
-results. Recommend using Out of the box annif for production. sketch
-implementation strategy.
+API is suitable to index an institutional repository such as Edoc. This
+is based on the performance of the Annif API in indexing the Edoc sample
+data set measured against the derivative gold standard constructed from
+cleaned and reconciled Edoc author keywords. With the prototype in
+place, the next step now concerns the implementation of a production
+system. The function \texttt{Data.enrich\_with\_annif} can of course be
+called to index all Edoc data available at \texttt{/raw/}. It would also
+be relatively straightforward to implement indexing with Annif for items
+newly added to Edoc respectively the University of Basel's research
+database. An alternative and perhaps more sustainable approach would be
+to improve the data quality by amending the process and requirements for
+data entry. Generally speaking, authors should be required to choose
+index terms from a controlled vocabulary or from a set of controlled
+vocabularies, and the entered data should be automatically validated.
+One way to implement this would be via the Skosmos recommendations
+feature of the BARTOC Skomos instance (see Waeber and Ledl 2019).
 
 Apart from implementing a production system as discussed above, natural
-next steps to build on this project include:
+next steps to improve upon this project include:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -1098,6 +1107,8 @@ next steps to build on this project include:
   tools such as DA-3 (Beckmann et al. 2019) which are currently
   informally evaluated at the University Library Basel.
 \end{enumerate}
+
+Finally, I had initially {[}monitoring,,,{]}.
 
 \hypertarget{appendix}{%
 \section{Appendix}\label{appendix}}
@@ -1208,5 +1219,13 @@ Journal for Library Culture} 4 (2): 84--97.
 \leavevmode\hypertarget{ref-UniversitatBasel.2021}{}%
 Universität Basel. n.d. {``Research Database of the University of Basel
 User Manual.''} Edited by Universität Basel.
+
+\leavevmode\hypertarget{ref-Waeber.2019}{}%
+Waeber, Jonas, and Andreas Ledl. 2019. {``A Semantic Web SKOS Vocabulary
+Service for Open Knowledge Organization Systems.''} In \emph{Metadata
+and Semantic Research}, edited by Emmanouel Garoufallou, Fabio Sartori,
+Rania Siatri, and Marios Zervas, 846:3--12. Communications in Computer
+and Information Science, 1865-0929. Cham, Switzerland: Springer.
+\url{https://doi.org/10.1007/978-3-030-14401-2\%7B/textunderscore\%20\%7D1}.
 
 \end{CSLReferences}
