@@ -45,7 +45,7 @@ fields has to be filled in. The complete database can hence be extracted by only
 sufficiently permissive time period such as 1940 to 2020 since the oldest record in the database was published in 1942.
 On January 21 2021, this query yielded 68'345 results. These results were then exported as a 326 MB JSON file
 called `1942-2020.json`. `1942-2020.json` has two drawbacks. First, the maximum file size on GitHub is 100 MB. And
-second, `1942-2020.json` is too big to be handled by standard editors requiring special editors such as Oxygen. For
+second, `1942-2020.json` is too big to be handled by standard editors requiring special editors. For
 these reasons `1942-2020.json` was split into smaller files that are easier handled and can be uploaded to GitHub. For
 this
 `Utility.split_json` was used yielding 14 files of size 20 MB or less containing 5000 or fewer entries each. These
@@ -54,7 +54,7 @@ files are called `raw_master_{year}.json` and saved under
 
 ## Data description
 
-Each Edoc item has 43 main data fields. Most of these data fields belong to the class of descriptive metadata. The data entry for an item's descriptive metadata is undertaken by the person who uploads the item which is in most cases one of the item's authors. The Note that an item is first uploaded to the University of Basel's research database [https://www.forschdb2.unibas.ch](https://www.forschdb2.unibas.ch) before being automatically fed into Edoc. There are explicit rules on how to enter the data as summarized in the user manual [@UniversitatBasel.2021]. However, there is no (or at least no systematic) manual or automatic validation of the entered data. This means that some data fields are very heterogenous and require further parsing (see [section "Gold standard"](#gold-standard)). The data fields that are of interest to the project at hand are discussed in more detail in (see [section "Sample data set"](#sample-data-set) below).
+Each Edoc item has 43 main data fields. Most of these data fields belong to the class of descriptive metadata. The data entry for an item's descriptive metadata is undertaken by the person who uploads the item which is (in most cases) one of the item's authors. Note that an item is first uploaded to the University of Basel's research database [https://www.forschdb2.unibas.ch](https://www.forschdb2.unibas.ch) before being automatically fed into Edoc. There are explicit rules on how to enter the data as summarized in the user manual [@UniversitatBasel.2021]. However, there is no (or at least no systematic) manual or automatic validation of the entered data. This means that some data fields are very heterogenous and require further parsing (see [section "Gold standard"](#gold-standard)). The data fields that are of interest to the project at hand are discussed in more detail in (see [section "Sample data set"](#sample-data-set) below).
 
 # Sample data set
 
@@ -63,13 +63,13 @@ specifying a subset of the Edoc data; by "construction" I mean the task of imple
 
 ## Selection
 
-There are a number of constraints for selecting the sample data set pertaining to an items's text, evaluability and 
+There are a number of constraints for selecting the sample data set pertaining to an items's text, evaluability, and 
 the data set's
 scope.
 
 The first constraint stems from Annif, the 
 machine 
-indexing framework that will be used. Put simply, machine indexing assigns index terms to a text based on training 
+indexing framework that will be used (see [section "Machine indexing"](#machine-indexing) for more details). Put simply, machine indexing assigns index terms to a text based on training 
 data. The training data consists of a set of texts, a vocabulary, and function from vocabulary to texts. In this 
 context we mean by "text" a sequence of words in a natural language and by "vocabulary" a set of words. Intuitively, the training data 
 consists of pairs of text and subject terms that meet some standard. The training data and the vocabulary are 
@@ -120,7 +120,7 @@ we try to avoid having to produce a standard. One way of doing so is by requirin
 have non-empty `keywords` data field. The caveats of this approach are discussed in [section "Assessment"](#assessment).
 
 Taking into account the third constraint simply means that we do not employ any further restrictions. We can hence 
-construct the sample data set by choosing exactly those items from [`/raw/`](https://github.com/MHindermann/mas/tree/main/files/raw) which have non-empty data fields 
+construct the Edoc sample data set by choosing exactly those items from [`/raw/`](https://github.com/MHindermann/mas/tree/main/files/raw) which have non-empty data fields 
 `title`, `abstract`, `id_number`, and `keywords`. We do so by calling `Data.select_from_file` iteratively for all 
 files in  [`/raw/`](https://github.com/MHindermann/mas/tree/main/files/raw). The resulting file is saved in [`/sample/`](https://github.com/MHindermann/mas/tree/main/files/sample) as `sample_master.json`. 
 
@@ -128,7 +128,7 @@ files in  [`/raw/`](https://github.com/MHindermann/mas/tree/main/files/raw). The
 
 ![The sample data set ($n$ = 4'111) is not representative of the raw Edoc data per department. Data field `abstract`: $\chi^2 (df=9) =$ 3'160.556, $p < 0.001$; data field `id_number`: $\chi^2 (df=9) =$ 4'209.0285, $p < 0.001$; data field `keywords`: $\chi^2 (df=9) =$ 2'314.533, $p < 0.001$. The data foundation is available at `/analysis/chi_square_{data field}` and the $\chi^2$-statistic can be calculated by calling `Analysis.print_chi_square_fit` on the data foundation files.](images/chi_square_selection_fields.pdf)
 
-Of the 68'345 items in  [`/raw/`](https://github.com/MHindermann/mas/tree/main/files/raw), all have a title (non-empty `title` data field),  a little more than half of the items have an abstract (37'381 items with non-empty `abstract` data field), roughly half of the items have an ID (35'355 items with non-empty `id_number` data field),[^1] and less than 10% of the items have keywords (6'660 items with non-empty `keywords` data field). The sample data set as requires all the above data fields to be non-empty; `/sample/sample_master.json` has 4'111 items and hence constitutes 6% of the raw data. 
+Of the 68'345 items in  [`/raw/`](https://github.com/MHindermann/mas/tree/main/files/raw), all have a title (non-empty `title` data field),  a little more than half of the items have an abstract (37'381 items with non-empty `abstract` data field), roughly half of the items have an ID (35'355 items with non-empty `id_number` data field),[^1] and less than 10% of the items have keywords (6'660 items with non-empty `keywords` data field). The Edoc sample data set as requires all the above data fields to be non-empty; `/sample/sample_master.json` has 4'111 items and hence constitutes 6% of the raw data. 
 
 [^1]: Note that when using the facet by blank on `id_number` in OpenRefine, there are 57'153 matches; this is due to the fact that many items with an ID such as DOI have secondary or tertiary IDs such as ISI or PMID. 
 
@@ -145,11 +145,11 @@ In this section, I will briefly introduce Annif and how indexing with Annif was 
 ## Annif
 
 Annif [@Suominen.2021] is an open source multi-algorithm automated
-indexing tool developed at the Finnish National Library [see @Suominen.2019 for an overview]. Training a local Annif instance for machine indexing is currently evaluated at different libraries, for example at the German National Library [@Nagelschmidt.12.11.2020]. As stated in section [section "Introduction"](#introduction), in this project I am interested in using Annif out of the box. This means that instead of training a local Annif instance, I will be relying on the Annif REST-style API (see [https://api.annif.org/](https://api.annif.org/)).[^2] The advantage of this approach is that it is quick and relatively easy to implement. The disadvantage is that no custom algorithms or vocabularies can be used. The task of constructing a gold standard (see [section "Gold standard"](#gold-standard)) remains the same. 
+indexing tool developed at the Finnish National Library [see @Suominen.2019 for an overview]. Training a local Annif instance for machine indexing is currently evaluated at different libraries, for example at the German National Library [see @Nagelschmidt.12.11.2020]. As stated in section [section "Introduction"](#introduction), in this project I am interested in using Annif out of the box. This means that instead of training a local Annif instance, I will be relying on the Annif REST-style API (see [https://api.annif.org/](https://api.annif.org/)).[^2] The advantage of this approach is that it is quick and relatively easy to implement. The disadvantage is that no custom algorithms or vocabularies can be used. The task of constructing a gold standard (see [section "Gold standard"](#gold-standard)) remains the same. 
 
 [^2]: This API is specifically intended for testing. For integration into a production system, the Finto AI API is available (see [https://ai.finto.fi/v1/ui/](https://ai.finto.fi/v1/ui/)).
 
-The vocabularies provided by the Annif API are the General Finnish Ontology or YSO in short (see [https://finto.fi/yso/en/](https://finto.fi/yso/en/)) and Wikidata (see [https://www.wikidata.org/](https://www.wikidata.org/)). Each vocabulary is combined with an algorithm or algorithm ensemble respectively and a specific language to create a so-called Annif "project". The five projects used in what follows are summarized in Table 1. A high-level description of the algorithm(s) is given by @Suominen.2019 [pp. 7-10]. Information on implementation can be found at the Annif GitHub Wiki (see [https://github.com/NatLibFi/Annif/wiki](https://github.com/NatLibFi/Annif/wiki)).
+The vocabularies provided by the Annif API are the General Finnish Ontology or YSO in short (see [https://finto.fi/yso/en/](https://finto.fi/yso/en/)) and Wikidata (see [https://www.wikidata.org/](https://www.wikidata.org/)). Each vocabulary is combined with an algorithm or algorithm ensemble respectively and a specific language to create a so-called Annif "project". The five projects used in what follows are summarized in Table 1. A high-level description of the algorithm(s) is given by @Suominen.2019 [pp. 7-10]. Information on the implementation of the algorithm(s) can be found at the Annif GitHub Wiki (see [https://github.com/NatLibFi/Annif/wiki](https://github.com/NatLibFi/Annif/wiki)).
 
 \begin{table}[]
 \centering
@@ -173,7 +173,7 @@ In order to generate the ouput, we call `Data.super_enrich_with_annif`, thereby 
 
 # Gold standard
 
-In this section I will construct a derivative gold standard in order to assess the quality of machine indexing the sample data set with Annif.  
+In this section I will construct a derivative gold standard in order to assess the quality of machine indexing the Edoc sample data set with Annif.  
 
 ## Definition
 
@@ -194,16 +194,16 @@ These steps are explained in more detail in what follows.
 
 ## Extract and clean keywords
 
-In a first step, the keywords must be extracted from the sample data set `/sample/sample_master.json`. Recall that we mandated a non-empty `keywords` data field for an item to be selected from the raw Edoc data (see [subsection "Selection"](#selection)). We can thus simply copy the information in the `keywords` data field on a per item basis. To do this, we call `Keywords.extract_keywords` with the sample data set as argument and save the output as `keywords/keywords_extracted.json` like so:
+In a first step, the keywords must be extracted from the Edoc sample data set `/sample/sample_master.json`. Recall that we mandated a non-empty `keywords` data field for an item to be selected from the raw Edoc data (see [subsection "Selection"](#selection)). We can thus simply copy the information in the `keywords` data field on a per item basis. To do this, we call `Keywords.extract_keywords` with the sample data set as argument and save the output as `keywords/keywords_extracted.json` like so:
 
 ~~~~{.Python caption="extract_keywords"}
 keywords = Keywords.extract_keywords("/sample/sample_master.json")
 Utility.save_json(keywords, "/keywords/keywords_extracted.json")
 ~~~~
 
-In second step, a list of all single keywords must be created. In order to do so, let us consider now in more detail the exact information extracted from the `keywords` data fields as per `/keywords/keywords_extracted.json`. In Edoc, the `keywords` data field of an item is a non-mandatory free text field that is filled in by the user (usually one of the authors) who undertakes the data entry of an item to Edoc. Even though the Edoc user manual specifies that keywords must be separated by commas [@UniversitatBasel.2021, p. 8], this requirement is neither validated by the input mask nor by an administrator of Edoc. Furthermore, neither the manual nor the input mask provide a definition of the term "keyword". A vocabulary or a list of vocabularies from which to choose the keywords is also lacking. Taken together, these observations are indicative of very heterogeneous data in the `keywords` data field. To wit, the items of `/keywords/keywords_extracted.json` are strings where single keywords are individuated by any symbols the user saw fit. So, for each item in `/keywords/keywords_extracted.json`, the user input must be parsed into single keywords. 
+In a second step, a list of all single keywords must be created. In order to do so, let us consider now in more detail the exact information extracted from the `keywords` data fields as per `/keywords/keywords_extracted.json`. In Edoc, the `keywords` data field of an item is a non-mandatory free text field that is filled in by the user (usually one of the authors) who undertakes the data entry of an item to Edoc. Even though the Edoc user manual specifies that keywords must be separated by commas [@UniversitatBasel.2021, p. 8], this requirement is neither validated by the input mask nor by an administrator of Edoc. Furthermore, neither the manual nor the input mask provide a definition of the term "keyword". A vocabulary or a list of vocabularies from which to choose the keywords is also lacking. Taken together, these observations are indicative of very heterogeneous data in the `keywords` data field. To wit, the items of `/keywords/keywords_extracted.json` are strings where single keywords are individuated by any symbols the user saw fit. So, for each item in `/keywords/keywords_extracted.json`, the user input must be parsed into single keywords. 
 
-Next the so parsed single keywords must be cleaned or normalized: we want the keywords to follow a uniform format thereby joining morphological duplicates such as "Gene", "gene", "gene_", "gene/", and so on. Also, some keywords are in fact keyword chains, for example "Dendrites/metabolism/ultrastructure". Keyword chains must be broken into their component keywords and then parsed again. The reason for this is that Annif only assigns flat keywords and not keyword chains. 
+Next the so parsed single keywords must be cleaned or normalized: we want the keywords to follow a uniform format thereby joining morphological duplicates such as "Gene", "gene", "gene_", "gene/", and so on. Also, some keywords are in fact keyword chains, for example "Dendrites/metabolism/ultrastructure". Keyword chains must be broken into their component keywords and then parsed again. The reason for this is that Annif only assigns flat (i.e., non-hierarchical) keywords and not keyword chains. 
 
 `Keywords.clean_keywords` is the implementation the parser while the recursive cleaner is implemented by `Keywords.clean_keyword`. To create the desired list of clean keywords, saved as `/keywords/keywords_clean.json`, we call `Keywords.clean_keywords` with the extracted keywords as argument:
 
@@ -235,7 +235,7 @@ keywords_counted = Keywords.make_count(sample_data_set)
 Utility.save_json(keywords_counted, "/analysis/keywords_counted.json")
 ~~~~
 
-The median number of keywords for an item in the sample data set is 6 with an IQR of 4 (min = 0, Q1 = 4, M = 6, Q3 = 8, max = 87).  Of course, items in the sample data set with a number of keywords below the first and above the third quartile are highly suspect from a qualitative point of view: when it comes to subject indexing, some terms are required, but more is usually worse. Items with too few or too many keywords will be discussed in more detail in section [section "Assessment"](#assessment)
+The median number of keywords for an item in the sample data set is 6 with an IQR of 4 (min = 0, Q1 = 4, M = 6, Q3 = 8, max = 87).  Of course, items in the sample data set with a number of keywords below the first and above the third quartile are highly suspect from a qualitative point of view: when it comes to subject indexing, some terms are required, but more is usually not better but worse. Items with too few or too many keywords will be discussed in more detail in section [section "Assessment"](#assessment)
 
 ## Reconciliation
 
@@ -258,7 +258,7 @@ Second, systematic biases were identified and removed. The most prevalent bias w
 [^4]: The complete list includes "academic journal", "open access journal", "thesis", "doctoral thesis", and "natural number".
 [^5]: The complete list includes "film", "musical group", "business", "literary work", "television series", "organization", "family name", "written work", "video game", "single, television series episode", "painting", , "city of the United States", "magazine", "studio album", "year", "nonprofit organization", "border town", "international organization", "political party", "software", "song", "website", "article comic strip", "collection", "commune of Italy", "fictional human", "film", "government agency", "village", "academic journal article", "female given name", and "poem".
 
-With these improvements in place, each keyword with a suggestion was assigned a QID via the "Add cloumns from reconciled values"-function (and similar for YSO and MeSH identifiers). The data was then exported and saved as `/keywords/keywords_reference.json`. Keywords with a QID now constitute 69% of all keywords and 78% of their total occurrences in the sample data set, but these numbers are significantly lower for the MeSH identifier (53.6% of all keywords with only 28.8% of all occurrences) and especially low for the YSO identifier (26.9% of all keywords with 11% of all occurrences). In both cases, the problem is due to the fact that Wikidata's mapping of MeSH respectively YSO is only partial. There can be two reasons for this state of affairs for a given entry: either there is no match between Wikidata and YSO or MeSH (after all, Wikidata is much larger than MeSH and YSO taken together), or there is a match but it has not yet been added to the mapping. In the latter case, at least with respect to YSO, there is a solution: Finto provides a REST-style API to access the YSO vocabulary directly (see [https://api.finto.fi/](https://api.finto.fi/)). For each keyword in the list of reference keywords that lacks a YSO identifier, the Finto API is queried; if a term turns up, it is added to the keyword. The effect of this second reconcilement is detailed in Figure 4. It is achieved by calling `Keywords.enrich_with_yso` on `/keywords/keywords_reference.json` and saving the output as `/keywords/keywords_reference_master.json`
+With these improvements in place, each keyword with a suggestion was assigned a QID via the "Add cloumns from reconciled values"-function (and similar for YSO and MeSH identifiers). The data was then exported and saved as `/keywords/keywords_reference.json`. Keywords with a QID now constitute 69% of all keywords and 78% of their total occurrences in the sample data set, but these numbers are significantly lower for the MeSH identifier (53.6% of all keywords with only 28.8% of all occurrences) and especially low for the YSO identifier (26.9% of all keywords with 11% of all occurrences). In both cases, the problem is due to the fact that Wikidata's mapping of MeSH respectively YSO is only partial. There can be two reasons for this state of affairs for a given entry: either there is no match between Wikidata and YSO or MeSH (after all, Wikidata is much larger than MeSH and YSO taken together), or there is a match but it has not yet been added to the mapping. In the latter case, at least with respect to YSO, there is a solution: Finto provides a REST-style API to access the YSO vocabulary directly (see [https://api.finto.fi/](https://api.finto.fi/)). For each keyword in the list of reference keywords that lacks a YSO identifier, the Finto API is queried; if a term turns up, it is added to the keyword. The effect of this second reconcilement is detailed in Figure 4. It is achieved by calling `Keywords.enrich_with_yso` on `/keywords/keywords_reference.json` and saving the output as `/keywords/keywords_reference_master.json` like so:
 
 ~~~~{.Python caption="enrich_with_yso"}
 keywords_reference = Utility.load_json("/keywords/keywords_reference.json")
@@ -268,7 +268,7 @@ Utility.save_json(keywords_histogram, "keywords/keywords_reference_master.json")
 
 ![The coverage of `/keywords/keywords_reference_master.json` by the controlled vocabularies of Wikidata (QID), Medical Subject Headings (MeSH), and YSO (General Finnish Ontology). Both MeSH and YSO are dependent on QID but independent of each other. YSO enriched is the superset of YSO created by reconciling keywords that lack a YSO identifier directly with the YSO database provided by the Finto API; it is hence independent of Wikidata.](images/native_gold_standard.pdf)
 
-Finally, consider the distribution of the cleaned and reconciled keywords per item in the Edoc sample data set. The corresponding data is generated with `Keywords.make_count` as described in [subsection Analysis](#analysis) above and available as `/analysis/keywords_counted.json`. Figure 5 shows that the median number of keywords from MeSH or YSO might be too low to be adequate. This problem can be amended by imposing further constraints on the sample data set and such a solution is discussed in section [!! section].
+Finally, consider the distribution of the cleaned and reconciled keywords per item in the Edoc sample data set. The corresponding data is generated with `Keywords.make_count` as described in [subsection Analysis](#analysis) above and available as `/analysis/keywords_counted.json`. Figure 5 shows that the median number of keywords from MeSH or YSO might be too low to be adequate. This problem can be amended by imposing further constraints on the Edoc sample data set and such a solution is discussed in [section "Conclusion and outlook"](#conclusion-and-outlook).
 
 ![The distribution of keywords per item in the Edoc sample data set. The leftmost boxplot shows the distribution of cleaned keywords (min = 0, Q1 = 4, M = 6, Q3 = 8, max = 87); the other boxplots show the distribution of cleaned keywords with reconciled QID (min = 0, Q1 = 2, M = 4, Q3 = 6, max = 80), MeSH ID (min = Q1 = 0, M = 2, Q3 = 4, max = 63), and YSO ID respectively (min = Q1 = 0, M = 1, Q3 = 2, max = 46). All four distributions are similarly consistent, but there is a linear decrease of the distribution's center leaving MeSH and YSO with potentially too few descriptors to represent an adequate indexing.](images/keywords_counted.pdf)
 
@@ -284,7 +284,7 @@ In this section I will assess the quality of the sample data set's indexing by A
 
 ## Precision, recall, F1-score
 
-The metrics used for the assessment are precision, recall and F1-score. Precision and recall are standard metrics for indexing quality [e.g., @Gantert.2016, p. 197] whereby the F1 score plays are more prominent role in the assessment of machine indexing [e.g., @Suominen.2019, pp. 11-14; @Toepfer.2016, p. 93f.]. Of course, there is a host of alternative metrics (such as indexing consistency, transparency, reproducibility) that are neglected here.
+The metrics used for the assessment are precision, recall and F1-score. Precision and recall are standard metrics for indexing quality [e.g., @Gantert.2016, p. 197] whereby the F1-score plays are more prominent role in the assessment of machine indexing [e.g., @Suominen.2019, pp. 11-14; @Toepfer.2016, p. 93f.]. Of course, there is a host of alternative metrics (such as indexing consistency, transparency, reproducibility) that are neglected here.
 
 Let us briefly look at the definitions and motivations of the chosen metrics. Remember that a suggestion of a subject term is correct if and only if the subject term is in the derivative gold standard. The possible outcomes are summarized in Table 2.
 
@@ -322,7 +322,7 @@ The F1-score is the harmonic mean between precision and recall:
 $\text{F1} = \displaystyle 2 * \frac{\text{Precision} * \text{Recall}}{\text{Precision} + \text{Recall}}$
 \end{center}
 
-The above scoring metrics were implemented using the scikit-learn machine learning library [@Pedregosa.2011].
+The above scoring metrics were implemented using the scikit-learn Python machine learning library [@Pedregosa.2011].
 
 ## Creating the data foundation
 
@@ -330,7 +330,7 @@ I will now describe how the data foundation for the assessment was created. Ther
 
 1. The Annif project (algorithm plus vocabulary) responsible for the indexing of the sample data set. As per the Annif REST API, these are `yso-en`, `yso-maui-en`, `yso-bonsai-en`, `yso-fasttext-en`, and `wikidata-en`. 
 2. The text base per item, namely title versus title and abstract.
-3. The maximum number of suggestions per item. Since we required 10 suggestions per item, we can choose between 1-10 suggestions.
+3. The maximum number of suggestions per item. Since we required 10 suggestions per item, we can choose between 1 to 10 suggestions.
  
 Combining these parameters, we really have 100 Annif configurations whose performance we want to compare and assess: Annif project $*$ text base $*$ maximum number of suggestions $= 5 * 2 * 10 = 100$. Remember the convention for constructing the marker that identifies a configuration (see [section "Annif"](#annif)): `{project_id}-{abstract}-{fulltext}-{n}-{threshold}`.
 
@@ -348,7 +348,7 @@ Note that the data foundation includes additional information, namely the sample
 
 In what follows I will discuss the general results of assessing the performance of the 100 Annif configurations versus the derivative gold standard with respect to the Edoc sample data set. The data foundation is available at `/analysis/metrics.json`.
 
-![Distribution of weighted F1-scores per class of project of Annif configuration (left) and per class of text basis of Annif configuration (right). `wikidata` (min = 0.239, Q1 = 0.355, M = 0.415, Q3 = 0.492, max = 0.517) outperforms any YSO configuration. `yso-bonsai-en`, `yso-en` and `yso-fasttext-en` are on par (min = 0.169, Q1 = 0.218, M = 0.312, Q3 = 0.414, max = 0.496) and slightly outperformed by the more consistent `yso-maui-en` (min = 0.171, Q1 = 0.250, M = 0.327, Q3 = 0.407, max = 0.496). Surprisingly, the performance of configurations based on titles (min = 0.169, Q1 = 0.250, M = 0.345, Q3 = 0.424, max = 0.517) was marginally better than the performance of configurations based on titles and abstracts (min = 0.169, Q1 = 0.242, M = 0.337, Q3 = 0.424, max = 0.517).](images/metrics_all_project+abstract.pdf)
+![Distribution of weighted F1-scores per class of project of Annif configuration (left), and per class of text basis of Annif configuration (right). `wikidata-en` (min = 0.239, Q1 = 0.355, M = 0.415, Q3 = 0.492, max = 0.517) outperforms any YSO configuration. `yso-bonsai-en`, `yso-en` and `yso-fasttext-en` are on par (min = 0.169, Q1 = 0.218, M = 0.312, Q3 = 0.414, max = 0.496) and slightly outperformed by the more consistent `yso-maui-en` (min = 0.171, Q1 = 0.250, M = 0.327, Q3 = 0.407, max = 0.496). Surprisingly, the performance of configurations based on titles (min = 0.169, Q1 = 0.250, M = 0.345, Q3 = 0.424, max = 0.517) was marginally better than the performance of configurations based on titles and abstracts (min = 0.169, Q1 = 0.242, M = 0.337, Q3 = 0.424, max = 0.517).](images/metrics_all_project+abstract.pdf)
 
 Let us first consider overall performance. Here the most striking result is that Wikidata configurations outperformed YSO configurations (see Figure 6, left). However, the explanation of this effect is not evident. The two main explanatory hypotheses are 1. that the suggestions by the Wikidata configurations are more salient, or 2. that the derivative gold standard is biased towards Wikidata due to its higher coverage of QIDs as compared to YSO IDs. By contrast, the Wikidata configurations are more productive than the YSO configurations, and the reason for this effect is the higher coverage of QIDs as compared to YSO IDs (see Figure 7). By "productivity" I mean that the absolute number of assigned subject terms. So Wikidata configurations are not only qualitatively but also quantitatively superior to YSO configurations. 
 
@@ -373,7 +373,7 @@ max & 0.414 & 0.496 & 0.492 & 0.517 & 0.503 & 0.467 & 0.427 & 0.389 & 0.355 & 0.
 \label{tab:max-number}
 \end{table}
 
-Let us turn to the parameter of the maximum number of suggestions per item in the Edoc sample data set (see Figure 8). Here the best performance was achieved by a token n = 4 configuration. However, the type n = 4 configuration performed on average significantly worse than the type n = 3 and type n = 2 configurations. So with respect to the maximum number of suggestions, there is a discrepancy between the best performing token configuration and the best performing type of configuration. This distinction is important: when choosing a configuration for the purpose of a production system, we are usually interested in the best token configuration. The top 20 token configurations are summarized in Figure 9. The best performing configuration with a weighted F1-score of 0.517 is `wikidata-en` with a maximum number of 4 suggestions per item; the text basis (title or abstract and title) does not matter.
+Let us turn to the parameter of the maximum number of suggestions per item in the Edoc sample data set (see Figure 8). Here the best performance was achieved by a token n = 4 configuration. However, the type n = 4 configuration performed on average significantly worse than the type n = 3 and type n = 2 configurations. So with respect to the maximum number of suggestions, there is a discrepancy between the best performing token configuration and the best performing type of configuration. This distinction is important: when choosing a configuration for the purpose of a production system, we are usually interested in the best token configuration. The top 20 token configurations are summarized in Figure 9. The best performing configuration with a weighted F1-score of 0.517 is `wikidata-en` with a maximum number of 4 suggestions per item; its text basis (title or abstract and title) does not matter.
 
 ![20 best performing Annif configurations (according to F1-score).](images/metrics_f1_top20.pdf)
 
@@ -392,11 +392,11 @@ This yields 1000 files in `/metrics/metrics_{department}_{marker}.json` (100 con
 
 ![Distribution of weighted F1-scores for all Annif configurations per department.](images/metrics_dept_distribution.pdf)
 
-Let us now look at the results. First consider the distribution of the performance scores across departments as shown in Figure 11. We can see that there are striking differences in variability between departments. The departments with the most consistent weighted F1-scores are Medicine and Central Services. However, these two departments have also the lowest maximum weighted F1-scores. It is noteworthy that all other departments have maximum weighted F1-scores that are well above the weighted F1-score of 0.517 of the best performing general Annif configuration. 
+Let us now look at the results. First consider the distribution of the performance scores across departments as shown in Figure 10. We can see that there are striking differences in variability between departments. The departments with the most consistent weighted F1-scores are Medicine and Central Services. However, these two departments have also the lowest maximum weighted F1-scores. It is noteworthy that all other departments have maximum weighted F1-scores that are well above the weighted F1-score of 0.517 of the best performing general Annif configuration. 
 
 ![Best performing Annif configuration (according to weighted F1-score) per department as compared to the overall best performing Annif configuration `wikidata-en-F-F-4-N`.](images/metrics_dept_summary.pdf)
 
-Let us now consider the best performing Annif configurations per department as summarized in Figure 12. It is evident that only two of the ten departments (namely Associated and Central Services) have as best performing configuration the configuration that was declared the overall best performing configuration (namely `wikidata-en-F-F-4-N`). More surprisingly, YSO outperforms Wikidata in all other departments except Interdisciplinary. However, the margin is rather slim. The notable exception is the department Economics, where the YSO configuration outperforms the Wikidata configuration by a factor of 3. More importantly, the best performing YSO configurations are significantly less productive than the slightly worse performing Wikidata configuration, except for `yso-en-F-F-4-N` in the Medicine department. 
+Let us now consider the best performing Annif configurations per department as summarized in Figure 11. It is evident that only two of the ten departments (namely Associated and Central Services) have as best performing configuration the configuration that was declared the overall best performing configuration (namely `wikidata-en-F-F-4-N`). More surprisingly, YSO outperforms Wikidata in all other departments except Interdisciplinary. However, the margin is rather slim. The notable exception is the department Economics, where the YSO configuration outperforms the Wikidata configuration by a factor of 3. More importantly, the best performing YSO configurations are significantly less productive than the slightly worse performing Wikidata configuration, except for `yso-en-F-F-4-N` in the Medicine department. 
 
 
 # Conclusion and outlook
