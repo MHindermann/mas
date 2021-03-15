@@ -415,11 +415,9 @@ Apart from implementing a production system as discussed above, natural next ste
 
 [^6]: The Edoc sample data set only contains 53 non-English (inclduding 48 German) items; the negligence is hence well justified.
 
-Finally, I had initially [monitoring,,,].
-
 # Appendix
 
-As mentioned in [section "Introduction"](#introduction), all files, data, and code used in this project is available at [https://github.com/MHindermann/mas](https://github.com/MHindermann/mas) and will not be replicated here.
+See [https://github.com/MHindermann/mas](https://github.com/MHindermann/mas).
 
 # Bibliography
 
