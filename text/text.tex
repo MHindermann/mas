@@ -107,20 +107,20 @@ to the class of descriptive metadata. The data entry for an item's
 descriptive metadata is undertaken by the person who uploads the item
 which is (in most cases) one of the item's authors. Note that an item is
 first uploaded to the University of Basel's research database
-\url{https://www.forschdb2.unibas.ch} before being automatically fed
+(\url{https://www.forschdb2.unibas.ch}) before being automatically fed
 into Edoc. There are explicit rules on how to enter the data as
 summarized in the user manual (Universität Basel, n.d.). However, there
 is no (or at least no systematic) manual or automatic validation of the
 entered data. This means that some data fields are very heterogenous and
 require further parsing (see \protect\hyperlink{gold-standard}{section
 ``Gold standard''}). The data fields that are of interest to the project
-at hand are discussed in more detail in (see
-\protect\hyperlink{sample-data-set}{section ``Sample data set''} below).
+at hand are discussed in more detail in
+\protect\hyperlink{sample-data-set}{section ``Sample data set''} below.
 
 \hypertarget{sample-data-set}{%
 \section{Sample data set}\label{sample-data-set}}
 
-In this section, I will explain how the sample data set is selected and
+In this section, I will explain how the sample data set was selected and
 constructed. ``Selection'' hereby means the task of specifying a subset
 of the Edoc data; by ``construction'' I mean the task of implementing
 this selection.
@@ -207,8 +207,9 @@ data set by choosing exactly those items from
 which have non-empty data fields \texttt{title}, \texttt{abstract},
 \texttt{id\_number}, and \texttt{keywords}. We do so by calling
 \texttt{Data.select\_from\_file} iteratively for all files in
-\href{https://github.com/MHindermann/mas/tree/main/files/raw}{\texttt{/raw/}}.
-The resulting file is saved in
+\href{https://github.com/MHindermann/mas/tree/main/files/raw}{\texttt{/raw/}}
+using the aforementioned data fields as parameters. The resulting file
+is saved in
 \href{https://github.com/MHindermann/mas/tree/main/files/sample}{\texttt{/sample/}}
 as \texttt{sample\_master.json}.
 
@@ -240,7 +241,7 @@ than half of the items have an abstract (37'381 items with non-empty
   many items with an ID such as DOI have secondary or tertiary IDs such
   as ISI or PMID.} and less than 10\% of the items have keywords (6'660
 items with non-empty \texttt{keywords} data field). The Edoc sample data
-set as requires all the above data fields to be non-empty;
+set requires all the above data fields to be non-empty;
 \texttt{/sample/sample\_master.json} has 4'111 items and hence
 constitutes 6\% of the raw data.
 
@@ -293,10 +294,10 @@ indexing tool developed at the Finnish National Library (see Suominen
 2019 for an overview). Training a local Annif instance for machine
 indexing is currently evaluated at different libraries, for example at
 the German National Library (see Nagelschmidt 12.11.2020). As stated in
-section \protect\hyperlink{introduction}{section ``Introduction''}, in
-this project I am interested in using Annif out of the box. This means
-that instead of training a local Annif instance, I will be relying on
-the Annif REST-style API (see \url{https://api.annif.org/}).\footnote{This
+\protect\hyperlink{introduction}{section ``Introduction''}, in this
+project I am interested in using Annif out of the box. This means that
+instead of training a local Annif instance, I will be relying on the
+Annif REST-style API (see \url{https://api.annif.org/}).\footnote{This
   API is specifically intended for testing. For integration into a
   production system, the Finto AI API is available (see
   \url{https://ai.finto.fi/v1/ui/}).} The advantage of this approach is
@@ -312,8 +313,8 @@ Wikidata (see \url{https://www.wikidata.org/}). Each vocabulary is
 combined with an algorithm or algorithm ensemble respectively and a
 specific language to create a so-called Annif ``project.'' The five
 projects used in what follows are summarized in Table 1. A high-level
-description of the algorithm(s) is given by Suominen (2019, 7--10).
-Information on the implementation of the algorithm(s) can be found at
+description of the algorithm(s) is given by Suominen (2019, 7--10);
+information on the implementation of the algorithm(s) can be found at
 the Annif GitHub Wiki (see
 \url{https://github.com/NatLibFi/Annif/wiki}).
 
@@ -535,8 +536,8 @@ keywords will be discussed in more detail in section
 \subsection{Reconciliation}\label{reconciliation}}
 
 As explained in \protect\hyperlink{machine-indexing}{section ``Machine
-indexing''}, Annif assigns index terms from a controlled vocabulary. If
-we want to assess the quality of the indexing via a gold standard, we
+indexing''}, Annif assigns subject terms from a controlled vocabulary.
+If we want to assess the quality of the indexing via a gold standard, we
 must therefore ensure that the gold standard makes use of the vocabulary
 used by Annif. The relevant (English) vocabularies are Wikidata and YSO.
 The next step in constructing the derivative gold standard is hence to
@@ -586,7 +587,7 @@ These keywords account for 14'996 occurrences or 40.638\% of the total
 occurrences and thus constitute an effective lever.
 
 Second, systematic biases were identified and removed. The most
-prevalent bias was an due to a suggestion's type. As stated above, the
+prevalent bias was due to a suggestion's type. As stated above, the
 reconciliation service API was not constrained by type but had access to
 the complete Wikidata database. Since Wikidata is an ontology that
 encompasses everything, it also features types whose concepts cannot
@@ -1085,7 +1086,7 @@ next steps to improve upon this project include:
   reconciled with Wikidata and YSO in a very time-consuming manner,
   yielding again only a derivative gold standard. As a way forward, it
   would be more effective to train a local instance of Annif on the
-  already obtained MeSh data.
+  already obtained MeSH data.
 \item
   As shown in \protect\hyperlink{assessment}{section ``Assessment''},
   the performance of Annif configurations varies with department. It is
@@ -1109,7 +1110,8 @@ next steps to improve upon this project include:
 \end{enumerate}
 
 \hypertarget{bibliography}{%
-\section{Bibliography}\label{bibliography}}
+\section*{Bibliography}\label{bibliography}}
+\addcontentsline{toc}{section}{Bibliography}
 
 \hypertarget{refs}{}
 \begin{CSLReferences}{1}{0}

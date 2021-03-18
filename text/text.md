@@ -54,11 +54,11 @@ files are called `raw_master_{year}.json` and saved under
 
 ## Data description
 
-Each Edoc item has 43 main data fields. Most of these data fields belong to the class of descriptive metadata. The data entry for an item's descriptive metadata is undertaken by the person who uploads the item which is (in most cases) one of the item's authors. Note that an item is first uploaded to the University of Basel's research database [https://www.forschdb2.unibas.ch](https://www.forschdb2.unibas.ch) before being automatically fed into Edoc. There are explicit rules on how to enter the data as summarized in the user manual [@UniversitatBasel.2021]. However, there is no (or at least no systematic) manual or automatic validation of the entered data. This means that some data fields are very heterogenous and require further parsing (see [section "Gold standard"](#gold-standard)). The data fields that are of interest to the project at hand are discussed in more detail in (see [section "Sample data set"](#sample-data-set) below).
+Each Edoc item has 43 main data fields. Most of these data fields belong to the class of descriptive metadata. The data entry for an item's descriptive metadata is undertaken by the person who uploads the item which is (in most cases) one of the item's authors. Note that an item is first uploaded to the University of Basel's research database ([https://www.forschdb2.unibas.ch](https://www.forschdb2.unibas.ch)) before being automatically fed into Edoc. There are explicit rules on how to enter the data as summarized in the user manual [@UniversitatBasel.2021]. However, there is no (or at least no systematic) manual or automatic validation of the entered data. This means that some data fields are very heterogenous and require further parsing (see [section "Gold standard"](#gold-standard)). The data fields that are of interest to the project at hand are discussed in more detail in [section "Sample data set"](#sample-data-set) below.
 
 # Sample data set
 
-In this section, I will explain how the sample data set is selected and constructed. "Selection" hereby means the task of 
+In this section, I will explain how the sample data set was selected and constructed. "Selection" hereby means the task of 
 specifying a subset of the Edoc data; by "construction" I mean the task of implementing this selection. 
 
 ## Selection
@@ -122,13 +122,13 @@ have non-empty `keywords` data field. The caveats of this approach are discussed
 Taking into account the third constraint simply means that we do not employ any further restrictions. We can hence 
 construct the Edoc sample data set by choosing exactly those items from [`/raw/`](https://github.com/MHindermann/mas/tree/main/files/raw) which have non-empty data fields 
 `title`, `abstract`, `id_number`, and `keywords`. We do so by calling `Data.select_from_file` iteratively for all 
-files in  [`/raw/`](https://github.com/MHindermann/mas/tree/main/files/raw). The resulting file is saved in [`/sample/`](https://github.com/MHindermann/mas/tree/main/files/sample) as `sample_master.json`. 
+files in  [`/raw/`](https://github.com/MHindermann/mas/tree/main/files/raw) using the aforementioned data fields as parameters. The resulting file is saved in [`/sample/`](https://github.com/MHindermann/mas/tree/main/files/sample) as `sample_master.json`. 
 
 ## Analysis
 
 ![The sample data set ($n$ = 4'111) is not representative of the raw Edoc data per department. Data field `abstract`: $\chi^2 (df=9) =$ 3'160.556, $p < 0.001$; data field `id_number`: $\chi^2 (df=9) =$ 4'209.0285, $p < 0.001$; data field `keywords`: $\chi^2 (df=9) =$ 2'314.533, $p < 0.001$. The data foundation is available at `/analysis/chi_square_{data field}` and the $\chi^2$-statistic can be calculated by calling `Analysis.print_chi_square_fit` on the data foundation files.](images/chi_square_selection_fields.pdf)
 
-Of the 68'345 items in  [`/raw/`](https://github.com/MHindermann/mas/tree/main/files/raw), all have a title (non-empty `title` data field),  a little more than half of the items have an abstract (37'381 items with non-empty `abstract` data field), roughly half of the items have an ID (35'355 items with non-empty `id_number` data field),[^1] and less than 10% of the items have keywords (6'660 items with non-empty `keywords` data field). The Edoc sample data set as requires all the above data fields to be non-empty; `/sample/sample_master.json` has 4'111 items and hence constitutes 6% of the raw data. 
+Of the 68'345 items in  [`/raw/`](https://github.com/MHindermann/mas/tree/main/files/raw), all have a title (non-empty `title` data field),  a little more than half of the items have an abstract (37'381 items with non-empty `abstract` data field), roughly half of the items have an ID (35'355 items with non-empty `id_number` data field),[^1] and less than 10% of the items have keywords (6'660 items with non-empty `keywords` data field). The Edoc sample data set requires all the above data fields to be non-empty; `/sample/sample_master.json` has 4'111 items and hence constitutes 6% of the raw data. 
 
 [^1]: Note that when using the facet by blank on `id_number` in OpenRefine, there are 57'153 matches; this is due to the fact that many items with an ID such as DOI have secondary or tertiary IDs such as ISI or PMID. 
 
@@ -145,11 +145,11 @@ In this section, I will briefly introduce Annif and how indexing with Annif was 
 ## Annif
 
 Annif [@Suominen.2021] is an open source multi-algorithm automated
-indexing tool developed at the Finnish National Library [see @Suominen.2019 for an overview]. Training a local Annif instance for machine indexing is currently evaluated at different libraries, for example at the German National Library [see @Nagelschmidt.12.11.2020]. As stated in section [section "Introduction"](#introduction), in this project I am interested in using Annif out of the box. This means that instead of training a local Annif instance, I will be relying on the Annif REST-style API (see [https://api.annif.org/](https://api.annif.org/)).[^2] The advantage of this approach is that it is quick and relatively easy to implement. The disadvantage is that no custom algorithms or vocabularies can be used. The task of constructing a gold standard (see [section "Gold standard"](#gold-standard)) remains the same. 
+indexing tool developed at the Finnish National Library [see @Suominen.2019 for an overview]. Training a local Annif instance for machine indexing is currently evaluated at different libraries, for example at the German National Library [see @Nagelschmidt.12.11.2020]. As stated in [section "Introduction"](#introduction), in this project I am interested in using Annif out of the box. This means that instead of training a local Annif instance, I will be relying on the Annif REST-style API (see [https://api.annif.org/](https://api.annif.org/)).[^2] The advantage of this approach is that it is quick and relatively easy to implement. The disadvantage is that no custom algorithms or vocabularies can be used. The task of constructing a gold standard (see [section "Gold standard"](#gold-standard)) remains the same. 
 
 [^2]: This API is specifically intended for testing. For integration into a production system, the Finto AI API is available (see [https://ai.finto.fi/v1/ui/](https://ai.finto.fi/v1/ui/)).
 
-The vocabularies provided by the Annif API are the General Finnish Ontology or YSO in short (see [https://finto.fi/yso/en/](https://finto.fi/yso/en/)) and Wikidata (see [https://www.wikidata.org/](https://www.wikidata.org/)). Each vocabulary is combined with an algorithm or algorithm ensemble respectively and a specific language to create a so-called Annif "project". The five projects used in what follows are summarized in Table 1. A high-level description of the algorithm(s) is given by @Suominen.2019 [pp. 7-10]. Information on the implementation of the algorithm(s) can be found at the Annif GitHub Wiki (see [https://github.com/NatLibFi/Annif/wiki](https://github.com/NatLibFi/Annif/wiki)).
+The vocabularies provided by the Annif API are the General Finnish Ontology or YSO in short (see [https://finto.fi/yso/en/](https://finto.fi/yso/en/)) and Wikidata (see [https://www.wikidata.org/](https://www.wikidata.org/)). Each vocabulary is combined with an algorithm or algorithm ensemble respectively and a specific language to create a so-called Annif "project". The five projects used in what follows are summarized in Table 1. A high-level description of the algorithm(s) is given by @Suominen.2019 [pp. 7-10]; information on the implementation of the algorithm(s) can be found at the Annif GitHub Wiki (see [https://github.com/NatLibFi/Annif/wiki](https://github.com/NatLibFi/Annif/wiki)).
 
 \begin{table}[]
 \centering
@@ -239,7 +239,7 @@ The median number of keywords for an item in the sample data set is 6 with an IQ
 
 ## Reconciliation
 
-As explained in [section "Machine indexing"](#machine-indexing), Annif assigns index terms from a controlled vocabulary. If we want to assess the quality of the indexing via a gold standard, we must therefore ensure that the gold standard makes use of the vocabulary used by Annif. The relevant (English) vocabularies are Wikidata and YSO. The next step in constructing the derivative gold standard is hence to match the extracted and cleaned keywords with keywords from Wikidata and YSO. This process is called "reconciliation" (see [https://docs.openrefine.org/manual/reconciling](https://docs.openrefine.org/manual/reconciling)) and the tool of choice for this task is OpenRefine).[^3]
+As explained in [section "Machine indexing"](#machine-indexing), Annif assigns subject terms from a controlled vocabulary. If we want to assess the quality of the indexing via a gold standard, we must therefore ensure that the gold standard makes use of the vocabulary used by Annif. The relevant (English) vocabularies are Wikidata and YSO. The next step in constructing the derivative gold standard is hence to match the extracted and cleaned keywords with keywords from Wikidata and YSO. This process is called "reconciliation" (see [https://docs.openrefine.org/manual/reconciling](https://docs.openrefine.org/manual/reconciling)) and the tool of choice for this task is OpenRefine).[^3]
 
 [^3]: For data refinement I use OpenRefine version 3.4.1 (see [https://openrefine.org/](https://openrefine.org/)). Data manipulation in OpenRefine is 
 tracked: 
@@ -253,7 +253,7 @@ The reconciliation service API returns automatic matches (call them "suggestions
 
 First, the suggestions to the top 500 keywords were manually verified. These keywords account for 14'996 occurrences or 40.638% of the total occurrences and thus constitute an effective lever.
 
-Second, systematic biases were identified and removed. The most prevalent bias was an due to a suggestion's type. As stated above, the reconciliation service API was not constrained by type but had access to the complete Wikidata database. Since Wikidata is an ontology that encompasses everything, it also features types whose concepts cannot qualify as subject terms (at least in the present context). The most prominent example is the type Q13442814 "scholarly article". Wikidata contains the metadata of many scholarly articles. Now, for some of our keywords, there is a scholarly article with a title that exactly matches the keyword; and since there is no restriction concerning the type, the scholarly article is suggested with high confidence (see [https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation-Service-API](https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation-Service-API) for details). To generalize, suggestions with types whose concepts are proper names are usually incorrect. Based on this observation, suggestions with types such as "scholarly article", "clinical trial", and "scientific journal" were rejected.[^4] Suggestions types such as  "human", "album", and "commune of France" were manually verified (i.e., checked for correctness).[^5]
+Second, systematic biases were identified and removed. The most prevalent bias was due to a suggestion's type. As stated above, the reconciliation service API was not constrained by type but had access to the complete Wikidata database. Since Wikidata is an ontology that encompasses everything, it also features types whose concepts cannot qualify as subject terms (at least in the present context). The most prominent example is the type Q13442814 "scholarly article". Wikidata contains the metadata of many scholarly articles. Now, for some of our keywords, there is a scholarly article with a title that exactly matches the keyword; and since there is no restriction concerning the type, the scholarly article is suggested with high confidence (see [https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation-Service-API](https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation-Service-API) for details). To generalize, suggestions with types whose concepts are proper names are usually incorrect. Based on this observation, suggestions with types such as "scholarly article", "clinical trial", and "scientific journal" were rejected.[^4] Suggestions types such as  "human", "album", and "commune of France" were manually verified (i.e., checked for correctness).[^5]
 
 [^4]: The complete list includes "academic journal", "open access journal", "thesis", "doctoral thesis", and "natural number".
 [^5]: The complete list includes "film", "musical group", "business", "literary work", "television series", "organization", "family name", "written work", "video game", "single, television series episode", "painting", , "city of the United States", "magazine", "studio album", "year", "nonprofit organization", "border town", "international organization", "political party", "software", "song", "website", "article comic strip", "collection", "commune of Italy", "fictional human", "film", "government agency", "village", "academic journal article", "female given name", and "poem".
@@ -407,7 +407,7 @@ Apart from implementing a production system as discussed above, natural next ste
 
 1. In response to the result that increasing the text basis to titles and abstracts does not increase performance discussed in [section "Assessment"](#assessment), add full text support and evaluate the performance by increasing the text basis even further. To do this, `Data.enrich_with_annif` must be amended to fetch and parse the full text PDFs. For an item in the sample data set, the link to the full text is constructed from the data fields `offical url` and `documents - main`. Initial tests using the Tika Python library for parsing were promising. 
 
-2. Originally I had intended to undertake an additional performance test based on a gold standard distinct from the derivative gold standard constructed in [section "Gold standard"](#gold-standard). In order to do so, items in the Edoc sample data set were enriched with MeSH terms (see [https://www.nlm.nih.gov/mesh/meshhome.html](https://www.nlm.nih.gov/mesh/meshhome.html)) retrieved from PubMed (if they had a PubMed ID). This was achieved by calling `Data.enrich_with_mesh` on `/indexed/indexed_master.json`. However, the Annif API does not include a configuration with a MeSH vocabulary, and there is no concordance between MeSH and either Wikidata or YSO (see [https://coli-conc.gbv.de/cocoda/app/concordances.html](https://coli-conc.gbv.de/cocoda/app/concordances.html)). Therefore, the MeSH terms obtained from PubMed would have to be reconciled with Wikidata and YSO in a very time-consuming manner, yielding again only a derivative gold standard. As a way forward, it would be more effective to train a local instance of Annif on the already obtained MeSh data.
+2. Originally I had intended to undertake an additional performance test based on a gold standard distinct from the derivative gold standard constructed in [section "Gold standard"](#gold-standard). In order to do so, items in the Edoc sample data set were enriched with MeSH terms (see [https://www.nlm.nih.gov/mesh/meshhome.html](https://www.nlm.nih.gov/mesh/meshhome.html)) retrieved from PubMed (if they had a PubMed ID). This was achieved by calling `Data.enrich_with_mesh` on `/indexed/indexed_master.json`. However, the Annif API does not include a configuration with a MeSH vocabulary, and there is no concordance between MeSH and either Wikidata or YSO (see [https://coli-conc.gbv.de/cocoda/app/concordances.html](https://coli-conc.gbv.de/cocoda/app/concordances.html)). Therefore, the MeSH terms obtained from PubMed would have to be reconciled with Wikidata and YSO in a very time-consuming manner, yielding again only a derivative gold standard. As a way forward, it would be more effective to train a local instance of Annif on the already obtained MeSH data.
 
 3. As shown in [section "Assessment"](#assessment), the performance of Annif configurations varies with department. It is hence plausible that some (subsets of) items in Edoc require domain-specific vocabularies that are not available in Annif. These vocabularies can be identified using BARTOC FAST [@Hindermann.2020]; the implementation is straightforward with my bartocsuggest Python library that already includes an Annif wrapper (see [https://pypi.org/project/bartocsuggest/](https://pypi.org/project/bartocsuggest/)).
 
@@ -420,33 +420,3 @@ Apart from implementing a production system as discussed above, natural next ste
 See [https://github.com/MHindermann/mas](https://github.com/MHindermann/mas).
 
 # Bibliography
-
-<!-- 
-Make main.tex like so:
-pandoc .\draft.md -s --number-sections --bibliography biblio.bib --citeproc --toc -o main.tex
-
-Make draft.tex like so:
-pandoc draft.md --bibliography biblio.bib --citeproc -o draft.tex
-
-How to cite:
-https://pandoc.org/demo/CITATIONS
-
-Annfi@DNB:
-https://wiki.dnb.de/display/FNMVE/Erfahrungen+und+Perspektiven+mit+dem+Toolkit+Annif
-
-Statistics-stuff:
-https://bolt.mph.ufl.edu/6050-6052/unit-1/one-quantitative-variable-introduction/describing-distributions/
-
-Chi-Square Test: 
-https://www.statology.org/chi-square-goodness-of-fit-test-python/
-
-Somewhere here we talk about indexing based on title and/or abstract and/or fulltext. Fulltext is not yet
- implemented. 
-
-Codeblocks are done like so:
-~~~~{.Python .numberLines caption="test"}
-def myfunction(var):
-  """ Oh how awesome this is. """
-  pass
-~~~~
--->
