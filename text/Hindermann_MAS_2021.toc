@@ -23,5 +23,6 @@
 \contentsline {subsection}{\numberline {6.3}General results}{24}{subsection.6.3}%
 \contentsline {subsection}{\numberline {6.4}Departmental results}{30}{subsection.6.4}%
 \contentsline {section}{\numberline {7}Conclusion and outlook}{33}{section.7}%
-\contentsline {section}{Bibliography}{34}{section*.3}%
-\contentsline {section}{\numberline {8}Appendix}{36}{section.8}%
+\contentsline {section}{\numberline {8}Bibliography}{34}{section.8}%
+\contentsline {section}{Bibliography}{34}{section.8}%
+\contentsline {section}{\numberline {9}Appendix}{36}{section.9}%
