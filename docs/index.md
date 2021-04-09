@@ -504,10 +504,6 @@ The output is saved as /metrics/metrics_{marker}.json.
 
 Available Annif-client project IDs are yso-en, yso-maui-en, yso-bonsai-en, yso-fasttext-en, wikidata-en.
 
-[https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html)
-[https://scikit-learn.org/stable/modules/generated/sklearn.metrics.recall_score.html](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.recall_score.html)
-[https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_score.html](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_score.html)
-
 
 * **Parameters**
 
